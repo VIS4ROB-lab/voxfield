@@ -1,0 +1,63 @@
+# Map 
+voxel_size: &voxel_size 0.05
+voxels_per_side_in_block: &voxels_per_side_in_block 8
+
+occ_voxel_size: *voxel_size
+occ_voxels_per_side: *voxels_per_side_in_block
+
+tsdf_voxel_size: *voxel_size
+tsdf_voxels_per_side: *voxels_per_side_in_block
+
+esdf_voxel_size: *voxel_size
+esdf_voxels_per_side: *voxels_per_side_in_block
+
+truncation_distance: -2.0
+
+# TSDF integration
+method: merged # select from simple, fast and merged
+normal_available: true
+use_const_weight: false
+use_weight_dropoff: true
+weight_reduction_exp: 2.0
+max_ray_length_m: 5.0
+curve_assumption: true
+reliable_band_ratio: 2.0
+reliable_normal_ratio_thre: 0.05
+
+# ESDF integration
+local_range_offset_x: 20
+local_range_offset_y: 20
+local_range_offset_z: 10
+esdf_default_distance_m: 2.0
+max_behind_surface_m: 0.2 # should be larger than truncation_distance
+num_buckets: 50
+patch_on: true
+early_break: false
+finer_esdf_on: true
+eval_esdf_on: false
+
+# State estimation
+enable_icp: false
+icp_iterations: 10
+use_tf_transforms: false
+world_frame: world
+
+# Timer
+update_mesh_every_n_sec: 1.0
+update_esdf_every_n_sec: 0.5
+publish_map_every_n_sec: 0.5
+eval_esdf_every_n_sec: 200.0
+min_time_between_msgs_sec: 0.0
+
+# Visualization
+color_mode: lambert_color # select from color, normals, height, lambert, lambert_color
+intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, inverse_grayscale, ironbow
+# publishing settings
+publish_traversable: false
+publish_pointclouds: false
+publish_slices: true
+slice_level: 1.0
+
+# Logging
+verbose: false
+timing: true

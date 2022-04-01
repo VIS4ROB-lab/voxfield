@@ -1,0 +1,24 @@
+<launch>
+  <param name="use_sim_time" value="true" />
+  <arg name="play_bag" default="true" />
+  <!-- Download the Cow & Lady dataset here: https://projects.asl.ethz.ch/datasets/doku.php?id=iros2017 -->
+  <arg name="bag_file" default="/media/yuepan/SeagateNew/1_data/thesis_dataset/cow_lady_dataset.bag"/>
+
+  <node name="player" pkg="rosbag" type="play" output="screen" args="-r 1.0 --clock $(arg bag_file)" if="$(arg play_bag)"/>
+
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/camera/depth_registered/points"/>
+    <remap from="transform" to="/kinect/vrpn_client/estimated_transform" />
+    <rosparam file="$(find voxblox_ros)/cfg/calib/cow_calib.yaml"/>  <!-- Sensor extrinsics and intrinsics -->
+    <rosparam file="$(find voxblox_ros)/cfg/param/cow_param.yaml"/>  <!-- Parameters -->
+  </node>
+
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/cow_5cm.rviz" />
+
+</launch>
+
+<!-- Use the service: rosservice call /voxblox_node/generate_mesh to save the mesh-->
+<!-- Use the service: rosservice call /voxblox_node/save_map xxx.vxblx to save the tsdf map-->
+<!-- Use the service: rosservice call /voxblox_node/save_esdf_map xxx.vxblx to save the esdf map-->
+<!-- Use the service: rosservice call /voxblox_node/save_occ_map xxx.vxblx to save the occ map-->
+<!-- Use the service: rosservice call /voxblox_node/save_all_map xxx to save tsdf, esdf, occ maps together-->
