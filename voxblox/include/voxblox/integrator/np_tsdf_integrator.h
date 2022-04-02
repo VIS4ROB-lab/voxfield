@@ -70,6 +70,8 @@ class NpTsdfIntegratorBase {
     /// Mode of the ThreadSafeIndex, determines the integration order of the
     /// rays. Options: "mixed", "sorted"
     std::string integration_order_mode = "mixed";
+    
+    bool merge_with_clear = true; // only for "merge" integration 
 
     /// merge integrator specific
     bool enable_anti_grazing = false;

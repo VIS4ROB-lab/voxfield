@@ -322,20 +322,24 @@ void MergedTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
       ThreadSafeIndexFactory::get(config_.integration_order_mode, points_C));
 
   // bundle rays in each voxel with point inside
+  timing::Timer bundle_timer("integrate_tsdf/merged/bundle");
   bundleRays(T_G_C, points_C, freespace_points, index_getter.get(), &voxel_map,
              &clear_map);
+  bundle_timer.Stop();    
 
+  timing::Timer nonclear_timer("integrate_tsdf/merged/nonclear");
   // integrate rays for non-clearing voxel (close to the surface)
-  integrateRays(T_G_C, points_C, colors, config_.enable_anti_grazing, false,
-                voxel_map, clear_map);
+  integrateRays(T_G_C, points_C, colors, config_.enable_anti_grazing, 
+                false, voxel_map, clear_map);
+  nonclear_timer.Stop();
 
-  timing::Timer clear_timer("integrate_tsdf/clear");
-
-  // integrate rays for clearing voxels (away from the surface)
-  integrateRays(T_G_C, points_C, colors, config_.enable_anti_grazing, true,
-                voxel_map, clear_map);
-
-  clear_timer.Stop();
+  if (config_.merge_with_clear) {
+    timing::Timer clear_timer("integrate_tsdf/merged/clear");
+    // integrate rays for clearing voxels (away from the surface)
+    integrateRays(T_G_C, points_C, colors, config_.enable_anti_grazing,
+                  true, voxel_map, clear_map);
+    clear_timer.Stop();
+  }
 
   integrate_timer.Stop();
 }

@@ -78,7 +78,7 @@ void EsdfVoxfieldIntegrator::updateFromTsdfBlocks(
         // truncated distance
 
         bool current_occupied;
-        if (config_.finer_esdf_on) {  // with the assist of gradient
+        if (config_.finer_esdf_on) {  // determine occupancy state with the assist of gradient
           current_occupied =
               isOccupied(tsdf_voxel.distance, tsdf_voxel.gradient);
         } else {
@@ -99,7 +99,8 @@ void EsdfVoxfieldIntegrator::updateFromTsdfBlocks(
                                   : config_.default_distance_m;
 
           // Newly found occupied --> insert_list
-          if (current_occupied) insert_list_.push_back(global_index);
+          if (current_occupied)
+            insert_list_.push_back(global_index);
         } else { // already initialized
           esdf_voxel.newly = false;
 

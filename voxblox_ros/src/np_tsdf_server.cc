@@ -237,6 +237,8 @@ void NpTsdfServer::getServerConfigFromRosParam(
 void NpTsdfServer::processPointCloudMessageAndInsert(
     const sensor_msgs::PointCloud2::Ptr& pointcloud_msg,
     const Transformation& T_G_C, const bool is_freespace_pointcloud) {
+  
+   timing::Timer ptcloud_timer("preprocess/input");
   // Convert the PCL pointcloud into our awesome format.
 
   // Horrible hack fix to fix color parsing colors in PCL.
@@ -259,10 +261,9 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   Pointcloud normals_C;
   Colors colors;
   Labels labels;
-  timing::Timer ptcloud_timer("preprocess/input");
-
+ 
   // Convert differently depending on RGB or I type.
-  if (has_label) { // py: added (test)
+  if (has_label) { 
     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr 
         pointcloud_pcl(new pcl::PointCloud<pcl::PointXYZRGBL>());
     // pointcloud_pcl is modified below:
@@ -297,9 +298,9 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   projectPointCloudToImage(points_C, colors, vertex_map, depth_image, color_image); 
   cv::Mat normal_image = computeNormalImage(vertex_map, depth_image); 
   // Back project to point cloud from range images
-  points_C = extractPointCloud(vertex_map);
-  normals_C = extractNormals(normal_image);
-  colors = extractColors(color_image);
+  points_C = extractPointCloud(vertex_map, depth_image);
+  normals_C = extractNormals(normal_image, depth_image);
+  colors = extractColors(color_image, depth_image);
   range_pre_timer.Stop();
 
   Transformation T_G_C_refined = T_G_C;
@@ -853,37 +854,46 @@ cv::Mat NpTsdfServer::computeNormalImage(const cv::Mat &vertex_map,
   return normal_image;
 }
 
-Pointcloud NpTsdfServer::extractPointCloud(const cv::Mat& vertex_map) const {
+Pointcloud NpTsdfServer::extractPointCloud(const cv::Mat& vertex_map, 
+                                           const cv::Mat &depth_image) const {
   Pointcloud points_C;
   for (int v = 0; v < vertex_map.rows; v++) {
     for (int u = 0; u < vertex_map.cols; u++) {
       cv::Vec3f vertex = vertex_map.at<cv::Vec3f>(v, u);
-      Point p_C(vertex[0], vertex[1], vertex[2]);
-      points_C.push_back(p_C);
+      if (depth_image.at<float>(v,u) > 0) {
+        Point p_C(vertex[0], vertex[1], vertex[2]);
+        points_C.push_back(p_C);
+      }
     }
   }
   return points_C;
 }
 
-Colors NpTsdfServer::extractColors(const cv::Mat& color_image) const {                                    
+Colors NpTsdfServer::extractColors(const cv::Mat& color_image,
+                                   const cv::Mat &depth_image) const {                                              
   Colors colors;
   for (int v = 0; v < color_image.rows; v++) {
     for (int u = 0; u < color_image.cols; u++) {
       cv::Vec3b color = color_image.at<cv::Vec3b>(v, u); // BGR
-      Color c_C(color[2], color[1], color[0]); // RGB
-      colors.push_back(c_C);
+      if (depth_image.at<float>(v,u) > 0) {
+        Color c_C(color[2], color[1], color[0]); // RGB
+        colors.push_back(c_C);
+      }
     }
   }
   return colors;
 }
 
-Pointcloud NpTsdfServer::extractNormals(const cv::Mat& normal_image) const {
+Pointcloud NpTsdfServer::extractNormals(const cv::Mat& normal_image,
+                                        const cv::Mat &depth_image) const {
   Pointcloud normals_C;                                              
   for (int v = 0; v < normal_image.rows; v++) {
     for (int u = 0; u < normal_image.cols; u++) {
       cv::Vec3f vertex = normal_image.at<cv::Vec3f>(v, u);
-      Point n_C(vertex[0], vertex[1], vertex[2]);
-      normals_C.push_back(n_C);
+      if (depth_image.at<float>(v,u) > 0) {
+        Ray n_C(vertex[0], vertex[1], vertex[2]);
+        normals_C.push_back(n_C);
+      }
     }
   }
   return normals_C;

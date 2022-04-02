@@ -132,9 +132,9 @@ class NpTsdfServer {
   cv::Mat computeNormalImage(const cv::Mat &vertex_map,
                              const cv::Mat &depth_image) const; 
   // from range image to point cloud
-  Pointcloud extractPointCloud(const cv::Mat& vertex_map) const;
-  Pointcloud extractNormals(const cv::Mat& normal_image) const; 
-  Colors extractColors(const cv::Mat& color_image) const; 
+  Pointcloud extractPointCloud(const cv::Mat& vertex_map, const cv::Mat &depth_image) const;
+  Pointcloud extractNormals(const cv::Mat& normal_image, const cv::Mat &depth_image) const; 
+  Colors extractColors(const cv::Mat& color_image, const cv::Mat &depth_image) const; 
 
  protected:
   /**

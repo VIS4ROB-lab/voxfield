@@ -2,8 +2,8 @@
 
 // marco settings, it's better to avoid them 
 #define USE_24_NEIGHBOR
-// #define DIRECTION_GUIDE 
-// No direction guide by default
+// #define DIRECTION_GUIDE  // No direction guide by default
+
 
 namespace voxblox {
 

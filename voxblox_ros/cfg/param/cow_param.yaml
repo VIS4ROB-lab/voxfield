@@ -14,12 +14,15 @@ esdf_voxels_per_side: *voxels_per_side_in_block
 truncation_distance: -2.0
 
 # TSDF integration
-method: merged # select from simple, fast and merged
+method: fast # select from simple, fast and merged
+merge_with_clear: false
+max_ray_length_m: 5.0
+min_ray_length_m: 0.1
+integration_threads: 6
 normal_available: true
 use_const_weight: false
 use_weight_dropoff: true
 weight_reduction_exp: 2.0
-max_ray_length_m: 5.0
 curve_assumption: true
 reliable_band_ratio: 2.0
 reliable_normal_ratio_thre: 0.05
@@ -44,8 +47,8 @@ world_frame: world
 
 # Timer
 update_mesh_every_n_sec: 1.0
-update_esdf_every_n_sec: 0.5
-publish_map_every_n_sec: 0.5
+update_esdf_every_n_sec: 1.0
+publish_map_every_n_sec: 1.0
 eval_esdf_every_n_sec: 200.0
 min_time_between_msgs_sec: 0.0
 

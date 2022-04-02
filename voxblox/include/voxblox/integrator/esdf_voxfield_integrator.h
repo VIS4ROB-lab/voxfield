@@ -60,12 +60,11 @@ class EsdfVoxfieldIntegrator {
     int num_buckets = 20;
 
     // Number of the neighbor voxels (select from 6, 18, 24 and 26)
-    // TODO: double-check if 24 is the best choice (according to FIESTA paper,
-    // it's the best)
-    int num_neighbor = 24;
+    int num_neighbor = 24; // same as FIESTA
 
-    // Turn on the patch code (Algorithm 3 in FIESTA) or not
+    // Turn on the patch code or not
     bool patch_on = true;
+    // Early break the increasing update or not    
     bool early_break = true;
     
     // Finer ESDF with the consideration of the inner voxel distance from the voxel center to the actual surface
@@ -75,9 +74,8 @@ class EsdfVoxfieldIntegrator {
     // use a fixed band for esdf to directly copy the tsdf value
     bool fixed_band_esdf_on = false;
 
-    float gradient_sign =
-        1.0f;  // sign (direction) of the gradient, towards or opposite to the
-               // surface, select from 1.0 or -1.0
+     // sign (direction) of the gradient, towards or opposite to the surface, select from 1.0 or -1.0
+    float gradient_sign = 1.0f;          
 
     bool allocate_tsdf_in_range = false;
 
@@ -165,7 +163,7 @@ class EsdfVoxfieldIntegrator {
   Layer<TsdfVoxel>* tsdf_layer_;
   Layer<EsdfVoxel>* esdf_layer_;
 
-  // Data structure used for FIESTA
+  // Data structure used for Voxfield
   GlobalIndexList insert_list_;
   GlobalIndexList delete_list_;
   BucketQueue<GlobalIndex> update_queue_;

@@ -1,5 +1,5 @@
 #include "voxblox/integrator/esdf_occ_edt_integrator.h"
-#define DIRECTION_GUIDE 
+// #define DIRECTION_GUIDE  // No direction guide by default
 
 namespace voxblox {
 

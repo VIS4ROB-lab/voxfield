@@ -91,6 +91,7 @@ inline TsdfIntegratorBase::Config getTsdfIntegratorConfigFromRosParam(
   nh_private.param("min_ray_length_m", integrator_config.min_ray_length_m,
                    integrator_config.min_ray_length_m);
   nh_private.param("max_weight", max_weight, max_weight);
+  integrator_config.max_weight = static_cast<float>(max_weight);
   nh_private.param("use_const_weight", integrator_config.use_const_weight,
                    integrator_config.use_const_weight);
   nh_private.param("use_weight_dropoff", integrator_config.use_weight_dropoff,
@@ -120,10 +121,14 @@ inline TsdfIntegratorBase::Config getTsdfIntegratorConfigFromRosParam(
   nh_private.param("integration_order_mode",
                    integrator_config.integration_order_mode,
                    integrator_config.integration_order_mode);
-
-  // integrator_config.default_truncation_distance =
-  //     static_cast<float>(truncation_distance);
-  integrator_config.max_weight = static_cast<float>(max_weight);
+  float integrator_threads = std::thread::hardware_concurrency();
+  nh_private.param("integrator_threads",
+                   integrator_threads,
+                   integrator_threads);  
+  integrator_config.integrator_threads = static_cast<int>(integrator_threads);
+  nh_private.param("merge_with_clear",
+                   integrator_config.merge_with_clear,
+                   integrator_config.merge_with_clear); 
 
   return integrator_config;
 }
@@ -190,7 +195,14 @@ inline NpTsdfIntegratorBase::Config getNpTsdfIntegratorConfigFromRosParam(
   nh_private.param("integration_order_mode",
                    integrator_config.integration_order_mode,
                    integrator_config.integration_order_mode);
-
+  float integrator_threads = std::thread::hardware_concurrency();
+  nh_private.param("integrator_threads",
+                   integrator_threads,
+                   integrator_threads);  
+  integrator_config.integrator_threads = static_cast<int>(integrator_threads);         
+  nh_private.param("merge_with_clear",
+                   integrator_config.merge_with_clear,
+                   integrator_config.merge_with_clear);     
   nh_private.param("normal_available",
                    integrator_config.normal_available,
                    integrator_config.normal_available);                                  
