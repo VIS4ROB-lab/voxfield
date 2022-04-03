@@ -58,14 +58,14 @@ class VoxbloxEvaluator {
   // Whether to recolor the voxels by error to the GT before generating a mesh.
   bool recolor_by_error_;
   // Whether to also evaluate the Esdf mapping accuracy
-  bool eval_esdf_;
+  bool eval_esdf_ = false;
   // Whether to use the occupied grid centers as the reference for evaluating
   // esdf.
   bool use_occ_ref_esdf_;
   // How to color the mesh.
   ColorMode color_mode_;
   // If visualizing, what TF frame to visualize in.
-  std::string frame_id_;
+  std::string frame_id_ = "world";
   // esdf & tsdf slice level (unit: m)
   float slice_level_;
   // error limit for visualization (unit: m)
@@ -122,7 +122,8 @@ VoxbloxEvaluator::VoxbloxEvaluator(const ros::NodeHandle& nh,
   nh_private_.param("use_occ_ref", use_occ_ref_esdf_, use_occ_ref_esdf_);
   nh_private_.param("slice_level", slice_level_, slice_level_);
   nh_private_.param("error_limit_m", error_limit_m_, error_limit_m_);
-  nh_private_.param("eval_only_positive", eval_only_positive_, eval_only_positive_);
+  nh_private_.param("eval_only_positive", eval_only_positive_, 
+                                          eval_only_positive_);
 
   // Load transformations.
   XmlRpc::XmlRpcValue T_V_G_xml;

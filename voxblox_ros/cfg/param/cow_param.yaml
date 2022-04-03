@@ -35,7 +35,7 @@ esdf_default_distance_m: 2.0
 max_behind_surface_m: 0.2 # should be larger than truncation_distance
 num_buckets: 50
 patch_on: true
-early_break: false
+early_break: true
 finer_esdf_on: true
 eval_esdf_on: false
 
@@ -47,7 +47,7 @@ world_frame: world
 
 # Timer
 update_mesh_every_n_sec: 1.0
-update_esdf_every_n_sec: 1.0
+update_esdf_every_n_sec: 0.2
 publish_map_every_n_sec: 1.0
 eval_esdf_every_n_sec: 200.0
 min_time_between_msgs_sec: 0.0

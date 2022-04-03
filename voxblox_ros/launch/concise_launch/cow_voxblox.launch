@@ -1,10 +1,11 @@
 <launch>
   <param name="use_sim_time" value="true" />
   <arg name="play_bag" default="true" />
+  <arg name="speed" default="0.25" />
   <!-- Download the Cow & Lady dataset here: https://projects.asl.ethz.ch/datasets/doku.php?id=iros2017 -->
   <arg name="bag_file" default="/media/yuepan/SeagateNew/1_data/thesis_dataset/cow_lady_dataset.bag"/>
 
-  <node name="player" pkg="rosbag" type="play" output="screen" args="-r 1.0 --clock $(arg bag_file)" if="$(arg play_bag)"/>
+  <node name="player" pkg="rosbag" type="play" output="screen" args="-r $(arg speed) --clock $(arg bag_file)" if="$(arg play_bag)"/>
 
   <node name="voxblox_node" pkg="voxblox_ros" type="voxblox_server" output="screen" args="-alsologtostderr" clear_params="true">
     <remap from="pointcloud" to="/camera/depth_registered/points"/>

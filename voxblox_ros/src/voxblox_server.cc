@@ -3,7 +3,7 @@
 #include "voxblox_ros/conversions.h"
 #include "voxblox_ros/ros_params.h"
 
-#include <pcl/kdtree/kdtree_flann.h> //py: added
+#include <pcl/kdtree/kdtree_flann.h>  // py: added
 
 namespace voxblox {
 
@@ -30,9 +30,7 @@ VoxbloxServer::VoxbloxServer(const ros::NodeHandle& nh,
       traversability_radius_(1.0),
       incremental_update_(true),
       num_subscribers_esdf_map_(0) {
-  
-  // py: add
-  // Set up Occupancy map and integrator
+  // ADD(py): Set up Occupancy map and integrator
   OccupancyMap::Config occ_config;
   occ_config.occupancy_voxel_size = esdf_config.esdf_voxel_size;
   occ_config.occupancy_voxels_per_side = esdf_config.esdf_voxels_per_side;
@@ -41,8 +39,6 @@ VoxbloxServer::VoxbloxServer(const ros::NodeHandle& nh,
   occupancy_integrator_.reset(new OccTsdfIntegrator(
       occ_tsdf_integrator_config, tsdf_map_->getTsdfLayerPtr(),
       occupancy_map_->getOccupancyLayerPtr()));
-  
-  
   // Set up map and integrator.
   esdf_map_.reset(new EsdfMap(esdf_config));
   esdf_integrator_.reset(new EsdfIntegrator(esdf_integrator_config,
@@ -61,7 +57,7 @@ void VoxbloxServer::setupRos() {
       "esdf_slice", 1, true);
   traversable_pub_ = nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
       "traversable", 1, true);
-  //py: added
+  // ADD(py):
   esdf_error_slice_pub_ =
       nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "esdf_error_slice", 1, true);
@@ -98,16 +94,14 @@ void VoxbloxServer::setupRos() {
         nh_private_.createTimer(ros::Duration(update_esdf_every_n_sec),
                                 &VoxbloxServer::updateEsdfEvent, this);
   }
-
-  // py: added
+  // ADD(py):
   bool eval_esdf_on = false;
   nh_private_.param("eval_esdf_on", eval_esdf_on, eval_esdf_on);
 
   double eval_esdf_every_n_sec = 100.0;  // default
   nh_private_.param("eval_esdf_every_n_sec", eval_esdf_every_n_sec,
                     eval_esdf_every_n_sec);
-
-  esdf_ready_ = false; 
+  esdf_ready_ = false;
 
   // Evaluate ESDF accuracy per xx second
   if (eval_esdf_every_n_sec > 0.0 && eval_esdf_on) {
@@ -160,9 +154,9 @@ void VoxbloxServer::updateEsdfEvent(const ros::TimerEvent& /*event*/) {
   if (publish_slices_) publishSlices();
 }
 
-bool VoxbloxServer::saveEsdfMapCallback(voxblox_msgs::FilePath::Request& request,
-                                     voxblox_msgs::FilePath::Response&
-                                     /*response*/) {  // NOLINT
+bool VoxbloxServer::saveEsdfMapCallback(
+    voxblox_msgs::FilePath::Request &request, voxblox_msgs::FilePath::Response &
+    /*response*/) { // NOLINT
   return saveMap(request.file_path);
 }
 
@@ -239,7 +233,7 @@ void VoxbloxServer::updateEsdf() {
   if (tsdf_map_->getTsdfLayer().getNumberOfAllocatedBlocks() > 0) {
     const bool clear_updated_flag_esdf = true;
     esdf_integrator_->updateFromTsdfLayer(clear_updated_flag_esdf);
-    esdf_ready_ = true; // py: added
+    esdf_ready_ = true;
   }
 }
 
@@ -305,7 +299,7 @@ void VoxbloxServer::clear() {
   publishMap(kResetRemoteMap);
 }
 
-// py: added
+// ADD(py):
 // incrementally update occupancy map from the updated TSDF map
 void VoxbloxServer::updateOccFromTsdf() {
   if (tsdf_map_->getTsdfLayer().getNumberOfAllocatedBlocks() > 0) {
@@ -318,18 +312,17 @@ void VoxbloxServer::updateOccFromTsdf() {
   }
 }
 
-// py: added
+// ADD(py):
 void VoxbloxServer::evalEsdfEvent(const ros::TimerEvent& /*event*/) {
   if (esdf_ready_) {
-    updateOccFromTsdf(); 
+    updateOccFromTsdf();
     evalEsdfRefOcc();
-
-    float voxel_size = occupancy_map_->getOccupancyLayer().voxel_size();
+    // float voxel_size = occupancy_map_->getOccupancyLayer().voxel_size();
     visualizeEsdfError();
   }
 }
 
-// py: added
+// ADD(py):
 // Evaluate the accuracy of ESDF mapping, referenced to current occupancy map
 // add it later to a seperate class
 void VoxbloxServer::evalEsdfRefOcc() {
@@ -405,7 +398,8 @@ void VoxbloxServer::evalEsdfRefOcc() {
       float cur_gt_dist = std::sqrt(pointNKNSquaredDistance[0]);
       float cur_est_dist = std::abs(esdf_voxel.distance);
       float cur_error_dist = cur_est_dist - cur_gt_dist;
-      cur_error_dist = std::min(error_trunc_limit, std::max(-error_trunc_limit, cur_error_dist)); // truncated error
+      cur_error_dist = std::min(error_trunc_limit, 
+                       std::max(-error_trunc_limit, cur_error_dist)); 
       mse += (cur_error_dist * cur_error_dist);
       mae += std::abs(cur_error_dist);
 
@@ -432,7 +426,7 @@ void VoxbloxServer::evalEsdfRefOcc() {
   occ_ptcloud.reset(new pcl::PointCloud<pcl::PointXYZ>());
 }
 
-// py: added
+// ADD(py):
 void VoxbloxServer::visualizeEsdfError() {
   pcl::PointCloud<pcl::PointXYZRGB> pointcloud;
 
@@ -446,5 +440,3 @@ void VoxbloxServer::visualizeEsdfError() {
 }
 
 }  // namespace voxblox
-
-//TODO: add the evaluation code //better to write evaluation code into another class

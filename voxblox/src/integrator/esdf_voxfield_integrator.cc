@@ -272,24 +272,6 @@ void EsdfVoxfieldIntegrator::insertIntoList(EsdfVoxel* occ_vox,
 // also update ESDF from TSDF instead of occupancy grids so that the distance
 // from the occupied voxel's center to the object surface is also take into
 // account
-
-// Main processing function of FIESTA
-// Reference: Han. L, et al., Fast Incremental Euclidean Distance Fields for
-// Online Motion Planning of Aerial Robots, IROS 2019 A mapping system called
-// Fiesta is proposed to build global ESDF map incrementally. By introducing two
-// independent updating queues for inserting and deleting obstacles separately,
-// and using Indexing Data Structures and Doubly Linked Lists for map
-// maintenance, our algorithm updates as few as possible nodes using a BFS
-// framework. The ESDF mapping has high computational performance and produces
-// near-optimal results. Code: https://github.com/HKUST-Aerial-Robotics/FIESTA
-//
-// About the patch_on and early_break settings:
-// The common option is to set them to be both true (slower but more accurate)
-// or both false (faster but less accurate).
-// Fastest operation can be achieved by setting patch_on=false and early_break
-// =true. Highest accuracy can be achieved with patch_on=true and early_break=
-// false. Please set them in the config file wisely.
-
 void EsdfVoxfieldIntegrator::updateESDF() {
   timing::Timer init_timer("update_esdf/voxfield/update_init");
 
@@ -326,7 +308,8 @@ void EsdfVoxfieldIntegrator::updateESDF() {
 
     GlobalIndex next_vox_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
 
-    // for each voxel in current voxel's doubly linked list (regard current voxel as the closest occupied voxel) )
+    // for each voxel in current voxel's doubly linked list
+    // (regard current voxel as the closest occupied voxel)
     for (GlobalIndex temp_vox_idx = cur_vox_idx; temp_vox_idx(0) != UNDEF;
          temp_vox_idx = next_vox_idx) {
       EsdfVoxel* temp_vox = esdf_layer_->getVoxelPtrByGlobalIndex(temp_vox_idx);
@@ -413,7 +396,7 @@ void EsdfVoxfieldIntegrator::updateESDF() {
     // if out, apply this finer esdf
     // add the sub-voxel part of the esdf
     if (config_.finer_esdf_on) {
-      if (!cur_vox->fixed) {  // out of the fixed band // TODO!!!
+      if (!cur_vox->fixed) { // out of the fixed band
         TsdfVoxel* coc_tsdf_vox =
             tsdf_layer_->getVoxelPtrByGlobalIndex(cur_vox->coc_idx);
         CHECK_NOTNULL(coc_tsdf_vox);
@@ -456,9 +439,7 @@ void EsdfVoxfieldIntegrator::updateESDF() {
     Neighborhood<>::getFromGlobalIndex(cur_vox->self_idx, &nbr_voxs_idx);
 #endif
 
-// TODO(py): when direction guide is used, you should take special care of those with UNDEF closest occupied voxel
-
-    // Algorithm 3 Patch Code
+    // Patch Code (optional)
     if (config_.patch_on &&
         cur_vox->newly) {  // only newly added voxels are required for checking
                            // if (config_.patch_on) {
@@ -496,9 +477,7 @@ void EsdfVoxfieldIntegrator::updateESDF() {
       }
       // patch_timer.Stop();
     }
-    // End of Algorithm 3
 
-    
     // Update
 #ifdef DIRECTION_GUIDE
     std::vector<int> used_nbr_idx;
@@ -540,8 +519,6 @@ void EsdfVoxfieldIntegrator::updateESDF() {
     }
   }
   update_timer.Stop();
-  // LOG(INFO)<<"Alg 1 done";
-  // End of Algorithm 1
   if (config_.verbose) {
     LOG(INFO) << "Voxfield: expanding [" << updated_count << "] nodes, with ["
               << patch_count << "] changes by the patch, up-to-now ["
@@ -552,7 +529,7 @@ void EsdfVoxfieldIntegrator::updateESDF() {
 inline float EsdfVoxfieldIntegrator::dist(GlobalIndex vox_idx_a,
                                           GlobalIndex vox_idx_b) {
   return (vox_idx_b - vox_idx_a).cast<float>().norm() * esdf_voxel_size_;
-  // TODO(yuepan): may use square root & * resolution_ at last
+  // TODO(py): may use square root & * resolution_ at last
   // together to speed up
 }
 

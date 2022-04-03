@@ -62,7 +62,11 @@ class EsdfVoxfieldIntegrator {
     // Number of the neighbor voxels (select from 6, 18, 24 and 26)
     int num_neighbor = 24; // same as FIESTA
 
-    // Turn on the patch code or not
+    // About the patch_on and early_break settings:
+    // Fastest operation can be achieved by setting patch_on=false and
+    // early_break =true. Highest accuracy can be achieved with patch_on=true
+    // and early_break= false. Please set them in the config file wisely. Turn
+    // on the patch code or not
     bool patch_on = true;
     // Early break the increasing update or not    
     bool early_break = true;

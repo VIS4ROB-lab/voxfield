@@ -202,7 +202,7 @@ void FiestaServer::evalEsdfEvent(const ros::TimerEvent& /*event*/) {
   if (esdf_ready_) {
     evalEsdfRefOcc();
 
-    float voxel_size = occupancy_map_->getOccupancyLayer().voxel_size();
+    // float voxel_size = occupancy_map_->getOccupancyLayer().voxel_size();
     visualizeEsdfError();
   }
 }

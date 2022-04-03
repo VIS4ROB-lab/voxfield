@@ -17,7 +17,7 @@ NpTsdfServer::NpTsdfServer(const ros::NodeHandle& nh,
 NpTsdfServer::NpTsdfServer(const ros::NodeHandle& nh,
                            const ros::NodeHandle& nh_private,
                            const TsdfMap::Config& config,
-                           const NpTsdfIntegratorBase::Config& integrator_config,
+                           const NpTsdfIntegratorBase::Config& integrator_config, // NOLINT
                            const MeshIntegratorConfig& mesh_config)
     : nh_(nh),
       nh_private_(nh_private),
@@ -104,13 +104,13 @@ NpTsdfServer::NpTsdfServer(const ros::NodeHandle& nh,
     tsdf_integrator_.reset(new SimpleNpTsdfIntegrator(
         integrator_config, tsdf_map_->getTsdfLayerPtr()));
   }
-  
   // Sensor specific
   nh_private_.param("sensor_is_lidar", sensor_is_lidar_, sensor_is_lidar_);
 
   nh_private_.param("width", width_, width_);
   nh_private_.param("height", height_, height_);
-  nh_private_.param("smooth_thre_ratio", smooth_thre_ratio_, smooth_thre_ratio_);
+  nh_private_.param("smooth_thre_ratio", smooth_thre_ratio_, 
+                                         smooth_thre_ratio_);
   
   if (sensor_is_lidar_)
   {
@@ -251,7 +251,7 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
       color_pointcloud = true;
     } else if (pointcloud_msg->fields[d].name == std::string("intensity")) {
       has_intensity = true;
-    } else if (pointcloud_msg->fields[d].name == std::string("label")) { // py: added
+    } else if (pointcloud_msg->fields[d].name == std::string("label")) {
       has_label = true;
       // ROS_INFO("Found semantic/instance label in the point cloud");
     }
@@ -263,12 +263,12 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   Labels labels;
  
   // Convert differently depending on RGB or I type.
-  if (has_label) { 
-    pcl::PointCloud<pcl::PointXYZRGBL>::Ptr 
+  if (has_label) {
+    pcl::PointCloud<pcl::PointXYZRGBL>::Ptr
         pointcloud_pcl(new pcl::PointCloud<pcl::PointXYZRGBL>());
     // pointcloud_pcl is modified below:
     pcl::fromROSMsg(*pointcloud_msg, *pointcloud_pcl);
-    convertPointcloud(*pointcloud_pcl, color_map_, &points_C, &colors, &labels, 
+    convertPointcloud(*pointcloud_pcl, color_map_, &points_C, &colors, &labels,
                       true);
     pointcloud_pcl.reset(new pcl::PointCloud<pcl::PointXYZRGBL>());
   } else if (color_pointcloud) {
@@ -292,11 +292,11 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   // calculate point-wise normal
   timing::Timer range_pre_timer("preprocess/normal_estimation");
   // Preprocess the point cloud: convert to range images
-  cv::Mat vertex_map = cv::Mat::zeros(height_, width_, CV_32FC3);                           
-  cv::Mat depth_image(vertex_map.size(), CV_32FC1, -1.0); 
-  cv::Mat color_image = cv::Mat::zeros(vertex_map.size(), CV_8UC3);                                    
-  projectPointCloudToImage(points_C, colors, vertex_map, depth_image, color_image); 
-  cv::Mat normal_image = computeNormalImage(vertex_map, depth_image); 
+  cv::Mat vertex_map = cv::Mat::zeros(height_, width_, CV_32FC3);                       
+  cv::Mat depth_image(vertex_map.size(), CV_32FC1, -1.0);
+  cv::Mat color_image = cv::Mat::zeros(vertex_map.size(), CV_8UC3);
+  projectPointCloudToImage(points_C, colors, vertex_map, depth_image, color_image);
+  cv::Mat normal_image = computeNormalImage(vertex_map, depth_image);
   // Back project to point cloud from range images
   points_C = extractPointCloud(vertex_map, depth_image);
   normals_C = extractNormals(normal_image, depth_image);
@@ -384,10 +384,8 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
     return false;
   }
   *pointcloud_msg = queue->front();
-  // LOG(INFO) << "from frame " << (*pointcloud_msg)->header.frame_id; //py: just for check
-  //std::string sensor_frame_ = "vehicle";
   
-  if (transformer_.lookupTransform(sensor_frame_ /*(*pointcloud_msg)->header.frame_id*/, //velodyne in kitti
+  if (transformer_.lookupTransform(sensor_frame_ /*(*pointcloud_msg)->header.frame_id*/, 
                                    world_frame_, 
                                    (*pointcloud_msg)->header.stamp, T_G_C)) {
     queue->pop();
@@ -720,8 +718,7 @@ bool NpTsdfServer::projectPointCloudToImage(const Pointcloud& points_C,
                                             cv::Mat &color_image)  
                                             const {
     // TODO(py): consider to calculate in parallel to speed up
-    for (int i=0; i<points_C.size(); i++)
-    {
+    for (size_t i = 0; i < points_C.size(); i++) {
       int u, v;
       float depth;
       if (sensor_is_lidar_)
