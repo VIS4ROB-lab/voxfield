@@ -326,6 +326,8 @@ class NpTsdfServer {
   float fov_down_;
   float fov_down_rad_;
   float fov_rad_;
+
+  size_t frame_count_ = 0;
 };
 
 }  // namespace voxblox

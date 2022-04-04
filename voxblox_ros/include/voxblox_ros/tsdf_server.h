@@ -283,6 +283,8 @@ class TsdfServer {
 
   /// Current transform corrections from ICP.
   Transformation icp_corrected_transform_;
+
+  size_t frame_count_ = 0;
 };
 
 }  // namespace voxblox

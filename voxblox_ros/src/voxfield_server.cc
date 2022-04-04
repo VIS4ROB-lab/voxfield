@@ -100,7 +100,7 @@ void VoxfieldServer::setupRos() {
         &VoxfieldServer::updateEsdfEvent, this);
   }
 
-  // py: added
+  // ADD(py):
   bool eval_esdf_on = false;
   nh_private_.param("eval_esdf_on", eval_esdf_on, eval_esdf_on);
 

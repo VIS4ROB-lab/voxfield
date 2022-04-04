@@ -305,6 +305,7 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   colors = extractColors(color_image, depth_image);
   range_pre_timer.Stop();
 
+  // ICP based pose refinement
   Transformation T_G_C_refined = T_G_C;
   if (enable_icp_) {
     timing::Timer icp_timer("icp");
@@ -359,6 +360,7 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   }
 
   ros::WallTime start = ros::WallTime::now();
+  // non-projective TSDF integration
   integratePointcloud(
       T_G_C_refined, points_C, normals_C, colors, is_freespace_pointcloud);
   ros::WallTime end = ros::WallTime::now();
@@ -368,7 +370,6 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
         (end - start).toSec(),
         tsdf_map_->getTsdfLayer().getNumberOfAllocatedBlocks());
   }
-
   // timing::Timer block_remove_timer("remove_distant_blocks");
   tsdf_map_->getTsdfLayerPtr()->removeDistantBlocks(
       T_G_C.getPosition(), max_block_distance_from_body_);
@@ -439,10 +440,13 @@ void NpTsdfServer::insertPointcloud(
   }
 
   if (timing_)
-    ROS_INFO_STREAM("Timings: " << std::endl << timing::Timing::Print());
+    ROS_INFO_STREAM(
+        "Frame [" << frame_count_ << "] timings: " << std::endl
+                  << timing::Timing::Print());
   if (verbose_)
     ROS_INFO_STREAM(
         "Layer memory: " << tsdf_map_->getTsdfLayer().getMemorySize());
+  frame_count_++;
 }
 
 void NpTsdfServer::insertFreespacePointcloud(

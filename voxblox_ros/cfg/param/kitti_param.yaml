@@ -1,5 +1,5 @@
 # Map 
-voxel_size: &voxel_size 0.08
+voxel_size: &voxel_size 0.25
 voxels_per_side_in_block: &voxels_per_side_in_block 8
 
 occ_voxel_size: *voxel_size
@@ -11,24 +11,33 @@ tsdf_voxels_per_side: *voxels_per_side_in_block
 esdf_voxel_size: *voxel_size
 esdf_voxels_per_side: *voxels_per_side_in_block
 
+truncation_distance: -3.0
+
 # TSDF integration
-# select from simple, fast and merged
-method: fast 
-use_const_weight: false
-truncation_voxel_size_ratio: 4
+method: merged # select from simple, fast and merged
+merge_with_clear: false
 max_ray_length_m: 50.0
+min_ray_length_m: 1.5
+integration_threads: 6
+normal_available: true
+use_const_weight: false
+use_weight_dropoff: true
+weight_reduction_exp: 1.0
+curve_assumption: true
+reliable_band_ratio: 2.0
+reliable_normal_ratio_thre: 0.05
 
 # ESDF integration
-local_range_offset_x: 10
-local_range_offset_y: 10
-local_range_offset_z: 2
-esdf_default_distance_m: 10.0
-# max_behind_surface_m should be larger than truncation_distance
-max_behind_surface_m: 3.0
-num_buckets: 20
+local_range_offset_x: 20
+local_range_offset_y: 20
+local_range_offset_z: 5
+esdf_default_distance_m: 4.0
+max_behind_surface_m: 1.0 # should be larger than truncation_distance
+num_buckets: 50
 patch_on: true
 early_break: true
-eval_esdf_on: true
+finer_esdf_on: true
+eval_esdf_on: false
 
 # Occupancy grid integration
 occ_voxel_size_ratio: 0.865
@@ -42,25 +51,23 @@ threshold_occupancy: 0.7
 # State estimation 
 enable_icp: false
 icp_iterations: 10
-# for semantic kitti
 use_tf_transforms: true
 world_frame: world
 sensor_frame: velodyne
 
 # Timer
-update_mesh_every_n_sec: 0.5 # 1.0
-update_esdf_every_n_sec: 9999.0
-publish_map_every_n_sec: 0.2
-eval_esdf_every_n_sec: 9999.0 # 200.0
+update_mesh_every_n_sec: 0.5
+update_esdf_every_n_sec: 0.5
+publish_map_every_n_sec: 0.5
+eval_esdf_every_n_sec: 0.0
 min_time_between_msgs_sec: 0.1
 
 # Visualization
-# select from color, normals, height, lambert, lambert_color
-color_mode: lambert_color
-# select from rainbow, inverse_rainbow, grayscale, inverse_grayscale, ironbow
-intensity_colormap: rainbow
+color_mode: lambert_color # select from color, normals, height, lambert, lambert_color
+intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, inverse_grayscale, ironbow
 # publishing settings
 publish_traversable: false
+publish_pointclouds: false
 publish_slices: true
 slice_level: 0.0
 

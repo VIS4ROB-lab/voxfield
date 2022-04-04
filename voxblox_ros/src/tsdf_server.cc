@@ -406,11 +406,15 @@ void TsdfServer::insertPointcloud(
   }
 
   if (timing_)
-    ROS_INFO_STREAM("Timings: " << std::endl << timing::Timing::Print());
+    ROS_INFO_STREAM(
+        "Frame [" << frame_count_ << "] timings: " << std::endl
+                  << timing::Timing::Print());
 
   if (verbose_)
     ROS_INFO_STREAM(
         "Layer memory: " << tsdf_map_->getTsdfLayer().getMemorySize());
+
+  frame_count_++;
 }
 
 void TsdfServer::insertFreespacePointcloud(

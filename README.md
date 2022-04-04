@@ -15,6 +15,12 @@ To install Voxfield, follow these [instructions]().
 - To run the ESDF mapping of FIESTA, use the executables: ```fiesta_server```.
 - To run the ESDF mapping of EDT, use the executables: ```voxedt_server```.
 
+## Example Usage
+### Run on the Cow & Lady dataset
+
+
+### Run on the KITTI dataset
+
 ## TODO
 
 ## Acknowledgments
