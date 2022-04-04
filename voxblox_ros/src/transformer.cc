@@ -64,8 +64,8 @@ Transformer::Transformer(const ros::NodeHandle& nh,
       }
     }
   }
-  //Or we will use tf_transform, we do not need the calibration parameters
-  //lookupTransformTf
+  // Or we will use tf_transform, we do not need the calibration parameters
+  // lookupTransformTf
 }
 
 void Transformer::transformCallback(

@@ -122,7 +122,7 @@ VoxbloxEvaluator::VoxbloxEvaluator(const ros::NodeHandle& nh,
   nh_private_.param("use_occ_ref", use_occ_ref_esdf_, use_occ_ref_esdf_);
   nh_private_.param("slice_level", slice_level_, slice_level_);
   nh_private_.param("error_limit_m", error_limit_m_, error_limit_m_);
-  nh_private_.param("eval_only_positive", eval_only_positive_, 
+  nh_private_.param("eval_only_positive", eval_only_positive_,
                                           eval_only_positive_);
 
   // Load transformations.

@@ -1,5 +1,5 @@
-#ifndef VOXBLOX_ROS_VOXFIELD_SERVER_H_
-#define VOXBLOX_ROS_VOXFIELD_SERVER_H_
+#ifndef VOXBLOX_ROS_FIESTA_SERVER_H_
+#define VOXBLOX_ROS_FIESTA_SERVER_H_
 
 #include <memory>
 #include <string>
@@ -149,4 +149,4 @@ class FiestaServer : public TsdfServer {
 
 }  // namespace voxblox
 
-#endif  // VOXBLOX_ROS_VOXFIELD_SERVER_H_
+#endif  // VOXBLOX_ROS_FIESTA_SERVER_H_

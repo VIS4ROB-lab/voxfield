@@ -231,7 +231,8 @@ inline bool visualizeGradientIntensityTsdfVoxels(const TsdfVoxel& voxel,
   CHECK_NOTNULL(intensity);
   constexpr float kMinWeight = 1e-6;
   if (voxel.weight > kMinWeight && voxel.gradient.norm() > kMinWeight) {
-    *intensity = std::atan2(voxel.gradient(0), voxel.gradient(1)); // [-pi, pi] on x-y plane
+    // [-pi, pi] on x-y plane
+    *intensity = std::atan2(voxel.gradient(0), voxel.gradient(1));
     return true;
   }
   return false;
@@ -247,7 +248,8 @@ inline bool visualizeGradientIntensityTsdfVoxelsSlice(
       (voxel_size / 2.0 + kFloatEpsilon)) {
     if (voxel.weight > kMinWeight && voxel.gradient.norm() > kMinWeight) {
       // atan2: Principal arc tangent of y/x, in the interval [-pi,+pi] radians.
-      *intensity = std::atan2(voxel.gradient(0), voxel.gradient(1)); // [-pi, pi] on x-y plane
+      // [-pi, pi] on x-y plane
+      *intensity = std::atan2(voxel.gradient(0), voxel.gradient(1));
       return true;
     }
   }
@@ -318,7 +320,8 @@ inline bool visualizeErrorIntensityEsdfVoxelsSlice(
   if (std::abs(coord(free_plane_index) - free_plane_val) <=
       (voxel_size / 2.0 + kFloatEpsilon)) {
     if (voxel.observed) {
-      *intensity = std::abs(voxel.error); // NOTE(py): better to use the absolute value of the error here
+      // NOTE(py): better to use the absolute value of the error here
+      *intensity = std::abs(voxel.error);
       return true;
     }
   }
@@ -338,8 +341,8 @@ inline bool visualizeErrorColorEsdfVoxelsSlice(
       (voxel_size / 2.0 + kFloatEpsilon)) {
     if (voxel.observed) {
       float frac =  std::min(1.0f, std::abs(voxel.error) / max_error_m);
-      int r = int(frac * 255.f);
-      int g = int((1.f - frac) * 255.f);
+      int r = satic_cast<int>(frac * 255.f);
+      int g = satic_cast<int>((1.f - frac) * 255.f);
       color->r = r;
       color->g = g;
       color->b = 0;
@@ -348,23 +351,6 @@ inline bool visualizeErrorColorEsdfVoxelsSlice(
   }
   return false;
 }
-
-// added for ESDF visualization from voxel unit distance square (deprecated)
-// inline bool visualizeDistSquareIntensityEsdfVoxelsSlice(
-//     const EsdfVoxel& voxel, const Point& coord, unsigned int free_plane_index,
-//     FloatingPoint free_plane_val, FloatingPoint voxel_size, double* intensity) {
-//   CHECK_NOTNULL(intensity);
-
-//   if (std::abs(coord(free_plane_index) - free_plane_val) <=
-//       (voxel_size / 2.0 + kFloatEpsilon)) {
-//     if (voxel.observed) {
-//       float voxel_dist = std::sqrt(1.0 * voxel.dist_square) * voxel_size;
-//       *intensity = voxel.behind ? -voxel_dist : voxel_dist;
-//       return true;
-//     }
-//   }
-//   return false;
-// }
 
 inline bool visualizeOccupiedTsdfVoxels(const TsdfVoxel& voxel,
                                         const Point& /*coord*/,
@@ -546,26 +532,6 @@ inline void createDistancePointcloudFromEsdfLayerSlice(
       pointcloud);
 }
 
-// added for ESDF visualization from voxel unit distance square (deprecated)
-// inline void createDistanceSquarePointcloudFromEsdfLayerSlice(
-//     const Layer<EsdfVoxel>& layer, unsigned int free_plane_index,
-//     FloatingPoint free_plane_val, pcl::PointCloud<pcl::PointXYZI>* pointcloud) {
-//   CHECK_NOTNULL(pointcloud);
-//   // Make sure that the free_plane_val doesn't fall evenly between 2 slices.
-//   // Prefer to push it up.
-//   // Using std::remainder rather than std::fmod as the latter has huge crippling
-//   // issues with floating-point division.
-//   if (std::remainder(free_plane_val, layer.voxel_size()) < kFloatEpsilon) {
-//     free_plane_val += layer.voxel_size() / 2.0;
-//   }
-
-//   createColorPointcloudFromLayer<EsdfVoxel>(
-//       layer,
-//       std::bind(&visualizeDistSquareIntensityEsdfVoxelsSlice, ph::_1, ph::_2,
-//                 free_plane_index, free_plane_val, layer.voxel_size(), ph::_3),
-//       pointcloud);
-// }
-
 // added for ESDF accuracy visualization
 inline void createErrorPointcloudFromEsdfLayerSlice(
     const Layer<EsdfVoxel>& layer, unsigned int free_plane_index,
@@ -589,7 +555,8 @@ inline void createErrorPointcloudFromEsdfLayerSlice(
 // added for ESDF accuracy visualization
 inline void createErrorPointcloudFromEsdfLayerSlice(
     const Layer<EsdfVoxel>& layer, unsigned int free_plane_index,
-    FloatingPoint free_plane_val, pcl::PointCloud<pcl::PointXYZRGB>* pointcloud) {
+    FloatingPoint free_plane_val,
+    pcl::PointCloud<pcl::PointXYZRGB>* pointcloud) {
   CHECK_NOTNULL(pointcloud);
   // Make sure that the free_plane_val doesn't fall evenly between 2 slices.
   // Prefer to push it up.

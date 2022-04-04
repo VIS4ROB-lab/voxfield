@@ -109,14 +109,12 @@ NpTsdfServer::NpTsdfServer(const ros::NodeHandle& nh,
 
   nh_private_.param("width", width_, width_);
   nh_private_.param("height", height_, height_);
-  nh_private_.param("smooth_thre_ratio", smooth_thre_ratio_, 
-                                         smooth_thre_ratio_);
-  
-  if (sensor_is_lidar_)
-  {
+  nh_private_.param("smooth_thre_ratio", smooth_thre_ratio_,
+                    smooth_thre_ratio_);
+
+  if (sensor_is_lidar_) {
     nh_private_.param("fov_up", fov_up_, fov_up_);
     nh_private_.param("fov_down", fov_down_, fov_down_);
-   
     float fov = std::abs(fov_down_) + std::abs(fov_up_);
     fov_down_rad_ = fov_down_ / 180.0f * M_PI;
     fov_rad_ = fov / 180.0f * M_PI;
@@ -128,10 +126,8 @@ NpTsdfServer::NpTsdfServer(const ros::NodeHandle& nh,
   }
 
   mesh_layer_.reset(new MeshLayer(tsdf_map_->block_size()));
-
   mesh_integrator_.reset(new MeshIntegrator<TsdfVoxel>(
       mesh_config, tsdf_map_->getTsdfLayerPtr(), mesh_layer_.get()));
-
   icp_.reset(new ICP(getICPConfigFromRosParam(nh_private)));
 
   // Advertise services.
@@ -184,7 +180,7 @@ void NpTsdfServer::getServerConfigFromRosParam(
                    max_block_distance_from_body_);
   nh_private.param("slice_level", slice_level_, slice_level_);
   nh_private.param("world_frame", world_frame_, world_frame_);
-  nh_private.param("sensor_frame", sensor_frame_, sensor_frame_); //py: added
+  nh_private.param("sensor_frame", sensor_frame_, sensor_frame_);
   nh_private.param("publish_pointclouds_on_update",
                    publish_pointclouds_on_update_,
                    publish_pointclouds_on_update_);
@@ -237,14 +233,12 @@ void NpTsdfServer::getServerConfigFromRosParam(
 void NpTsdfServer::processPointCloudMessageAndInsert(
     const sensor_msgs::PointCloud2::Ptr& pointcloud_msg,
     const Transformation& T_G_C, const bool is_freespace_pointcloud) {
-  
-   timing::Timer ptcloud_timer("preprocess/input");
+  timing::Timer ptcloud_timer("preprocess/input");
   // Convert the PCL pointcloud into our awesome format.
-
   // Horrible hack fix to fix color parsing colors in PCL.
   bool color_pointcloud = false;
   bool has_intensity = false;
-  bool has_label = false; // py: added
+  bool has_label = false;
   for (size_t d = 0; d < pointcloud_msg->fields.size(); ++d) {
     if (pointcloud_msg->fields[d].name == std::string("rgb")) {
       pointcloud_msg->fields[d].datatype = sensor_msgs::PointField::FLOAT32;
@@ -261,11 +255,11 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   Pointcloud normals_C;
   Colors colors;
   Labels labels;
- 
+
   // Convert differently depending on RGB or I type.
   if (has_label) {
-    pcl::PointCloud<pcl::PointXYZRGBL>::Ptr
-        pointcloud_pcl(new pcl::PointCloud<pcl::PointXYZRGBL>());
+    pcl::PointCloud<pcl::PointXYZRGBL>::Ptr pointcloud_pcl(
+        new pcl::PointCloud<pcl::PointXYZRGBL>());
     // pointcloud_pcl is modified below:
     pcl::fromROSMsg(*pointcloud_msg, *pointcloud_pcl);
     convertPointcloud(*pointcloud_pcl, color_map_, &points_C, &colors, &labels,
@@ -288,14 +282,15 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
     convertPointcloud(pointcloud_pcl, color_map_, &points_C, &colors);
   }
   ptcloud_timer.Stop();
-  
+
   // calculate point-wise normal
   timing::Timer range_pre_timer("preprocess/normal_estimation");
   // Preprocess the point cloud: convert to range images
-  cv::Mat vertex_map = cv::Mat::zeros(height_, width_, CV_32FC3);                       
+  cv::Mat vertex_map = cv::Mat::zeros(height_, width_, CV_32FC3);
   cv::Mat depth_image(vertex_map.size(), CV_32FC1, -1.0);
   cv::Mat color_image = cv::Mat::zeros(vertex_map.size(), CV_8UC3);
-  projectPointCloudToImage(points_C, colors, vertex_map, depth_image, color_image);
+  projectPointCloudToImage(points_C, colors, vertex_map, depth_image,
+                           color_image);
   cv::Mat normal_image = computeNormalImage(vertex_map, depth_image);
   // Back project to point cloud from range images
   points_C = extractPointCloud(vertex_map, depth_image);
@@ -356,7 +351,8 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   }
 
   ros::WallTime start = ros::WallTime::now();
-  integratePointcloud(T_G_C_refined, points_C, normals_C, colors, is_freespace_pointcloud);
+  integratePointcloud(T_G_C_refined, points_C, normals_C, colors,
+                      is_freespace_pointcloud);
   ros::WallTime end = ros::WallTime::now();
   if (verbose_) {
     ROS_INFO("Finished integrating in %f seconds, have %lu blocks.",
@@ -384,9 +380,8 @@ bool NpTsdfServer::getNextPointcloudFromQueue(
     return false;
   }
   *pointcloud_msg = queue->front();
-  
-  if (transformer_.lookupTransform(sensor_frame_ /*(*pointcloud_msg)->header.frame_id*/, 
-                                   world_frame_, 
+
+  if (transformer_.lookupTransform(sensor_frame_, world_frame_,
                                    (*pointcloud_msg)->header.stamp, T_G_C)) {
     queue->pop();
     return true;
@@ -434,11 +429,9 @@ void NpTsdfServer::insertPointcloud(
 
   if (timing_)
     ROS_INFO_STREAM("Timings: " << std::endl << timing::Timing::Print());
-  
-  if (verbose_) 
+  if (verbose_)
     ROS_INFO_STREAM(
         "Layer memory: " << tsdf_map_->getTsdfLayer().getMemorySize());
-
 }
 
 void NpTsdfServer::insertFreespacePointcloud(
@@ -711,53 +704,52 @@ void NpTsdfServer::tsdfMapCallback(const voxblox_msgs::Layer& layer_msg) {
   }
 }
 
-bool NpTsdfServer::projectPointCloudToImage(const Pointcloud& points_C,
-                                            const Colors& colors, 
-                                            cv::Mat &vertex_map,   // corresponding point
-                                            cv::Mat &depth_image,  // Float depth image (CV_32FC1).
-                                            cv::Mat &color_image)  
-                                            const {
-    // TODO(py): consider to calculate in parallel to speed up
-    for (size_t i = 0; i < points_C.size(); i++) {
-      int u, v;
-      float depth;
-      if (sensor_is_lidar_)
-        depth = projectPointToImageLiDAR(points_C[i], &u, &v); //colum, row
-      else
-        depth = projectPointToImageCamera(points_C[i], &u, &v); //colum, row
-      if (depth > 0.0)
-      { 
-        float old_depth = depth_image.at<float>(v,u);
-        if (old_depth <= 0.0 || old_depth > depth) // save only nearest point for each pixel
-        {
-          for (int k=0; k<=2; k++) // should be 3f instead of 3b
-          {
-            vertex_map.at<cv::Vec3f>(v,u)[k] = points_C[i](k);
-          }
-          depth_image.at<float>(v,u) = depth;
-          //BGR default order
-          color_image.at<cv::Vec3b>(v,u)[0] = colors[i].b;
-          color_image.at<cv::Vec3b>(v,u)[1] = colors[i].g;
-          color_image.at<cv::Vec3b>(v,u)[2] = colors[i].r;
+bool NpTsdfServer::projectPointCloudToImage(
+    const Pointcloud &points_C, const Colors &colors,
+    cv::Mat &vertex_map,  // corresponding point // NOLINT
+    cv::Mat &depth_image, // Float depth image (CV_32FC1). // NOLINT
+    cv::Mat &color_image) const {
+  // TODO(py): consider to calculate in parallel to speed up
+  for (size_t i = 0; i < points_C.size(); i++) {
+    int u, v;
+    float depth;
+    if (sensor_is_lidar_)
+      depth = projectPointToImageLiDAR(points_C[i], &u, &v);
+    else
+      depth = projectPointToImageCamera(points_C[i], &u, &v);
+    if (depth > 0.0) {
+      float old_depth = depth_image.at<float>(v, u);
+      // save only nearest point for each pixel
+      if (old_depth <= 0.0 || old_depth > depth) {
+        for (int k = 0; k <= 2; k++) {
+          vertex_map.at<cv::Vec3f>(v, u)[k] = points_C[i](k);
         }
+        depth_image.at<float>(v, u) = depth;
+        // BGR default order
+        color_image.at<cv::Vec3b>(v, u)[0] = colors[i].b;
+        color_image.at<cv::Vec3b>(v, u)[1] = colors[i].g;
+        color_image.at<cv::Vec3b>(v, u)[2] = colors[i].r;
       }
     }
-    return false;                                         
+  }
+  return false;
 }
 
 // point should be in the LiDAR's coordinate system
-float NpTsdfServer::projectPointToImageLiDAR(const Point& p_C, int* u, int* v) const {                                          
+float NpTsdfServer::projectPointToImageLiDAR(const Point &p_C, int *u,
+                                             int *v) const {
   // All values are ceiled and floored to guarantee that the resulting points
   // will be valid for any integer conversion.
-  float depth = std::sqrt(p_C.x() * p_C.x() + p_C.y() * p_C.y() + p_C.z() * p_C.z());
+  float depth =
+      std::sqrt(p_C.x() * p_C.x() + p_C.y() * p_C.y() + p_C.z() * p_C.z());
   float yaw = std::atan2(p_C.y(), p_C.x());
   float pitch = std::asin(p_C.z() / depth);
   // projections in im coor (percentage)
-  float proj_x = 0.5 * (yaw / M_PI + 1.0); //[0-1]
-  float proj_y = 1.0 - (pitch - fov_down_rad_) / fov_rad_; //[0-1]
-  // scale to image size 
-  proj_x *= width_;  //[0-W]
-  proj_y *= height_; //[0-H]
+  float proj_x = 0.5 * (yaw / M_PI + 1.0);
+  float proj_y = 1.0 - (pitch - fov_down_rad_) / fov_rad_;
+  // scale to image size
+  proj_x *= width_;
+  proj_y *= height_;
   // round for integer index
   CHECK_NOTNULL(u);
   *u = std::round(proj_x);
@@ -772,7 +764,8 @@ float NpTsdfServer::projectPointToImageLiDAR(const Point& p_C, int* u, int* v) c
   return depth;
 }
 
-bool NpTsdfServer::projectPointToImageCamera(const Point& p_C, int* u, int* v) const {
+bool NpTsdfServer::projectPointToImageCamera(const Point &p_C, int *u,
+                                             int *v) const {
   CHECK_NOTNULL(u);
   *u = std::round(p_C.x() * fx_ / p_C.z() + vx_);
   if (*u >= width_ || *u < 0) {
@@ -789,61 +782,59 @@ bool NpTsdfServer::projectPointToImageCamera(const Point& p_C, int* u, int* v) c
 cv::Mat NpTsdfServer::computeNormalImage(const cv::Mat &vertex_map,
                                          const cv::Mat &depth_image) const {
   cv::Mat normal_image(depth_image.size(), CV_32FC3, 0.0);
-  for (int u=0; u < width_; u++){
-    for (int v=0; v < height_; v++){
+  for (int u = 0; u < width_; u++) {
+    for (int v = 0; v < height_; v++) {
       Point p;
-      p << vertex_map.at<cv::Vec3f>(v, u)[0], 
-           vertex_map.at<cv::Vec3f>(v, u)[1], 
-           vertex_map.at<cv::Vec3f>(v, u)[2];
+      p << vertex_map.at<cv::Vec3f>(v, u)[0], vertex_map.at<cv::Vec3f>(v, u)[1],
+          vertex_map.at<cv::Vec3f>(v, u)[2];
 
-      float d_p = depth_image.at<float>(v,u);
-      float sign = 1.0; //sign of the normal vector
+      float d_p = depth_image.at<float>(v, u);
+      // sign of the normal vector
+      float sign = 1.0;
 
-      if(d_p > 0)
-      {
+      if (d_p > 0) {
         // neighbor x (in ring)
         int n_x_u;
-        if(u == width_-1)
+        if (u == width_ - 1)
           n_x_u = 0;
         else
           n_x_u = u + 1;
         Point n_x;
-        n_x << vertex_map.at<cv::Vec3f>(v, n_x_u)[0], 
-               vertex_map.at<cv::Vec3f>(v, n_x_u)[1], 
-               vertex_map.at<cv::Vec3f>(v, n_x_u)[2];
-
+        n_x << vertex_map.at<cv::Vec3f>(v, n_x_u)[0],
+            vertex_map.at<cv::Vec3f>(v, n_x_u)[1],
+            vertex_map.at<cv::Vec3f>(v, n_x_u)[2];
         float d_n_x = depth_image.at<float>(v, n_x_u);
         if (d_n_x < 0)
           continue;
-        if (std::abs(d_n_x - d_p) > smooth_thre_ratio_ * d_p) // on the boundary, not continous
+        // on the boundary, not continous
+        if (std::abs(d_n_x - d_p) > smooth_thre_ratio_ * d_p)
           continue;
 
         // neighbor y
         int n_y_v;
-        if(v == height_){
+        if (v == height_) {
           n_y_v = v - 1;
           sign *= -1.0;
-        }
-        else {
+        } else {
           n_y_v = v + 1;
         }
         Point n_y;
-        n_y << vertex_map.at<cv::Vec3f>(n_y_v, u)[0], 
-               vertex_map.at<cv::Vec3f>(n_y_v, u)[1], 
-               vertex_map.at<cv::Vec3f>(n_y_v, u)[2];
+        n_y << vertex_map.at<cv::Vec3f>(n_y_v, u)[0],
+            vertex_map.at<cv::Vec3f>(n_y_v, u)[1],
+            vertex_map.at<cv::Vec3f>(n_y_v, u)[2];
 
         float d_n_y = depth_image.at<float>(n_y_v, u);
         if (d_n_y < 0)
           continue;
-        if (std::abs(d_n_y - d_p) > smooth_thre_ratio_ * d_p) //on the boundary, not continous
+        // on the boundary, not continous
+        if (std::abs(d_n_y - d_p) > smooth_thre_ratio_ * d_p)
           continue;
-          
         Point dx = n_x - p;
         Point dy = n_y - p;
 
-        Point normal = (dx.cross(dy)).normalized() * sign; 
+        Point normal = (dx.cross(dy)).normalized() * sign;
         cv::Vec3f& normals = normal_image.at<cv::Vec3f>(v, u);
-        for (int k=0; k<=2; k++)
+        for (int k = 0; k <= 2; k++)
           normals[k] = normal(k);
       }
     }
@@ -851,13 +842,13 @@ cv::Mat NpTsdfServer::computeNormalImage(const cv::Mat &vertex_map,
   return normal_image;
 }
 
-Pointcloud NpTsdfServer::extractPointCloud(const cv::Mat& vertex_map, 
+Pointcloud NpTsdfServer::extractPointCloud(const cv::Mat &vertex_map,
                                            const cv::Mat &depth_image) const {
   Pointcloud points_C;
   for (int v = 0; v < vertex_map.rows; v++) {
     for (int u = 0; u < vertex_map.cols; u++) {
       cv::Vec3f vertex = vertex_map.at<cv::Vec3f>(v, u);
-      if (depth_image.at<float>(v,u) > 0) {
+      if (depth_image.at<float>(v, u) > 0) {
         Point p_C(vertex[0], vertex[1], vertex[2]);
         points_C.push_back(p_C);
       }
@@ -866,14 +857,16 @@ Pointcloud NpTsdfServer::extractPointCloud(const cv::Mat& vertex_map,
   return points_C;
 }
 
-Colors NpTsdfServer::extractColors(const cv::Mat& color_image,
-                                   const cv::Mat &depth_image) const {                                              
+Colors NpTsdfServer::extractColors(const cv::Mat &color_image,
+                                   const cv::Mat &depth_image) const {
   Colors colors;
   for (int v = 0; v < color_image.rows; v++) {
     for (int u = 0; u < color_image.cols; u++) {
-      cv::Vec3b color = color_image.at<cv::Vec3b>(v, u); // BGR
-      if (depth_image.at<float>(v,u) > 0) {
-        Color c_C(color[2], color[1], color[0]); // RGB
+      // BGR
+      cv::Vec3b color = color_image.at<cv::Vec3b>(v, u);
+      if (depth_image.at<float>(v, u) > 0) {
+        // RGB
+        Color c_C(color[2], color[1], color[0]);
         colors.push_back(c_C);
       }
     }
@@ -883,11 +876,11 @@ Colors NpTsdfServer::extractColors(const cv::Mat& color_image,
 
 Pointcloud NpTsdfServer::extractNormals(const cv::Mat& normal_image,
                                         const cv::Mat &depth_image) const {
-  Pointcloud normals_C;                                              
+  Pointcloud normals_C;
   for (int v = 0; v < normal_image.rows; v++) {
     for (int u = 0; u < normal_image.cols; u++) {
       cv::Vec3f vertex = normal_image.at<cv::Vec3f>(v, u);
-      if (depth_image.at<float>(v,u) > 0) {
+      if (depth_image.at<float>(v, u) > 0) {
         Ray n_C(vertex[0], vertex[1], vertex[2]);
         normals_C.push_back(n_C);
       }

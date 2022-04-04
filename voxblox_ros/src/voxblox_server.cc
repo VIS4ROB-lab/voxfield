@@ -398,8 +398,8 @@ void VoxbloxServer::evalEsdfRefOcc() {
       float cur_gt_dist = std::sqrt(pointNKNSquaredDistance[0]);
       float cur_est_dist = std::abs(esdf_voxel.distance);
       float cur_error_dist = cur_est_dist - cur_gt_dist;
-      cur_error_dist = std::min(error_trunc_limit, 
-                       std::max(-error_trunc_limit, cur_error_dist)); 
+      cur_error_dist = std::min(error_trunc_limit,
+                       std::max(-error_trunc_limit, cur_error_dist));
       mse += (cur_error_dist * cur_error_dist);
       mae += std::abs(cur_error_dist);
 

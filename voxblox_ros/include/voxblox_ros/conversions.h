@@ -167,7 +167,7 @@ inline void convertPointcloud(
     }
 
     Label cur_label(pointcloud_pcl.points[i].label);
-    
+
     // only for semantic kitti dataset
     // Filter those outlier and dynamic objects
     // sem_label <=1 means unlabeled or outlier
@@ -177,14 +177,14 @@ inline void convertPointcloud(
       continue;
     if (filter_moving_object && cur_label.sem_label > 250)
       continue;
-      
+  
     points_C->push_back(Point(pointcloud_pcl.points[i].x,
                               pointcloud_pcl.points[i].y,
                               pointcloud_pcl.points[i].z));
     colors->emplace_back(
         convertColor<pcl::PointXYZRGBL>(pointcloud_pcl.points[i], color_map));
-
-    labels->emplace_back(cur_label); // add definition of Label
+    // add definition of Label
+    labels->emplace_back(cur_label); 
   }
 }
 

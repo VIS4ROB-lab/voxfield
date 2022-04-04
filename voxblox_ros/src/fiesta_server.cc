@@ -225,7 +225,6 @@ void FiestaServer::publishPointclouds() {
     publishTraversable();
   }
 
-  // TODO:
   // TsdfServer::publishPointclouds();
 }
 
@@ -337,7 +336,7 @@ void FiestaServer::updateEsdfFromOcc() {
   }
 }
 
-// TODO: Processing in batch
+// TODO(py): Processing in batch
 // void FiestaServer::updateEsdfBatch(bool full_euclidean) {
 //   if (occupancy_map_->getOccupancyLayer().getNumberOfAllocatedBlocks() > 0) {
 //     esdf_integrator_->setFullEuclidean(full_euclidean);
@@ -431,7 +430,7 @@ void FiestaServer::evalEsdfRefOcc() {
       float cur_gt_dist = std::sqrt(pointNKNSquaredDistance[0]);
       float cur_est_dist = std::abs(esdf_voxel.distance);
       float cur_error_dist = cur_est_dist - cur_gt_dist;
-      cur_error_dist = std::min(error_trunc_limit, std::max(-error_trunc_limit, cur_error_dist)); // truncated error
+      cur_error_dist = std::min(error_trunc_limit, std::max(-error_trunc_limit, cur_error_dist)); // NOLINT
       mse += (cur_error_dist * cur_error_dist);
       mae += std::abs(cur_error_dist);
 

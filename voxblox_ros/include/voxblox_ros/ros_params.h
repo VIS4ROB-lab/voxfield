@@ -72,15 +72,15 @@ inline TsdfIntegratorBase::Config getTsdfIntegratorConfigFromRosParam(
   const TsdfMap::Config tsdf_config = getTsdfMapConfigFromRosParam(nh_private);
 
   double max_weight = integrator_config.max_weight;
-  
-  float truncation_distance = -2.0; // if negative, it means the multiplier of the voxel size
+  // if negative, it means the multiplier of the voxel size
+  float truncation_distance = -2.0;
 
   nh_private.param("truncation_distance", truncation_distance,
                    truncation_distance);
-  
-  integrator_config.default_truncation_distance = truncation_distance > 0 ? 
-                truncation_distance : 
-               -truncation_distance * tsdf_config.tsdf_voxel_size;  
+
+  integrator_config.default_truncation_distance = truncation_distance > 0 ?
+                truncation_distance :
+               -truncation_distance * tsdf_config.tsdf_voxel_size;
 
   nh_private.param("voxel_carving_enabled",
                    integrator_config.voxel_carving_enabled,
@@ -124,11 +124,11 @@ inline TsdfIntegratorBase::Config getTsdfIntegratorConfigFromRosParam(
   float integrator_threads = std::thread::hardware_concurrency();
   nh_private.param("integrator_threads",
                    integrator_threads,
-                   integrator_threads);  
+                   integrator_threads);
   integrator_config.integrator_threads = static_cast<int>(integrator_threads);
   nh_private.param("merge_with_clear",
                    integrator_config.merge_with_clear,
-                   integrator_config.merge_with_clear); 
+                   integrator_config.merge_with_clear);
 
   return integrator_config;
 }
@@ -142,15 +142,15 @@ inline NpTsdfIntegratorBase::Config getNpTsdfIntegratorConfigFromRosParam(
   const TsdfMap::Config tsdf_config = getTsdfMapConfigFromRosParam(nh_private);
 
   double max_weight = integrator_config.max_weight;
-  
-  float truncation_distance = -2.0; // if negative, it means the multiplier of the voxel size
+  // if negative, it means the multiplier of the voxel size
+  float truncation_distance = -2.0;
 
   nh_private.param("truncation_distance", truncation_distance,
                    truncation_distance);
-  
-  integrator_config.default_truncation_distance = truncation_distance > 0 ? 
-                truncation_distance : 
-               -truncation_distance * tsdf_config.tsdf_voxel_size;  
+
+  integrator_config.default_truncation_distance = truncation_distance > 0 ?
+                truncation_distance :
+               -truncation_distance * tsdf_config.tsdf_voxel_size;
 
   nh_private.param("voxel_carving_enabled",
                    integrator_config.voxel_carving_enabled,
@@ -164,12 +164,12 @@ inline NpTsdfIntegratorBase::Config getNpTsdfIntegratorConfigFromRosParam(
   integrator_config.max_weight = static_cast<float>(max_weight);
   nh_private.param("use_const_weight", integrator_config.use_const_weight,
                    integrator_config.use_const_weight);
-  nh_private.param("weight_reduction_exp", integrator_config.weight_reduction_exp,
-                   integrator_config.weight_reduction_exp);       
+  nh_private.param("weight_reduction_exp", integrator_config.weight_reduction_exp, // NOLINT
+                   integrator_config.weight_reduction_exp);
   nh_private.param("use_weight_dropoff", integrator_config.use_weight_dropoff,
                    integrator_config.use_weight_dropoff);
-  nh_private.param("weight_dropoff_epsilon", integrator_config.weight_dropoff_epsilon,
-                   integrator_config.weight_dropoff_epsilon);                                  
+  nh_private.param("weight_dropoff_epsilon", integrator_config.weight_dropoff_epsilon, // NOLINT
+                   integrator_config.weight_dropoff_epsilon);
   nh_private.param("allow_clear", integrator_config.allow_clear,
                    integrator_config.allow_clear);
   nh_private.param("start_voxel_subsampling_factor",
@@ -198,23 +198,23 @@ inline NpTsdfIntegratorBase::Config getNpTsdfIntegratorConfigFromRosParam(
   float integrator_threads = std::thread::hardware_concurrency();
   nh_private.param("integrator_threads",
                    integrator_threads,
-                   integrator_threads);  
-  integrator_config.integrator_threads = static_cast<int>(integrator_threads);         
+                   integrator_threads);
+  integrator_config.integrator_threads = static_cast<int>(integrator_threads);
   nh_private.param("merge_with_clear",
                    integrator_config.merge_with_clear,
-                   integrator_config.merge_with_clear);     
+                   integrator_config.merge_with_clear);
   nh_private.param("normal_available",
                    integrator_config.normal_available,
-                   integrator_config.normal_available);                                  
+                   integrator_config.normal_available);
   nh_private.param("reliable_band_ratio",
                    integrator_config.reliable_band_ratio,
-                   integrator_config.reliable_band_ratio); 
+                   integrator_config.reliable_band_ratio);
   nh_private.param("curve_assumption",
                    integrator_config.curve_assumption,
-                   integrator_config.curve_assumption); 
+                   integrator_config.curve_assumption);
   nh_private.param("reliable_normal_ratio_thre",
                    integrator_config.reliable_normal_ratio_thre,
-                   integrator_config.reliable_normal_ratio_thre);                                                          
+                   integrator_config.reliable_normal_ratio_thre);
 
   return integrator_config;
 }
@@ -261,7 +261,7 @@ inline EsdfIntegrator::Config getEsdfIntegratorConfigFromRosParam(
   nh_private.param("esdf_add_occupied_crust",
                    esdf_integrator_config.add_occupied_crust,
                    esdf_integrator_config.add_occupied_crust);
-  
+
   if (esdf_integrator_config.default_distance_m <
       esdf_integrator_config.max_distance_m) {
     esdf_integrator_config.default_distance_m =
@@ -379,8 +379,8 @@ getEsdfVoxfieldIntegratorConfigFromRosParam(const ros::NodeHandle& nh_private) {
   nh_private.param("esdf_default_distance_m",
                    esdf_integrator_config.default_distance_m,
                    esdf_integrator_config.default_distance_m);
-  
-  nh_private.param("fix_band_distance_m", esdf_integrator_config.band_distance_m,
+
+  nh_private.param("fix_band_distance_m", esdf_integrator_config.band_distance_m, // NOLINT
                    esdf_integrator_config.band_distance_m);
 
   nh_private.param("max_behind_surface_m",
@@ -416,7 +416,7 @@ getEsdfVoxfieldIntegratorConfigFromRosParam(const ros::NodeHandle& nh_private) {
 }
 
 inline EsdfOccFiestaIntegrator::Config
-getEsdfOccFiestaIntegratorConfigFromRosParam(const ros::NodeHandle& nh_private) {
+getEsdfOccFiestaIntegratorConfigFromRosParam(const ros::NodeHandle& nh_private) { // NOLINT
   EsdfOccFiestaIntegrator::Config esdf_integrator_config;
 
   int range_boundary_offset_x = esdf_integrator_config.range_boundary_offset(0);

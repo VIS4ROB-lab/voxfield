@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 
 #include <eigen_conversions/eigen_msg.h>
 #include <visualization_msgs/Marker.h>
@@ -195,10 +196,10 @@ inline void generateVoxbloxMeshMsg(MeshLayer* mesh_layer, ColorMode color_mode,
                   block_index.cast<FloatingPoint>());
 
       // check all points are in range [0, 1.0]
-      // TODO: (py) added, a dirty fix
+      // TODO(py): added, now it's a dirty fix
       if (normalized_verticies.squaredNorm() > 1.0f)
         continue;
-        
+
       CHECK_LE(normalized_verticies.squaredNorm(), 1.0f);
       CHECK((normalized_verticies.array() >= 0.0).all());
 

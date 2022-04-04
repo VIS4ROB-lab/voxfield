@@ -1,6 +1,8 @@
 #ifndef VOXBLOX_UTILS_NEIGHBOR_TOOLS_H_
 #define VOXBLOX_UTILS_NEIGHBOR_TOOLS_H_
 
+#include <vector>
+
 #include "voxblox/core/common.h"
 #include "voxblox/core/layer.h"
 
@@ -65,7 +67,8 @@ class Neighborhood : public NeighborhoodLookupTables {
     if (coc_index(2) >= global_index(2))
       neighbors_idx.push_back(4);
     
-    if(coc_index(1) <= global_index(1)){ //y > obsty
+    // y > obsty
+    if (coc_index(1) <= global_index(1)) { 
       neighbors_idx.push_back(3);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(13);
@@ -73,28 +76,30 @@ class Neighborhood : public NeighborhoodLookupTables {
         neighbors_idx.push_back(12);
     }
 
-    if(coc_index(1) >= global_index(1)){ //y < obsty
+    // y < obsty
+    if (coc_index(1) >= global_index(1)) { 
       neighbors_idx.push_back(2);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(11);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(10);
     }
-
-    if(coc_index(0) <= global_index(0)){ //x > obstx
+    
+    // x > obstx
+    if (coc_index(0) <= global_index(0)) { 
       neighbors_idx.push_back(1);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(17);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(15);
-      if(coc_index(1) >= global_index(1)){
+      if (coc_index(1) >= global_index(1)){
         neighbors_idx.push_back(9);
         if (coc_index(2) <= global_index(2))
           neighbors_idx.push_back(25);
         if (coc_index(2) >= global_index(2))
           neighbors_idx.push_back(24);
       }
-      if(coc_index(1) >= global_index(1)){
+      if (coc_index(1) >= global_index(1)) {
         neighbors_idx.push_back(8);
         if (coc_index(2) <= global_index(2))
           neighbors_idx.push_back(23);
@@ -102,21 +107,21 @@ class Neighborhood : public NeighborhoodLookupTables {
           neighbors_idx.push_back(22);
       }
     }
-
-    if(coc_index(0) >= global_index(0)){ //x < obstx
+    // x < obstx
+    if (coc_index(0) >= global_index(0)) { 
       neighbors_idx.push_back(0);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(16);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(14);
-      if(coc_index(1) >= global_index(1)){
+      if (coc_index(1) >= global_index(1)) {
         neighbors_idx.push_back(7);
         if (coc_index(2) <= global_index(2))
           neighbors_idx.push_back(21);
         if (coc_index(2) >= global_index(2))
           neighbors_idx.push_back(20);
       }
-      if(coc_index(1) >= global_index(1)){
+      if (coc_index(1) >= global_index(1)) {
         neighbors_idx.push_back(6);
         if (coc_index(2) <= global_index(2))
           neighbors_idx.push_back(19);
@@ -124,9 +129,7 @@ class Neighborhood : public NeighborhoodLookupTables {
           neighbors_idx.push_back(18);
       }
     }
-
   }
-
   /**
    * Get the block idx and local voxel index of a neighbor voxel. The neighbor
    * voxel is defined by providing a direction. The main purpose of this

@@ -29,10 +29,12 @@ NpTsdfIntegratorBase::Ptr NpTsdfIntegratorFactory::create(
   CHECK_NOTNULL(layer);
   switch (integrator_type) {
     case TsdfIntegratorType::kSimple:
-      return NpTsdfIntegratorBase::Ptr(new SimpleNpTsdfIntegrator(config, layer));
+      return NpTsdfIntegratorBase::Ptr(
+          new SimpleNpTsdfIntegrator(config, layer)); // NOLINT
       break;
     case TsdfIntegratorType::kMerged:
-      return NpTsdfIntegratorBase::Ptr(new MergedNpTsdfIntegrator(config, layer));
+      return NpTsdfIntegratorBase::Ptr(
+          new MergedNpTsdfIntegrator(config, layer)); // NOLINT
       break;
     case TsdfIntegratorType::kFast:
       return NpTsdfIntegratorBase::Ptr(new FastNpTsdfIntegrator(config, layer));
@@ -67,13 +69,10 @@ NpTsdfIntegratorBase::NpTsdfIntegratorBase(const Config& config,
 
 void NpTsdfIntegratorBase::setLayer(Layer<TsdfVoxel>* layer) {
   CHECK_NOTNULL(layer);
-
   layer_ = layer;
-
   voxel_size_ = layer_->voxel_size();
   block_size_ = layer_->block_size();
   voxels_per_side_ = layer_->voxels_per_side();
-  
   voxel_size_inv_ = 1.0 / voxel_size_;
   block_size_inv_ = 1.0 / block_size_;
   voxels_per_side_inv_ = 1.0 / voxels_per_side_;
@@ -165,7 +164,7 @@ float NpTsdfIntegratorBase::computeDistance(const Point& origin,
   return sdf;
 }
 
-// Thread safe. 
+// Thread safe.
 // Only the first part of computeVoxelWeight
 float NpTsdfIntegratorBase::getVoxelWeight(const Point& point_C) const {
   if (config_.use_const_weight) {
@@ -183,31 +182,32 @@ float NpTsdfIntegratorBase::computeVoxelWeight(const Point& point_C,
                                                const float sdf,
                                                const bool with_init_weight,
                                                const float init_weight) const {
-  
   float weight = 1.0;
   if (with_init_weight) {
     weight = init_weight;
   } else {
-    // Part 1. Weight reduction with distance (according to sensor noise models).
+    // Part 1. Weight reduction with distance
+    // (according to sensor noise models).
     // Also Independent of sdf
-    if (!config_.use_const_weight) { // weight reduction 
+    if (!config_.use_const_weight) {
       weight /= std::pow(point_C.norm(), config_.weight_reduction_exp);
     }
   }
 
-  // Part 2. weight drop-off 
-  // Apply weight drop-off if appropriate. 
+  // Part 2. weight drop-off
+  // Apply weight drop-off if appropriate.
   const float truncation_distance = config_.default_truncation_distance;
   if (config_.use_weight_dropoff) {
     const float dropoff_epsilon =
         config_.weight_dropoff_epsilon > 0.f
             ? config_.weight_dropoff_epsilon
-            : config_.weight_dropoff_epsilon * -voxel_size_; 
-    //for example, weight_dropoff_epsilon = -1.0 --> dropoff_epsilon = voxel_size
+            : config_.weight_dropoff_epsilon * -voxel_size_;
+    // for example, weight_dropoff_epsilon = -1.0
+    // --> dropoff_epsilon = voxel_size
     if (sdf < -dropoff_epsilon) {
       weight *=
           (truncation_distance + sdf) / (truncation_distance - dropoff_epsilon);
-      weight = std::max(weight, 0.f); 
+      weight = std::max(weight, 0.f);
     }
   }
 
@@ -223,28 +223,28 @@ float NpTsdfIntegratorBase::computeVoxelWeight(const Point& point_C,
       weight *= config_.sparsity_compensation_factor;
     }
   }
-
   return weight;
 }
 
-//each voxel has a distance and a weight
-//once a new distance and weight is calculated, update it as 
-//a kind of weighted average
-void NpTsdfIntegratorBase::updateTsdfVoxelValue(TsdfVoxel* voxel, const float sdf,
-                                                const float weight, 
-                                                const Color* color) const {
-  
+// each voxel has a distance and a weight
+// once a new distance and weight is calculated, update it as
+// a kind of weighted average
+void NpTsdfIntegratorBase::updateTsdfVoxelValue(TsdfVoxel *voxel,
+                                                const float sdf,
+                                                const float weight,
+                                                const Color *color) const {
   float new_weight = voxel->weight + weight;
   // it is possible to have weights very close to zero, due to the limited
   // precision of floating points dividing by this small value can cause nans
   if (new_weight < kFloatEpsilon) {
     return;
   }
-  
   // Weighted averaging fusion.
-  voxel->distance = (voxel->distance * voxel->weight + sdf * weight) / new_weight;    
-  // voxel->distance = std::max(-config_.default_truncation_distance, 
-  //                   std::min(config_.default_truncation_distance, voxel->distance));          
+  voxel->distance =
+      (voxel->distance * voxel->weight + sdf * weight) / new_weight;
+  // voxel->distance = std::max(-config_.default_truncation_distance,
+  //                   std::min(config_.default_truncation_distance,
+  //                   voxel->distance));
 
   voxel->weight = std::min(new_weight, config_.max_weight);
   // also take average of the color
@@ -252,11 +252,11 @@ void NpTsdfIntegratorBase::updateTsdfVoxelValue(TsdfVoxel* voxel, const float sd
     voxel->color =
         Color::blendTwoColors(voxel->color, voxel->weight, *color, weight);
   }
-}  
+}
 
-void NpTsdfIntegratorBase::updateTsdfVoxelGradient(TsdfVoxel* voxel, const Ray normal,
+void NpTsdfIntegratorBase::updateTsdfVoxelGradient(TsdfVoxel *voxel,
+                                                   const Ray normal,
                                                    const float weight) const {
-                                              
   float new_weight = voxel->weight + weight;
   // it is possible to have weights very close to zero, due to the limited
   // precision of floating points dividing by this small value can cause nans
@@ -264,11 +264,11 @@ void NpTsdfIntegratorBase::updateTsdfVoxelGradient(TsdfVoxel* voxel, const Ray n
     return;
   }
 
-  if(voxel->gradient.norm() > kFloatEpsilon){ 
+  if (voxel->gradient.norm() > kFloatEpsilon) {
     voxel->gradient = ((voxel->gradient * voxel->weight + normal * weight) /
                       new_weight).normalized();
-  }
-  else { // newly assigned, originally zero vector
+  } else {
+    // newly assigned, originally zero vector
     voxel->gradient = normal.normalized();
   }
 }
@@ -282,7 +282,8 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
                                            const Ray& normal_C,
                                            const Ray& normal_G,
                                            const GlobalIndex& global_voxel_idx,
-                                           const Color& color, const float init_weight,
+                                           const Color& color,
+                                           const float init_weight,
                                            TsdfVoxel* tsdf_voxel) {
   DCHECK(tsdf_voxel != nullptr);
 
@@ -303,60 +304,67 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
   Ray gradient_C;
   if (config_.normal_available && in_the_reliable_band) {
     float normal_ratio = 1.0f;
-    if (tsdf_voxel->gradient.norm() > kFloatEpsilon){ // use current un-updated normal because the weight is unknown
-      gradient_C = T_G_C.inverse().getRotationMatrix() * tsdf_voxel->gradient; //back to sensor(camera)'s frame
+    // use current un-updated normal because the weight is unknown
+    if (tsdf_voxel->gradient.norm() > kFloatEpsilon) {
+      // transform back to sensor(camera)'s frame
+      gradient_C = T_G_C.inverse().getRotationMatrix() * tsdf_voxel->gradient;
       if (config_.curve_assumption && normal_C.norm() > kFloatEpsilon) {
-        // condition 1: curve assumption, [sin(theta+alpha)-sin(theta)]/sin(alpha)
-        float cos_theta = std::abs(gradient_C.dot(point_C)/point_C.norm()); 
-        float cos_alpha = std::abs(gradient_C.dot(normal_C)/normal_C.norm()); 
+        // condition 1: curve assumption
+        // [sin(theta+alpha)-sin(theta)]/sin(alpha)]
+        float cos_theta = std::abs(gradient_C.dot(point_C) / point_C.norm());
+        float cos_alpha = std::abs(gradient_C.dot(normal_C) / normal_C.norm());
         float sin_theta = std::sqrt(1-cos_theta*cos_theta);
         float sin_alpha = std::sqrt(1-cos_alpha*cos_alpha);
-        normal_ratio = std::abs(sin_theta * (cos_alpha-1) / sin_alpha + cos_theta);
-        if (std::isnan(normal_ratio)) 
+        normal_ratio = std::abs(sin_theta * (cos_alpha-1) / sin_alpha + cos_theta); // NOLINT
+        if (std::isnan(normal_ratio))
           normal_ratio = cos_theta;
-      } else { // condition 2: flat surface, cos(theta)
-        normal_ratio = std::abs(gradient_C.dot(point_C)/point_C.norm()); 
+      } else {
+        // condition 2: flat surface, cos(theta)
+        normal_ratio = std::abs(gradient_C.dot(point_C) / point_C.norm());
       }
-    } else { //gradient not ready yet, use the first (current) normal vector
-      //NOTE(py): kFloatEpsilon is a safe value in case of numerical rounding error
-      if (normal_C.norm() > kFloatEpsilon) { //current normal is valid
+    } else {
+      // gradient not ready yet, use the first (current) normal vector
+      // NOTE(py): kFloatEpsilon is a safe value in case of numerical rounding
+      // error
+      if (normal_C.norm() > kFloatEpsilon) {
+        // current normal is valid
         normal_ratio = std::abs(normal_C.dot(point_C)/point_C.norm());
       }
     }
     // NOTE(py): ruling out extremely large incidence angle
-    if (normal_ratio < config_.reliable_normal_ratio_thre) 
+    if (normal_ratio < config_.reliable_normal_ratio_thre)
       return;
-    // get the non-projective sdf, if it's still larger than truncation distance, 
-    // the gradient would not be updated 
-    sdf *= normal_ratio; 
+    // get the non-projective sdf, if it's still larger than truncation
+    // distance, the gradient would not be updated
+    sdf *= normal_ratio;
   }
-
   if (sdf < -truncation_distance) {
     return;
   }
-
   bool with_init_weight = false;
   if (init_weight > 0)
     with_init_weight = true;
-  float weight = computeVoxelWeight(point_C, sdf, with_init_weight, init_weight);
-  
+  float weight = computeVoxelWeight(point_C, sdf,
+    with_init_weight, init_weight);
   // it is possible to have weights very close to zero, due to the limited
   // precision of floating points dividing by this small value can cause nans
   if (weight < kFloatEpsilon) {
     return;
   }
-                               
   // Only merge color and classification data near the surface.
   if (sdf > truncation_distance) {
     // far away, do not interpolate color
     updateTsdfVoxelValue(tsdf_voxel, sdf, weight);
-    tsdf_voxel->distance = std::min(truncation_distance, tsdf_voxel->distance);    
-  } else { // close to the surface
-    if (config_.normal_available) { // only update the gradient close to the surface
-      if (normal_G.norm() > kFloatEpsilon) 
-        updateTsdfVoxelGradient(tsdf_voxel, normal_G, weight); 
+    tsdf_voxel->distance = std::min(truncation_distance, tsdf_voxel->distance);
+  } else {
+    // close to the surface
+    if (config_.normal_available) {
+      // only update the gradient close to the surface
+      if (normal_G.norm() > kFloatEpsilon)
+        updateTsdfVoxelGradient(tsdf_voxel, normal_G, weight);
     }
-    updateTsdfVoxelValue(tsdf_voxel, sdf, weight, &color); // blend color
+    // blend color
+    updateTsdfVoxelValue(tsdf_voxel, sdf, weight, &color);
   }
 }
 
@@ -423,9 +431,8 @@ void SimpleNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
     while (ray_caster.nextRayIndex(&global_voxel_idx)) {
       TsdfVoxel* voxel =
           allocateStorageAndGetVoxelPtr(global_voxel_idx, &block, &block_idx);
-
       updateTsdfVoxel(T_G_C, origin, point_C, point_G, normal_C, normal_G,
-                      global_voxel_idx, color, 0.0, voxel);           
+                      global_voxel_idx, color, 0.0, voxel);
     }
   }
 }
@@ -440,7 +447,6 @@ void MergedNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
   timing::Timer integrate_timer("integrate_np_tsdf/merged");
   CHECK_EQ(points_C.size(), colors.size());
   CHECK_EQ(points_C.size(), normals_C.size());
-
   // Pre-compute a list of unique voxels to end on.
   // Create a hashmap: VOXEL INDEX -> index in original cloud.
   LongIndexHashMapType<AlignedVector<size_t>>::type voxel_map;
@@ -456,22 +462,21 @@ void MergedNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
   timing::Timer bundle_timer("integrate_np_tsdf/merged/bundle");
   bundleRays(T_G_C, points_C, freespace_points,
              index_getter.get(), &voxel_map, &clear_map);
-  bundle_timer.Stop();          
+  bundle_timer.Stop();
 
   // integrate rays for non-clearing voxel (close to the surface)
   timing::Timer nonclear_timer("integrate_np_tsdf/merged/nonclear");
-  integrateRays(T_G_C, points_C, normals_C, colors, config_.enable_anti_grazing,
-                false, voxel_map, clear_map);
+  integrateRays(T_G_C, points_C, normals_C, colors,
+                config_.enable_anti_grazing, false, voxel_map, clear_map);
   nonclear_timer.Stop();
 
   if (config_.merge_with_clear) {
     timing::Timer clear_timer("integrate_np_tsdf/merged/clear");
     // integrate rays for clearing voxels (away from the surface)
-    integrateRays(T_G_C, points_C, normals_C, colors, config_.enable_anti_grazing,
-                  true, voxel_map, clear_map);
+    integrateRays(T_G_C, points_C, normals_C, colors,
+                  config_.enable_anti_grazing, true, voxel_map, clear_map);
     clear_timer.Stop();
   }
-
   integrate_timer.Stop();
 }
 
@@ -517,21 +522,20 @@ void MergedNpTsdfIntegrator::integrateRays(
   // if only 1 thread just do function call, otherwise spawn threads
   if (config_.integrator_threads == 1) {
     constexpr size_t thread_idx = 0;
-    integrateVoxels(T_G_C, points_C, normals_C, colors, enable_anti_grazing, clearing_ray,
-                    voxel_map, clear_map, thread_idx);
+    integrateVoxels(T_G_C, points_C, normals_C, colors, enable_anti_grazing,
+                    clearing_ray, voxel_map, clear_map, thread_idx);
   } else {
     std::list<std::thread> integration_threads;
     for (size_t i = 0; i < config_.integrator_threads; ++i) {
       integration_threads.emplace_back(
-          &MergedNpTsdfIntegrator::integrateVoxels, this, T_G_C, points_C, normals_C, colors,
+          &MergedNpTsdfIntegrator::integrateVoxels, this,
+          T_G_C, points_C, normals_C, colors,
           enable_anti_grazing, clearing_ray, voxel_map, clear_map, i);
     }
-
     for (std::thread& thread : integration_threads) {
       thread.join();
     }
   }
-
   // timing::Timer insertion_timer("inserting_missed_blocks");
   updateLayerWithStoredBlocks();
 
@@ -557,15 +561,15 @@ void MergedNpTsdfIntegrator::integrateVoxels(
 
   for (size_t i = 0; i < map_size; ++i) {
     if (((i + thread_idx + 1) % config_.integrator_threads) == 0) {
-      integrateVoxel(T_G_C, points_C, normals_C, colors, enable_anti_grazing, clearing_ray,
-                     *it, voxel_map);
+      integrateVoxel(T_G_C, points_C, normals_C, colors, enable_anti_grazing,
+                     clearing_ray, *it, voxel_map);
     }
     ++it;
   }
 }
 
 void MergedNpTsdfIntegrator::integrateVoxel(
-    const Transformation& T_G_C, const Pointcloud& points_C, 
+    const Transformation& T_G_C, const Pointcloud& points_C,
     const Pointcloud& normals_C,
     const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
     const std::pair<GlobalIndex, AlignedVector<size_t>>& kv,
@@ -584,8 +588,8 @@ void MergedNpTsdfIntegrator::integrateVoxel(
     const Point& point_C = points_C[pt_idx];
     const Ray& normal_C = normals_C[pt_idx];
     const Color& color = colors[pt_idx];
-
-    const float point_weight = getVoxelWeight(point_C); // only the reduction part
+    // only the reduction part
+    const float point_weight = getVoxelWeight(point_C);
     if (point_weight < kEpsilon) {
       continue;
     }
@@ -593,13 +597,13 @@ void MergedNpTsdfIntegrator::integrateVoxel(
                      (merged_weight + point_weight);
     merged_color =
         Color::blendTwoColors(merged_color, merged_weight, color, point_weight);
-    
-    if (config_.normal_available) { 
-      merged_normal_C = merged_normal_C * merged_weight + normal_C * point_weight;
+    if (config_.normal_available) {
+      merged_normal_C = merged_normal_C * merged_weight +
+        normal_C * point_weight;
       if (merged_normal_C.norm() > kEpsilon) {
         merged_normal_C.normalize();
       }
-    }    
+    }
     merged_weight += point_weight;
 
     // only take first point when clearing
@@ -617,7 +621,7 @@ void MergedNpTsdfIntegrator::integrateVoxel(
 
   GlobalIndex global_voxel_idx;
   while (ray_caster.nextRayIndex(&global_voxel_idx)) {
-    if (enable_anti_grazing) { // TODO(py): what does grazing mean
+    if (enable_anti_grazing) {
       // Check if this one is already the block hash map for this
       // insertion. Skip this to avoid grazing.
       if ((clearing_ray || global_voxel_idx != kv.first) &&
@@ -630,9 +634,9 @@ void MergedNpTsdfIntegrator::integrateVoxel(
     BlockIndex block_idx;
     TsdfVoxel* voxel =
         allocateStorageAndGetVoxelPtr(global_voxel_idx, &block, &block_idx);
-  
-    updateTsdfVoxel(T_G_C, origin, merged_point_C, merged_point_G, 
-                    merged_normal_C, merged_normal_G, 
+
+    updateTsdfVoxel(T_G_C, origin, merged_point_C, merged_point_G,
+                    merged_normal_C, merged_normal_G,
                     global_voxel_idx, merged_color,
                     merged_weight, voxel);
   }

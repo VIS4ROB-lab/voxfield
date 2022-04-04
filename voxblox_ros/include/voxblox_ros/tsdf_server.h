@@ -164,8 +164,10 @@ class TsdfServer {
   ros::Timer update_mesh_timer_;
   ros::Timer publish_map_timer_;
 
-  bool verbose_; // output detailed log or not
-  bool timing_;  // output timing record or not
+  // output detailed log or not
+  bool verbose_;
+  // output timing record or not
+  bool timing_;
 
   /**
    * Global/map coordinate frame. Will always look up TF transforms to this
@@ -173,7 +175,7 @@ class TsdfServer {
    */
   std::string world_frame_;
 
-  std::string sensor_frame_; //py: added
+  std::string sensor_frame_;
 
   /**
    * Name of the ICP corrected frame. Publishes TF and transform topic to this

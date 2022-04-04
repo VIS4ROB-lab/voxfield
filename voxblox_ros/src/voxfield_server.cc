@@ -3,7 +3,7 @@
 #include "voxblox_ros/conversions.h"
 #include "voxblox_ros/ros_params.h"
 
-#include <pcl/kdtree/kdtree_flann.h>  //py: added
+#include <pcl/kdtree/kdtree_flann.h>
 
 namespace voxblox {
 
@@ -30,9 +30,9 @@ VoxfieldServer::VoxfieldServer(
       traversability_radius_(1.0),
       incremental_update_(true),
       num_subscribers_esdf_map_(0) {
-
   // ADD(py): Set up Occupancy map and integrator
-  OccupancyMap::Config occ_config; // Only for evaluation
+  // Only for evaluation
+  OccupancyMap::Config occ_config;
   occ_config.occupancy_voxel_size = esdf_config.esdf_voxel_size;
   occ_config.occupancy_voxels_per_side = esdf_config.esdf_voxels_per_side;
   OccTsdfIntegrator::Config occ_tsdf_integrator_config;
@@ -410,7 +410,7 @@ void VoxfieldServer::evalEsdfRefOcc() {
       float cur_gt_dist = std::sqrt(pointNKNSquaredDistance[0]);
       float cur_est_dist = std::abs(esdf_voxel.distance);
       float cur_error_dist = cur_est_dist - cur_gt_dist;
-      cur_error_dist = std::min(error_trunc_limit, std::max(-error_trunc_limit, cur_error_dist)); // truncated error
+      cur_error_dist = std::min(error_trunc_limit, std::max(-error_trunc_limit, cur_error_dist)); // NOLINT
       mse += (cur_error_dist * cur_error_dist);
       mae += std::abs(cur_error_dist);
 

@@ -1,5 +1,5 @@
-#ifndef VOXBLOX_ROS_VOXFIELD_SERVER_H_
-#define VOXBLOX_ROS_VOXFIELD_SERVER_H_
+#ifndef VOXBLOX_ROS_VOXEDT_SERVER_H_
+#define VOXBLOX_ROS_VOXEDT_SERVER_H_
 
 #include <memory>
 #include <string>
@@ -22,7 +22,6 @@ class VoxedtServer : public TsdfServer {
   VoxedtServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
   VoxedtServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
                  const EsdfMap::Config& esdf_config,
-                 //const EsdfOccFiestaIntegrator::Config& esdf_integrator_config,
                  const EsdfOccEdtIntegrator::Config& esdf_integrator_config,
                  const TsdfMap::Config& tsdf_config,
                  const TsdfIntegratorBase::Config& tsdf_integrator_config,
@@ -141,7 +140,7 @@ class VoxedtServer : public TsdfServer {
 
   // ESDF maps.
   std::shared_ptr<EsdfMap> esdf_map_;
-  //std::unique_ptr<EsdfOccFiestaIntegrator> esdf_integrator_;
+  // std::unique_ptr<EsdfOccFiestaIntegrator> esdf_integrator_;
   std::unique_ptr<EsdfOccEdtIntegrator> esdf_integrator_;
 
   // Occupancy maps.
@@ -151,4 +150,4 @@ class VoxedtServer : public TsdfServer {
 
 }  // namespace voxblox
 
-#endif  // VOXBLOX_ROS_VOXFIELD_SERVER_H_
+#endif  // VOXBLOX_ROS_VOXEDT_SERVER_H_

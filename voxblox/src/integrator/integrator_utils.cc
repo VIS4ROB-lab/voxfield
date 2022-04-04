@@ -71,11 +71,11 @@ size_t SortedThreadSafeIndex::getNextIndexImpl(size_t sequential_idx) {
 // map to voxel indices.
 RayCaster::RayCaster(const Point& origin, const Point& point_G,
                      const bool is_clearing_ray,
-                     const bool voxel_carving_enabled, // if enabled, then begin from the origin
+                     const bool voxel_carving_enabled,
                      const FloatingPoint max_ray_length_m,
                      const FloatingPoint voxel_size_inv,
                      const FloatingPoint truncation_distance,
-                     const bool cast_from_origin) { // defualt: true
+                     const bool cast_from_origin) {
   const Ray unit_ray = (point_G - origin).normalized();
 
   Point ray_start, ray_end;
@@ -96,7 +96,8 @@ RayCaster::RayCaster(const Point& origin, const Point& point_G,
   const Point start_scaled = ray_start * voxel_size_inv;
   const Point end_scaled = ray_end * voxel_size_inv;
 
-  if (cast_from_origin) { // from start to end
+  if (cast_from_origin) {
+    // from start to end
     setupRayCaster(start_scaled, end_scaled);
   } else {
     setupRayCaster(end_scaled, start_scaled);

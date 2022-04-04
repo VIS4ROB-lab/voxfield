@@ -58,8 +58,8 @@ class NpTsdfServer {
       const Transformation& T_G_C, const bool is_freespace_pointcloud);
 
   void integratePointcloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C, 
-                           const Pointcloud& normals_C, 
+                           const Pointcloud& points_C,
+                           const Pointcloud& normals_C,
                            const Colors& colors,
                            const bool is_freespace_pointcloud = false);
   virtual void newPoseCallback(const Transformation& /*new_pose*/) {
@@ -124,17 +124,19 @@ class NpTsdfServer {
 
   /// Preprocessing
   // from point cloud to range image
-  bool projectPointCloudToImage(const Pointcloud& points_C, const Colors& colors, 
-                                cv::Mat &vertex_map, cv::Mat &depth_image,              
-                                cv::Mat &color_image) const;                                                                                                                                  
+  bool projectPointCloudToImage(const Pointcloud& points_C, 
+                                const Colors& colors,
+                                cv::Mat &vertex_map,
+                                cv::Mat &depth_image,
+                                cv::Mat &color_image) const;
   float projectPointToImageLiDAR(const Point& p_C, int* u, int* v) const;
   bool projectPointToImageCamera(const Point& p_C, int* u, int* v) const;
   cv::Mat computeNormalImage(const cv::Mat &vertex_map,
-                             const cv::Mat &depth_image) const; 
+                             const cv::Mat &depth_image) const;
   // from range image to point cloud
-  Pointcloud extractPointCloud(const cv::Mat& vertex_map, const cv::Mat &depth_image) const;
-  Pointcloud extractNormals(const cv::Mat& normal_image, const cv::Mat &depth_image) const; 
-  Colors extractColors(const cv::Mat& color_image, const cv::Mat &depth_image) const; 
+  Pointcloud extractPointCloud(const cv::Mat& vertex_map, const cv::Mat &depth_image) const; // NOLINT
+  Pointcloud extractNormals(const cv::Mat& normal_image, const cv::Mat &depth_image) const; // NOLINT
+  Colors extractColors(const cv::Mat& color_image, const cv::Mat &depth_image) const; // NOLINT
 
  protected:
   /**
@@ -181,16 +183,17 @@ class NpTsdfServer {
   ros::Timer update_mesh_timer_;
   ros::Timer publish_map_timer_;
 
-  bool verbose_; // output detailed log or not
-  bool timing_;  // output timing record or not
+  // output detailed log or not
+  bool verbose_;
+  // output timing record or not
+  bool timing_;
 
   /**
    * Global/map coordinate frame. Will always look up TF transforms to this
    * frame.
    */
   std::string world_frame_;
-
-  std::string sensor_frame_; //py: added
+  std::string sensor_frame_;
 
   /**
    * Name of the ICP corrected frame. Publishes TF and transform topic to this
@@ -287,10 +290,9 @@ class NpTsdfServer {
   float max_range_;
   float min_range_;
   float smooth_thre_ratio_ = 1.0f;
-
   bool sensor_is_lidar_ = false;
 
-  // Camera 
+  // Camera
   int vx_;
   int vy_;
   int fx_;
@@ -301,7 +303,6 @@ class NpTsdfServer {
   float fov_down_;
   float fov_down_rad_;
   float fov_rad_;
-  
 };
 
 }  // namespace voxblox

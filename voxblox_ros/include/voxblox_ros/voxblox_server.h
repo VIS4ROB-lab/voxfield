@@ -81,7 +81,7 @@ class VoxbloxServer : public TsdfServer {
 
   // py: added
   void updateOccFromTsdf();
-  void evalEsdfEvent(const ros::TimerEvent& event); 
+  void evalEsdfEvent(const ros::TimerEvent& event);
   void evalEsdfRefOcc();
   void visualizeEsdfError();
 
@@ -94,7 +94,7 @@ class VoxbloxServer : public TsdfServer {
   ros::Publisher esdf_pointcloud_pub_;
   ros::Publisher esdf_slice_pub_;
   ros::Publisher traversable_pub_;
-  ros::Publisher esdf_error_slice_pub_; //py: added
+  ros::Publisher esdf_error_slice_pub_;
 
   /// Publish the complete map for other nodes to consume.
   ros::Publisher esdf_map_pub_;
@@ -108,7 +108,7 @@ class VoxbloxServer : public TsdfServer {
 
   /// Timers.
   ros::Timer update_esdf_timer_;
-  ros::Timer eval_esdf_timer_; //py: added
+  ros::Timer eval_esdf_timer_;
 
   bool clear_sphere_for_planning_;
   bool publish_esdf_map_;
@@ -117,17 +117,15 @@ class VoxbloxServer : public TsdfServer {
   bool incremental_update_;
   int num_subscribers_esdf_map_;
 
-  bool esdf_ready_; // py: added
+  bool esdf_ready_;
 
   // ESDF maps.
   std::shared_ptr<EsdfMap> esdf_map_;
   std::unique_ptr<EsdfIntegrator> esdf_integrator_;
 
-  // py: added
-  // Occupancy maps. 
+  // Occupancy maps.
   std::shared_ptr<OccupancyMap> occupancy_map_;
   std::unique_ptr<OccTsdfIntegrator> occupancy_integrator_;
-
 };
 
 }  // namespace voxblox

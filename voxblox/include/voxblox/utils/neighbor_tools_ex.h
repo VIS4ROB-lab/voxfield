@@ -48,21 +48,23 @@ class Neighborhood24 : public Neighborhood24LookupTables {
                                             const GlobalIndex& coc_index,
                                             std::vector<int> &neighbors_idx) {
     
-  // -1,  1,  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -2,  2,  0,  0,  0,  0, // dx
-  //  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2,  0,  0, // dy
-  //  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2; // dz
-  //  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23; // index
+    // -1,  1,  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -2,  2,  0,  0,  0,  0, // dx
+    //  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2,  0,  0, // dy
+    //  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2; // dz
+    //  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23; // index
 
-    if (coc_index(2) <= global_index(2)){ // z >= obstz 
+    // z >= obstz 
+    if (coc_index(2) <= global_index(2)) {
       neighbors_idx.push_back(5);
       neighbors_idx.push_back(23);
     }
-    if (coc_index(2) >= global_index(2)){ // z <= obstz 
+    // z <= obstz 
+    if (coc_index(2) >= global_index(2)) { 
       neighbors_idx.push_back(4);
       neighbors_idx.push_back(22);
     }
-    
-    if(coc_index(1) <= global_index(1)){ // y >= obsty
+    // y >= obsty
+    if (coc_index(1) <= global_index(1)) { 
       neighbors_idx.push_back(3);
       neighbors_idx.push_back(21);
       if (coc_index(2) <= global_index(2))
@@ -70,8 +72,8 @@ class Neighborhood24 : public Neighborhood24LookupTables {
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(15);
     }
-
-    if(coc_index(1) >= global_index(1)){ // y <= obsty
+    // y <= obsty
+    if (coc_index(1) >= global_index(1)) {
       neighbors_idx.push_back(2);
       neighbors_idx.push_back(20);
       if (coc_index(2) <= global_index(2))
@@ -79,30 +81,30 @@ class Neighborhood24 : public Neighborhood24LookupTables {
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(8);
     }
-
-    if(coc_index(0) <= global_index(0)){ // x >= obstx
+    // x >= obstx
+    if (coc_index(0) <= global_index(0)) {
       neighbors_idx.push_back(1);
       neighbors_idx.push_back(19);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(11);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(16);
-      if(coc_index(1) >= global_index(1))
+      if (coc_index(1) >= global_index(1))
         neighbors_idx.push_back(7);
-      if(coc_index(1) >= global_index(1))
+      if (coc_index(1) >= global_index(1))
         neighbors_idx.push_back(13);
     }
-
-    if(coc_index(0) >= global_index(0)){ // x <= obstx
+    // x <= obstx
+    if (coc_index(0) >= global_index(0)) {
       neighbors_idx.push_back(0);
       neighbors_idx.push_back(18);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(17);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(10);
-      if(coc_index(1) >= global_index(1))
+      if (coc_index(1) >= global_index(1))
         neighbors_idx.push_back(12);
-      if(coc_index(1) >= global_index(1))
+      if (coc_index(1) >= global_index(1))
         neighbors_idx.push_back(6);
     }
   }

@@ -2,7 +2,7 @@
 #include <eigen-checks/gtest.h>
 #include <gtest/gtest.h>
 
-//#include "voxblox/core/tsdf_map.h"
+// #include "voxblox/core/tsdf_map.h"
 #include "voxblox/core/common.h"
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"

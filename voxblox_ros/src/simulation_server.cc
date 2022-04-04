@@ -284,7 +284,7 @@ void SimulationServer::evaluate() {
   const double esdf_rmse = utils::evaluateLayersRmse(*esdf_gt_, *esdf_test_);
 
   ROS_INFO_STREAM("TSDF RMSE: " << tsdf_rmse << " ESDF RMSE: " << esdf_rmse);
-  
+
   ROS_INFO_STREAM("Mesh Timings: " << std::endl << timing::Timing::Print());
 }
 

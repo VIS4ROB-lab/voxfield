@@ -51,11 +51,13 @@ class NpTsdfIntegratorBase {
     bool voxel_carving_enabled = true;
     float min_ray_length_m = 0.1;
     float max_ray_length_m = 5.0;
-    bool use_const_weight = false; // if true, then we apply weight reduction
+    // if true, then we apply weight reduction
+    bool use_const_weight = false;
     float weight_reduction_exp = 1.0f;
     bool allow_clear = true;
     bool use_weight_dropoff = true;
-    float weight_dropoff_epsilon = -1.0f; // if negative, then the value would be the ratio of voxel size
+    // if negative, then the value would be the ratio of voxel size
+    float weight_dropoff_epsilon = -1.0f;
     bool use_sparsity_compensation_factor = false;
     float sparsity_compensation_factor = 1.0f;
 
@@ -70,8 +72,7 @@ class NpTsdfIntegratorBase {
     /// Mode of the ThreadSafeIndex, determines the integration order of the
     /// rays. Options: "mixed", "sorted"
     std::string integration_order_mode = "mixed";
-    
-    bool merge_with_clear = true; // only for "merge" integration 
+    bool merge_with_clear = true; // only for "merge" integration
 
     /// merge integrator specific
     bool enable_anti_grazing = false;
@@ -152,28 +153,29 @@ class NpTsdfIntegratorBase {
 
   /// Updates tsdf_voxel, Thread safe.
   void updateTsdfVoxel(const Transformation& T_G_C, const Point& origin,
-                       const Point& point_C, const Point& point_G,                   
-                       const Ray& normal_C, const Ray& normal_G,                   
-                       const GlobalIndex& global_voxel_idx, const Color& color,                    
-                       const float init_weight, TsdfVoxel* tsdf_voxel);                   
+                       const Point& point_C, const Point& point_G,
+                       const Ray& normal_C, const Ray& normal_G,
+                       const GlobalIndex& global_voxel_idx, const Color& color,
+                       const float init_weight, TsdfVoxel* tsdf_voxel);
                                            
   /// Update tsdf_voxel's truncated signed distance and weight value
   void updateTsdfVoxelValue(TsdfVoxel* voxel, const float sdf,
-                            const float weight, const Color* color = nullptr) const; 
+                            const float weight, const Color* color = nullptr) const;
 
   /// Update tsdf_voxel's signed distance gradient
   void updateTsdfVoxelGradient(TsdfVoxel* voxel, const Ray normal,
-                               const float weight) const;                                       
+                               const float weight) const;
                                                 
   /// Calculates TSDF distance, Thread safe.
   float computeDistance(const Point& origin, const Point& point_G,
                         const Point& voxel_center) const;
-                      
+
   /// Calculates measurment weight (confidence)
   float computeVoxelWeight(const Point& point_C, const float sdf,
-                           const bool with_init_weight, const float init_weight) const;                  
-                                                                                           
-  /// Thread safe. (only contain the weight reduction part according to distance and sensor)
+                           const bool with_init_weight, const float init_weight) const;
+
+  /// Thread safe.
+  // only contain the weight reduction part according to distance and sensor)
   float getVoxelWeight(const Point& point_C) const;
 
   Config config_;
@@ -234,7 +236,8 @@ class SimpleNpTsdfIntegrator : public NpTsdfIntegratorBase {
       : NpTsdfIntegratorBase(config, layer) {}
 
   void integratePointCloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C, const Pointcloud& normals_C, 
+                           const Pointcloud& points_C,
+                           const Pointcloud& normals_C,
                            const Colors& colors,
                            const bool freespace_points = false);
 
@@ -244,7 +247,6 @@ class SimpleNpTsdfIntegrator : public NpTsdfIntegratorBase {
                          const bool freespace_points,
                          ThreadSafeIndex* index_getter);
 };
-
 /**
  * Uses ray bundling to improve integration speed, points which lie in the same
  * voxel are "merged" into a single point. Raycasting and updating then proceeds
@@ -311,7 +313,8 @@ class FastNpTsdfIntegrator : public NpTsdfIntegratorBase {
       : NpTsdfIntegratorBase(config, layer) {}
 
   void integrateFunction(const Transformation& T_G_C,
-                         const Pointcloud& points_C, const Pointcloud& normals_C,
+                         const Pointcloud& points_C,
+                         const Pointcloud& normals_C,
                          const Colors& colors,
                          const bool freespace_points,
                          ThreadSafeIndex* index_getter);
