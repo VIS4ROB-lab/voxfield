@@ -123,7 +123,9 @@ class MeshLayer {
     return allocateNewBlock(computeBlockIndexFromCoordinates(coords));
   }
 
-  void removeMesh(const BlockIndex& index) { mesh_map_.erase(index); }
+  void removeMesh(const BlockIndex& index) {
+    mesh_map_.erase(index);
+  }
 
   void removeMeshByCoordinates(const Point& coords) {
     mesh_map_.erase(computeBlockIndexFromCoordinates(coords));
@@ -270,11 +272,13 @@ class MeshLayer {
       meshes.push_back(getMeshPtrByIndex(block_index));
     }
 
-    createConnectedMesh(meshes, connected_mesh,
-                        approximate_vertex_proximity_threshold);
+    createConnectedMesh(
+        meshes, connected_mesh, approximate_vertex_proximity_threshold);
   }
 
-  size_t getNumberOfAllocatedMeshes() const { return mesh_map_.size(); }
+  size_t getNumberOfAllocatedMeshes() const {
+    return mesh_map_.size();
+  }
 
   inline size_t getMemorySize() const {
     size_t size_bytes = 0u;
@@ -292,11 +296,17 @@ class MeshLayer {
   }
 
   /// Deletes ALL parts of the mesh.
-  void clear() { mesh_map_.clear(); }
+  void clear() {
+    mesh_map_.clear();
+  }
 
-  FloatingPoint block_size() const { return block_size_; }
+  FloatingPoint block_size() const {
+    return block_size_;
+  }
 
-  FloatingPoint block_size_inv() const { return block_size_inv_; }
+  FloatingPoint block_size_inv() const {
+    return block_size_inv_;
+  }
 
  private:
   FloatingPoint block_size_;

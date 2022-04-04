@@ -97,7 +97,9 @@ class PlyWriter {
     return true;
   }
 
-  void closeFile() { file_.close(); }
+  void closeFile() {
+    file_.close();
+  }
 
  private:
   bool header_written_;

@@ -14,8 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/block_hash.h"
 #include "voxblox/core/common.h"
@@ -27,8 +27,6 @@
 #include "voxblox/utils/timing.h"
 
 namespace voxblox {
-
-
 
 /**
  * Base class to the simple, merged and fast TSDF integrators. The integrator
@@ -72,7 +70,8 @@ class NpTsdfIntegratorBase {
     /// Mode of the ThreadSafeIndex, determines the integration order of the
     /// rays. Options: "mixed", "sorted"
     std::string integration_order_mode = "mixed";
-    bool merge_with_clear = true; // only for "merge" integration
+    // only for "merge" integration
+    bool merge_with_clear = true;
 
     /// merge integrator specific
     bool enable_anti_grazing = false;
@@ -98,21 +97,23 @@ class NpTsdfIntegratorBase {
    * truncation distance. Used when we are given a minimum distance to a point,
    * rather then exact distance. This is useful for clearing out free space.
    */
-  virtual void integratePointCloud(const Transformation& T_G_C,
-                                   const Pointcloud& points_C,
-                                   const Pointcloud& normals_C,
-                                   const Colors& colors,
-                                   const bool freespace_points = false) = 0;
+  virtual void integratePointCloud(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool freespace_points = false) = 0;
 
   /// Returns a CONST ref of the config.
-  const Config& getConfig() const { return config_; }
+  const Config& getConfig() const {
+    return config_;
+  }
 
   void setLayer(Layer<TsdfVoxel>* layer);
 
  protected:
   /// Thread safe.
-  inline bool isPointValid(const Point& point_C, const bool freespace_point,
-                           bool* is_clearing) const {
+  inline bool isPointValid(
+      const Point& point_C, const bool freespace_point,
+      bool* is_clearing) const {
     DCHECK(is_clearing != nullptr);
     const FloatingPoint ray_distance = point_C.norm();
     if (ray_distance < config_.min_ray_length_m) {
@@ -141,9 +142,9 @@ class NpTsdfIntegratorBase {
    * These temporary blocks can be merged into the layer later by calling
    * updateLayerWithStoredBlocks
    */
-  TsdfVoxel* allocateStorageAndGetVoxelPtr(const GlobalIndex& global_voxel_idx,
-                                           Block<TsdfVoxel>::Ptr* last_block,
-                                           BlockIndex* last_block_idx);
+  TsdfVoxel* allocateStorageAndGetVoxelPtr(
+      const GlobalIndex& global_voxel_idx, Block<TsdfVoxel>::Ptr* last_block,
+      BlockIndex* last_block_idx);
 
   /**
    * Merges temporarily stored blocks into the main layer. NOT thread safe, see
@@ -152,27 +153,29 @@ class NpTsdfIntegratorBase {
   void updateLayerWithStoredBlocks();
 
   /// Updates tsdf_voxel, Thread safe.
-  void updateTsdfVoxel(const Transformation& T_G_C, const Point& origin,
-                       const Point& point_C, const Point& point_G,
-                       const Ray& normal_C, const Ray& normal_G,
-                       const GlobalIndex& global_voxel_idx, const Color& color,
-                       const float init_weight, TsdfVoxel* tsdf_voxel);
-                                           
+  void updateTsdfVoxel(
+      const Transformation& T_G_C, const Point& origin, const Point& point_C,
+      const Point& point_G, const Ray& normal_C, const Ray& normal_G,
+      const GlobalIndex& global_voxel_idx, const Color& color,
+      const float init_weight, TsdfVoxel* tsdf_voxel);
   /// Update tsdf_voxel's truncated signed distance and weight value
-  void updateTsdfVoxelValue(TsdfVoxel* voxel, const float sdf,
-                            const float weight, const Color* color = nullptr) const;
+  void updateTsdfVoxelValue(
+      TsdfVoxel* voxel, const float sdf, const float weight,
+      const Color* color = nullptr) const;  // NOLINT
 
   /// Update tsdf_voxel's signed distance gradient
-  void updateTsdfVoxelGradient(TsdfVoxel* voxel, const Ray normal,
-                               const float weight) const;
-                                                
+  void updateTsdfVoxelGradient(
+      TsdfVoxel* voxel, const Ray normal, const float weight) const;
+
   /// Calculates TSDF distance, Thread safe.
-  float computeDistance(const Point& origin, const Point& point_G,
-                        const Point& voxel_center) const;
+  float computeDistance(
+      const Point& origin, const Point& point_G,
+      const Point& voxel_center) const;
 
   /// Calculates measurment weight (confidence)
-  float computeVoxelWeight(const Point& point_C, const float sdf,
-                           const bool with_init_weight, const float init_weight) const;
+  float computeVoxelWeight(
+      const Point& point_C, const float sdf, const bool with_init_weight,
+      const float init_weight) const;  // NOLINT
 
   /// Thread safe.
   // only contain the weight reduction part according to distance and sensor)
@@ -235,17 +238,15 @@ class SimpleNpTsdfIntegrator : public NpTsdfIntegratorBase {
   SimpleNpTsdfIntegrator(const Config& config, Layer<TsdfVoxel>* layer)
       : NpTsdfIntegratorBase(config, layer) {}
 
-  void integratePointCloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C,
-                           const Pointcloud& normals_C,
-                           const Colors& colors,
-                           const bool freespace_points = false);
+  void integratePointCloud(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool freespace_points = false);
 
-  void integrateFunction(const Transformation& T_G_C,
-                         const Pointcloud& points_C, const Pointcloud& normals_C, 
-                         const Colors& colors,
-                         const bool freespace_points,
-                         ThreadSafeIndex* index_getter);
+  void integrateFunction(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool freespace_points, ThreadSafeIndex* index_getter);
 };
 /**
  * Uses ray bundling to improve integration speed, points which lie in the same
@@ -259,36 +260,37 @@ class MergedNpTsdfIntegrator : public NpTsdfIntegratorBase {
   MergedNpTsdfIntegrator(const Config& config, Layer<TsdfVoxel>* layer)
       : NpTsdfIntegratorBase(config, layer) {}
 
-  void integratePointCloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C, const Pointcloud& normals_C, 
-                           const Colors& colors,
-                           const bool freespace_points = false);
+  void integratePointCloud(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool freespace_points = false);
 
  protected:
-  void bundleRays(const Transformation& T_G_C, const Pointcloud& points_C, 
-                  const bool freespace_points, ThreadSafeIndex* index_getter,
-                  LongIndexHashMapType<AlignedVector<size_t>>::type* voxel_map,
-                  LongIndexHashMapType<AlignedVector<size_t>>::type* clear_map);
+  void bundleRays(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const bool freespace_points, ThreadSafeIndex* index_getter,
+      LongIndexHashMapType<AlignedVector<size_t>>::type* voxel_map,
+      LongIndexHashMapType<AlignedVector<size_t>>::type* clear_map);
 
   void integrateVoxel(
       const Transformation& T_G_C, const Pointcloud& points_C,
-      const Pointcloud& normals_C,
-      const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
+      const Pointcloud& normals_C, const Colors& colors,
+      bool enable_anti_grazing, bool clearing_ray,
       const std::pair<GlobalIndex, AlignedVector<size_t>>& kv,
       const LongIndexHashMapType<AlignedVector<size_t>>::type& voxel_map);
 
   void integrateVoxels(
       const Transformation& T_G_C, const Pointcloud& points_C,
-      const Pointcloud& normals_C,
-      const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
+      const Pointcloud& normals_C, const Colors& colors,
+      bool enable_anti_grazing, bool clearing_ray,
       const LongIndexHashMapType<AlignedVector<size_t>>::type& voxel_map,
       const LongIndexHashMapType<AlignedVector<size_t>>::type& clear_map,
       size_t thread_idx);
 
   void integrateRays(
       const Transformation& T_G_C, const Pointcloud& points_C,
-      const Pointcloud& normals_C,
-      const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
+      const Pointcloud& normals_C, const Colors& colors,
+      bool enable_anti_grazing, bool clearing_ray,
       const LongIndexHashMapType<AlignedVector<size_t>>::type& voxel_map,
       const LongIndexHashMapType<AlignedVector<size_t>>::type& clear_map);
 };
@@ -312,17 +314,15 @@ class FastNpTsdfIntegrator : public NpTsdfIntegratorBase {
   FastNpTsdfIntegrator(const Config& config, Layer<TsdfVoxel>* layer)
       : NpTsdfIntegratorBase(config, layer) {}
 
-  void integrateFunction(const Transformation& T_G_C,
-                         const Pointcloud& points_C,
-                         const Pointcloud& normals_C,
-                         const Colors& colors,
-                         const bool freespace_points,
-                         ThreadSafeIndex* index_getter);
+  void integrateFunction(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool freespace_points, ThreadSafeIndex* index_getter);
 
-  void integratePointCloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C, const Pointcloud& normals_C,
-                           const Colors& colors,
-                           const bool freespace_points = false);
+  void integratePointCloud(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool freespace_points = false);
 
  private:
   /**

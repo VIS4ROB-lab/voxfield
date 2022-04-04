@@ -33,8 +33,8 @@ class TsdfMap {
   };
 
   explicit TsdfMap(const Config& config)
-      : tsdf_layer_(new Layer<TsdfVoxel>(config.tsdf_voxel_size,
-                                         config.tsdf_voxels_per_side)),
+      : tsdf_layer_(new Layer<TsdfVoxel>(
+            config.tsdf_voxel_size, config.tsdf_voxels_per_side)),
         interpolator_(tsdf_layer_.get()) {
     block_size_ = config.tsdf_voxel_size * config.tsdf_voxels_per_side;
   }
@@ -51,8 +51,9 @@ class TsdfMap {
        * This is idiomatic when wrapping C++ code for Python, especially with
        * pybind11
        */
-      throw std::runtime_error(std::string("Null Layer<TsdfVoxel>::Ptr") +
-                               " in TsdfMap constructor");
+      throw std::runtime_error(
+          std::string("Null Layer<TsdfVoxel>::Ptr") +
+          " in TsdfMap constructor");
     }
 
     CHECK(layer);
@@ -61,14 +62,22 @@ class TsdfMap {
 
   virtual ~TsdfMap() {}
 
-  Layer<TsdfVoxel>* getTsdfLayerPtr() { return tsdf_layer_.get(); }
+  Layer<TsdfVoxel>* getTsdfLayerPtr() {
+    return tsdf_layer_.get();
+  }
   const Layer<TsdfVoxel>* getTsdfLayerConstPtr() const {
     return tsdf_layer_.get();
   }
-  const Layer<TsdfVoxel>& getTsdfLayer() const { return *tsdf_layer_; }
+  const Layer<TsdfVoxel>& getTsdfLayer() const {
+    return *tsdf_layer_;
+  }
 
-  FloatingPoint block_size() const { return block_size_; }
-  FloatingPoint voxel_size() const { return tsdf_layer_->voxel_size(); }
+  FloatingPoint block_size() const {
+    return block_size_;
+  }
+  FloatingPoint voxel_size() const {
+    return tsdf_layer_->voxel_size();
+  }
 
   /* NOTE(mereweth@jpl.nasa.gov)
    * EigenDRef is fully dynamic stride type alias for Numpy array slices
@@ -87,14 +96,15 @@ class TsdfMap {
    */
   unsigned int coordPlaneSliceGetDistanceWeight(
       unsigned int free_plane_index, double free_plane_val,
-      EigenDRef<Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,
+      EigenDRef<Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,  // NOLINT
       Eigen::Ref<Eigen::VectorXd> distances,
       Eigen::Ref<Eigen::VectorXd> weights, unsigned int max_points) const;
 
-  bool getWeightAtPosition(const Eigen::Vector3d& position,
-                           double* weight) const;
-  bool getWeightAtPosition(const Eigen::Vector3d& position,
-                           const bool interpolate, double* weight) const;
+  bool getWeightAtPosition(
+      const Eigen::Vector3d& position, double* weight) const;
+  bool getWeightAtPosition(
+      const Eigen::Vector3d& position, const bool interpolate,
+      double* weight) const;
 
  protected:
   FloatingPoint block_size_;

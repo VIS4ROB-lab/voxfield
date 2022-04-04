@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include <Eigen/Core>
 #include <glog/logging.h>
 #include <kindr/minimal/quat-transformation.h>
-#include <Eigen/Core>
 
 #include "voxblox/core/common.h"
 
@@ -28,8 +28,12 @@ class Plane {
   /// I guess more correctly, is the point on the correct side of the plane.
   bool isPointInside(const Point& point) const;
 
-  Point normal() const { return normal_; }
-  double distance() const { return distance_; }
+  Point normal() const {
+    return normal_;
+  }
+  double distance() const {
+    return distance_;
+  }
 
  private:
   Point normal_;
@@ -50,8 +54,9 @@ class CameraModel {
   void setIntrinsicsFromFocalLength(
       const Eigen::Matrix<FloatingPoint, 2, 1>& resolution, double focal_length,
       double min_distance, double max_distance);
-  void setIntrinsicsFromFoV(double horizontal_fov, double vertical_fov,
-                            double min_distance, double max_distance);
+  void setIntrinsicsFromFoV(
+      double horizontal_fov, double vertical_fov, double min_distance,
+      double max_distance);
   void setExtrinsics(const Transformation& T_C_B);
 
   /**

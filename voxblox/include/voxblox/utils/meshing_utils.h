@@ -9,12 +9,13 @@ namespace voxblox {
 namespace utils {
 
 template <typename VoxelType>
-bool getSdfIfValid(const VoxelType& voxel, const FloatingPoint min_weight,
-                   FloatingPoint* sdf);
+bool getSdfIfValid(
+    const VoxelType& voxel, const FloatingPoint min_weight, FloatingPoint* sdf);
 
 template <>
-inline bool getSdfIfValid(const TsdfVoxel& voxel,
-                          const FloatingPoint min_weight, FloatingPoint* sdf) {
+inline bool getSdfIfValid(
+    const TsdfVoxel& voxel, const FloatingPoint min_weight,
+    FloatingPoint* sdf) {
   DCHECK(sdf != nullptr);
   if (voxel.weight <= min_weight) {
     return false;
@@ -24,9 +25,9 @@ inline bool getSdfIfValid(const TsdfVoxel& voxel,
 }
 
 template <>
-inline bool getSdfIfValid(const EsdfVoxel& voxel,
-                          const FloatingPoint /*min_weight*/,
-                          FloatingPoint* sdf) {
+inline bool getSdfIfValid(
+    const EsdfVoxel& voxel, const FloatingPoint /*min_weight*/,
+    FloatingPoint* sdf) {
   DCHECK(sdf != nullptr);
   if (!voxel.observed) {
     return false;
@@ -36,12 +37,12 @@ inline bool getSdfIfValid(const EsdfVoxel& voxel,
 }
 
 template <typename VoxelType>
-bool getColorIfValid(const VoxelType& voxel, const FloatingPoint min_weight,
-                     Color* color);
+bool getColorIfValid(
+    const VoxelType& voxel, const FloatingPoint min_weight, Color* color);
 
 template <>
-inline bool getColorIfValid(const TsdfVoxel& voxel,
-                            const FloatingPoint min_weight, Color* color) {
+inline bool getColorIfValid(
+    const TsdfVoxel& voxel, const FloatingPoint min_weight, Color* color) {
   DCHECK(color != nullptr);
   if (voxel.weight <= min_weight) {
     return false;
@@ -51,8 +52,8 @@ inline bool getColorIfValid(const TsdfVoxel& voxel,
 }
 
 template <>
-inline bool getColorIfValid(const EsdfVoxel& voxel,
-                            const FloatingPoint /*min_weight*/, Color* color) {
+inline bool getColorIfValid(
+    const EsdfVoxel& voxel, const FloatingPoint /*min_weight*/, Color* color) {
   DCHECK(color != nullptr);
   if (!voxel.observed) {
     return false;

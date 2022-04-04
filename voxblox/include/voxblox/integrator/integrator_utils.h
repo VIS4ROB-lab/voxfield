@@ -4,10 +4,12 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <string>
+#include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/block_hash.h"
 #include "voxblox/core/common.h"
@@ -27,7 +29,6 @@ const std::array<std::string, kNumTsdfIntegratorTypes>
     kTsdfIntegratorTypeNames = {{/*kSimple*/ "simple",
                                  /*kMerged*/ "merged",
                                  /*kFast*/ "fast"}};
-
 
 /**
  * Small class that can be used by multiple threads that need mutually exclusive
@@ -101,8 +102,8 @@ class SortedThreadSafeIndex : public ThreadSafeIndex {
 
 class ThreadSafeIndexFactory {
  public:
-  static ThreadSafeIndex* get(const std::string& mode,
-                              const Pointcloud& points_C);
+  static ThreadSafeIndex* get(
+      const std::string& mode, const Pointcloud& points_C);
 };
 
 /**
@@ -115,12 +116,12 @@ class RayCaster {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  RayCaster(const Point& origin, const Point& point_G,
-            const bool is_clearing_ray, const bool voxel_carving_enabled,
-            const FloatingPoint max_ray_length_m,
-            const FloatingPoint voxel_size_inv,
-            const FloatingPoint truncation_distance,
-            const bool cast_from_origin = true);
+  RayCaster(
+      const Point& origin, const Point& point_G, const bool is_clearing_ray,
+      const bool voxel_carving_enabled, const FloatingPoint max_ray_length_m,
+      const FloatingPoint voxel_size_inv,
+      const FloatingPoint truncation_distance,
+      const bool cast_from_origin = true);
 
   RayCaster(const Point& start_scaled, const Point& end_scaled);
 
@@ -144,8 +145,9 @@ class RayCaster {
  * size. The indices are also returned in this scales coordinate system, which
  * should map to voxel indices.
  */
-inline void castRay(const Point& start_scaled, const Point& end_scaled,
-                    AlignedVector<GlobalIndex>* indices) {
+inline void castRay(
+    const Point& start_scaled, const Point& end_scaled,
+    AlignedVector<GlobalIndex>* indices) {
   CHECK_NOTNULL(indices);
 
   RayCaster ray_caster(start_scaled, end_scaled);

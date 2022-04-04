@@ -50,7 +50,9 @@ class LayerUtilsTest : public ::testing::Test,
     simulation.generateSdfFromWorld(max_distance_world, world_.get());
   }
 
-  virtual void SetUp() { initializeSimulatedWorld(); }
+  virtual void SetUp() {
+    initializeSimulatedWorld();
+  }
 
   typename Layer<VoxelType>::Ptr world_;
 
@@ -71,16 +73,16 @@ TEST_F(TsdfLayerUtilsTest, centerBlocksOfLayerTsdfTest) {
   Point new_layer_origin;
   utils::centerBlocksOfLayer(world_.get(), &new_layer_origin);
 
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(new_layer_origin,
-                                expected_new_coordinate_origin_, kPrecision));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      new_layer_origin, expected_new_coordinate_origin_, kPrecision));
 }
 
 TEST_F(EsdfLayerUtilsTest, centerBlocksOfLayerEsdfTest) {
   Point new_layer_origin;
   utils::centerBlocksOfLayer(world_.get(), &new_layer_origin);
 
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(new_layer_origin,
-                                expected_new_coordinate_origin_, kPrecision));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      new_layer_origin, expected_new_coordinate_origin_, kPrecision));
 }
 
 int main(int argc, char** argv) {

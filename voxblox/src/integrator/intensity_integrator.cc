@@ -4,8 +4,8 @@
 
 namespace voxblox {
 
-IntensityIntegrator::IntensityIntegrator(const Layer<TsdfVoxel>& tsdf_layer,
-                                         Layer<IntensityVoxel>* intensity_layer)
+IntensityIntegrator::IntensityIntegrator(
+    const Layer<TsdfVoxel>& tsdf_layer, Layer<IntensityVoxel>* intensity_layer)
     : max_distance_(5.0),
       max_weight_(100.0),
       intensity_prop_voxel_radius_(2),

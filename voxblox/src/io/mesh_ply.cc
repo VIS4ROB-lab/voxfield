@@ -24,9 +24,9 @@
 
 namespace voxblox {
 
-bool convertMeshLayerToMesh(const MeshLayer& mesh_layer, Mesh* mesh,
-                            const bool connected_mesh,
-                            const FloatingPoint vertex_proximity_threshold) {
+bool convertMeshLayerToMesh(
+    const MeshLayer& mesh_layer, Mesh* mesh, const bool connected_mesh,
+    const FloatingPoint vertex_proximity_threshold) {
   CHECK_NOTNULL(mesh);
 
   if (connected_mesh) {
@@ -37,15 +37,15 @@ bool convertMeshLayerToMesh(const MeshLayer& mesh_layer, Mesh* mesh,
   return mesh->size() > 0u;
 }
 
-bool outputMeshLayerAsPly(const std::string& filename,
-                          const MeshLayer& mesh_layer) {
+bool outputMeshLayerAsPly(
+    const std::string& filename, const MeshLayer& mesh_layer) {
   constexpr bool kConnectedMesh = true;
   return outputMeshLayerAsPly(filename, kConnectedMesh, mesh_layer);
 }
 
-bool outputMeshLayerAsPly(const std::string& filename,
-                          const bool connected_mesh,
-                          const MeshLayer& mesh_layer) {
+bool outputMeshLayerAsPly(
+    const std::string& filename, const bool connected_mesh,
+    const MeshLayer& mesh_layer) {
   Mesh combined_mesh(mesh_layer.block_size(), Point::Zero());
 
   if (!convertMeshLayerToMesh(mesh_layer, &combined_mesh, connected_mesh)) {

@@ -139,8 +139,9 @@ TEST_P(ClearSphereTest, EsdfIntegrators) {
   io::SaveLayer(tsdf_layer, "esdf_clear1a.voxblox", true);
   io::SaveLayer(esdf_layer, "esdf_clear1a.voxblox", false);
 
-  world_.getPointcloudFromTransform(poses_[i], depth_camera_resolution_,
-                                    fov_h_rad_, max_dist_, &ptcloud, &colors);
+  world_.getPointcloudFromTransform(
+      poses_[i], depth_camera_resolution_, fov_h_rad_, max_dist_, &ptcloud,
+      &colors);
   transformPointcloud(poses_[i].inverse(), ptcloud, &ptcloud_C);
   tsdf_integrator.integratePointCloud(poses_[i], ptcloud_C, colors);
 
@@ -159,8 +160,9 @@ TEST_P(ClearSphereTest, EsdfIntegrators) {
   ptcloud.clear();
   colors.clear();
   ptcloud_C.clear();
-  world_.getPointcloudFromTransform(poses_[i], depth_camera_resolution_,
-                                    fov_h_rad_, max_dist_, &ptcloud, &colors);
+  world_.getPointcloudFromTransform(
+      poses_[i], depth_camera_resolution_, fov_h_rad_, max_dist_, &ptcloud,
+      &colors);
   transformPointcloud(poses_[i].inverse(), ptcloud, &ptcloud_C);
   tsdf_integrator.integratePointCloud(poses_[i], ptcloud_C, colors);
   esdf_integrator.updateFromTsdfLayer(clear_updated_flag);
@@ -206,8 +208,8 @@ TEST_P(ClearSphereTest, EsdfIntegrators) {
   io::SaveLayer(*esdf_gt_, "esdf_clear_gt.voxblox", false);
 }
 
-INSTANTIATE_TEST_CASE_P(VoxelSizes, ClearSphereTest,
-                        ::testing::Values(0.1f, 0.2f));
+INSTANTIATE_TEST_CASE_P(
+    VoxelSizes, ClearSphereTest, ::testing::Values(0.1f, 0.2f));
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

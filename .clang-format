@@ -1,9 +1,15 @@
 ---
 Language: Cpp
 BasedOnStyle: Google
+DerivePointerAlignment: false
+PointerAlignment: Left
 ColumnLimit: 80
-IncludeBlocks: Preserve
----
-Language: Proto
-BasedOnStyle: Google
-...
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlignAfterOpenBracket: AlwaysBreak
+IncludeCategories:
+  - Regex:           '^<.*'
+    Priority:        1
+  - Regex:           '.*'
+    Priority:        2

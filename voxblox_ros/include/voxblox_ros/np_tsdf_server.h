@@ -5,12 +5,12 @@
 #include <queue>
 #include <string>
 
+#include <opencv2/core/mat.hpp>
 #include <pcl/conversions.h>
 #include <pcl/filters/filter.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h>
-#include <opencv2/core/mat.hpp>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <std_srvs/Empty.h>
@@ -40,10 +40,11 @@ class NpTsdfServer {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   NpTsdfServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
-  NpTsdfServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
-             const TsdfMap::Config& config,
-             const NpTsdfIntegratorBase::Config& integrator_config,
-             const MeshIntegratorConfig& mesh_config);
+  NpTsdfServer(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
+      const TsdfMap::Config& config,
+      const NpTsdfIntegratorBase::Config& integrator_config,
+      const MeshIntegratorConfig& mesh_config);
   virtual ~NpTsdfServer() {}
 
   void getServerConfigFromRosParam(const ros::NodeHandle& nh_private);
@@ -57,11 +58,10 @@ class NpTsdfServer {
       const sensor_msgs::PointCloud2::Ptr& pointcloud_msg,
       const Transformation& T_G_C, const bool is_freespace_pointcloud);
 
-  void integratePointcloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C,
-                           const Pointcloud& normals_C,
-                           const Colors& colors,
-                           const bool is_freespace_pointcloud = false);
+  void integratePointcloud(
+      const Transformation& T_G_C, const Pointcloud& points_C,
+      const Pointcloud& normals_C, const Colors& colors,
+      const bool is_freespace_pointcloud = false);
   virtual void newPoseCallback(const Transformation& /*new_pose*/) {
     // Do nothing.
   }
@@ -82,31 +82,46 @@ class NpTsdfServer {
   virtual bool saveMap(const std::string& file_path);
   virtual bool loadMap(const std::string& file_path);
 
-  bool clearMapCallback(std_srvs::Empty::Request& request,           // NOLINT
-                        std_srvs::Empty::Response& response);        // NOLINT
-  bool saveMapCallback(voxblox_msgs::FilePath::Request& request,     // NOLINT
-                       voxblox_msgs::FilePath::Response& response);  // NOLINT
-  bool loadMapCallback(voxblox_msgs::FilePath::Request& request,     // NOLINT
-                       voxblox_msgs::FilePath::Response& response);  // NOLINT
-  bool generateMeshCallback(std_srvs::Empty::Request& request,       // NOLINT
-                            std_srvs::Empty::Response& response);    // NOLINT
+  bool clearMapCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
+  bool saveMapCallback(
+      voxblox_msgs::FilePath::Request& request,     // NOLINT
+      voxblox_msgs::FilePath::Response& response);  // NOLINT
+  bool loadMapCallback(
+      voxblox_msgs::FilePath::Request& request,     // NOLINT
+      voxblox_msgs::FilePath::Response& response);  // NOLINT
+  bool generateMeshCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
   bool publishPointcloudsCallback(
-      std_srvs::Empty::Request& request,                             // NOLINT
-      std_srvs::Empty::Response& response);                          // NOLINT
-  bool publishTsdfMapCallback(std_srvs::Empty::Request& request,     // NOLINT
-                              std_srvs::Empty::Response& response);  // NOLINT
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
+  bool publishTsdfMapCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
 
   void updateMeshEvent(const ros::TimerEvent& event);
   void publishMapEvent(const ros::TimerEvent& event);
 
-  std::shared_ptr<TsdfMap> getTsdfMapPtr() { return tsdf_map_; }
-  std::shared_ptr<const TsdfMap> getTsdfMapPtr() const { return tsdf_map_; }
+  std::shared_ptr<TsdfMap> getTsdfMapPtr() {
+    return tsdf_map_;
+  }
+  std::shared_ptr<const TsdfMap> getTsdfMapPtr() const {
+    return tsdf_map_;
+  }
 
   /// Accessors for setting and getting parameters.
-  double getSliceLevel() const { return slice_level_; }
-  void setSliceLevel(double slice_level) { slice_level_ = slice_level; }
+  double getSliceLevel() const {
+    return slice_level_;
+  }
+  void setSliceLevel(double slice_level) {
+    slice_level_ = slice_level;
+  }
 
-  bool setPublishSlices() const { return publish_slices_; }
+  bool setPublishSlices() const {
+    return publish_slices_;
+  }
   void setPublishSlices(const bool publish_slices) {
     publish_slices_ = publish_slices;
   }
@@ -114,7 +129,9 @@ class NpTsdfServer {
   void setWorldFrame(const std::string& world_frame) {
     world_frame_ = world_frame;
   }
-  std::string getWorldFrame() const { return world_frame_; }
+  std::string getWorldFrame() const {
+    return world_frame_;
+  }
 
   /// CLEARS THE ENTIRE MAP!
   virtual void clear();
@@ -124,19 +141,25 @@ class NpTsdfServer {
 
   /// Preprocessing
   // from point cloud to range image
-  bool projectPointCloudToImage(const Pointcloud& points_C, 
-                                const Colors& colors,
-                                cv::Mat &vertex_map,
-                                cv::Mat &depth_image,
-                                cv::Mat &color_image) const;
+  bool projectPointCloudToImage(
+      const Pointcloud& points_C, const Colors& colors,
+      cv::Mat& vertex_map,          // NOLINT
+      cv::Mat& depth_image,         // NOLINT
+      cv::Mat& color_image) const;  // NOLINT
   float projectPointToImageLiDAR(const Point& p_C, int* u, int* v) const;
   bool projectPointToImageCamera(const Point& p_C, int* u, int* v) const;
-  cv::Mat computeNormalImage(const cv::Mat &vertex_map,
-                             const cv::Mat &depth_image) const;
+  cv::Mat computeNormalImage(
+      const cv::Mat& vertex_map, const cv::Mat& depth_image) const;
   // from range image to point cloud
-  Pointcloud extractPointCloud(const cv::Mat& vertex_map, const cv::Mat &depth_image) const; // NOLINT
-  Pointcloud extractNormals(const cv::Mat& normal_image, const cv::Mat &depth_image) const; // NOLINT
-  Colors extractColors(const cv::Mat& color_image, const cv::Mat &depth_image) const; // NOLINT
+  Pointcloud extractPointCloud(
+      const cv::Mat& vertex_map,
+      const cv::Mat& depth_image) const;  // NOLINT
+  Pointcloud extractNormals(
+      const cv::Mat& normal_image,
+      const cv::Mat& depth_image) const;  // NOLINT
+  Colors extractColors(
+      const cv::Mat& color_image,
+      const cv::Mat& depth_image) const;  // NOLINT
 
  protected:
   /**

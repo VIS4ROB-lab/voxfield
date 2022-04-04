@@ -23,8 +23,8 @@ enum class MapDerializationAction : uint8_t {
   kReset = 2u
 };
 
-inline void colorVoxbloxToMsg(const Color& color,
-                              std_msgs::ColorRGBA* color_msg) {
+inline void colorVoxbloxToMsg(
+    const Color& color, std_msgs::ColorRGBA* color_msg) {
   CHECK_NOTNULL(color_msg);
   color_msg->r = color.r / 255.0;
   color_msg->g = color.g / 255.0;
@@ -32,8 +32,8 @@ inline void colorVoxbloxToMsg(const Color& color,
   color_msg->a = color.a / 255.0;
 }
 
-inline void colorMsgToVoxblox(const std_msgs::ColorRGBA& color_msg,
-                              Color* color) {
+inline void colorMsgToVoxblox(
+    const std_msgs::ColorRGBA& color_msg, Color* color) {
   CHECK_NOTNULL(color);
   color->r = static_cast<uint8_t>(color_msg.r * 255.0);
   color->g = static_cast<uint8_t>(color_msg.g * 255.0);
@@ -61,8 +61,8 @@ inline void pointcloudToPclXYZRGB(
   }
 }
 
-inline void pointcloudToPclXYZ(const Pointcloud& ptcloud,
-                               pcl::PointCloud<pcl::PointXYZ>* ptcloud_pcl) {
+inline void pointcloudToPclXYZ(
+    const Pointcloud& ptcloud, pcl::PointCloud<pcl::PointXYZ>* ptcloud_pcl) {
   CHECK_NOTNULL(ptcloud_pcl);
   ptcloud_pcl->clear();
   ptcloud_pcl->reserve(ptcloud.size());
@@ -76,9 +76,9 @@ inline void pointcloudToPclXYZ(const Pointcloud& ptcloud,
   }
 }
 
-inline void pointcloudToPclXYZI(const Pointcloud& ptcloud,
-                                const std::vector<float>& intensities,
-                                pcl::PointCloud<pcl::PointXYZI>* ptcloud_pcl) {
+inline void pointcloudToPclXYZI(
+    const Pointcloud& ptcloud, const std::vector<float>& intensities,
+    pcl::PointCloud<pcl::PointXYZI>* ptcloud_pcl) {
   CHECK_NOTNULL(ptcloud_pcl);
   CHECK_EQ(ptcloud.size(), intensities.size());
   ptcloud_pcl->clear();
@@ -102,30 +102,33 @@ inline bool isPointFinite(const PCLPoint& point) {
 }
 
 template <typename PCLPoint>
-Color convertColor(const PCLPoint& point,
-                   const std::shared_ptr<ColorMap>& color_map);
+Color convertColor(
+    const PCLPoint& point, const std::shared_ptr<ColorMap>& color_map);
 
 template <>
-inline Color convertColor(const pcl::PointXYZRGBL& point,
-                          const std::shared_ptr<ColorMap>& /*color_map*/) {
+inline Color convertColor(
+    const pcl::PointXYZRGBL& point,
+    const std::shared_ptr<ColorMap>& /*color_map*/) {
   return Color(point.r, point.g, point.b);
 }
 
 template <>
-inline Color convertColor(const pcl::PointXYZRGB& point,
-                          const std::shared_ptr<ColorMap>& /*color_map*/) {
+inline Color convertColor(
+    const pcl::PointXYZRGB& point,
+    const std::shared_ptr<ColorMap>& /*color_map*/) {
   return Color(point.r, point.g, point.b, point.a);
 }
 
 template <>
-inline Color convertColor(const pcl::PointXYZI& point,
-                          const std::shared_ptr<ColorMap>& color_map) {
+inline Color convertColor(
+    const pcl::PointXYZI& point, const std::shared_ptr<ColorMap>& color_map) {
   return color_map->colorLookup(point.intensity);
 }
 
 template <>
-inline Color convertColor(const pcl::PointXYZ& /*point*/,
-                          const std::shared_ptr<ColorMap>& color_map) {
+inline Color convertColor(
+    const pcl::PointXYZ& /*point*/,
+    const std::shared_ptr<ColorMap>& color_map) {
   return color_map->colorLookup(0);
 }
 
@@ -141,14 +144,13 @@ inline void convertPointcloud(
     if (!isPointFinite(pointcloud_pcl.points[i])) {
       continue;
     }
-    points_C->push_back(Point(pointcloud_pcl.points[i].x,
-                              pointcloud_pcl.points[i].y,
-                              pointcloud_pcl.points[i].z));
+    points_C->push_back(Point(
+        pointcloud_pcl.points[i].x, pointcloud_pcl.points[i].y,
+        pointcloud_pcl.points[i].z));
     colors->emplace_back(
         convertColor<PCLPoint>(pointcloud_pcl.points[i], color_map));
   }
 }
-
 
 // Convert pointclouds of different PCL types to a voxblox pointcloud.
 // With color, with label
@@ -177,14 +179,13 @@ inline void convertPointcloud(
       continue;
     if (filter_moving_object && cur_label.sem_label > 250)
       continue;
-  
-    points_C->push_back(Point(pointcloud_pcl.points[i].x,
-                              pointcloud_pcl.points[i].y,
-                              pointcloud_pcl.points[i].z));
+    points_C->push_back(Point(
+        pointcloud_pcl.points[i].x, pointcloud_pcl.points[i].y,
+        pointcloud_pcl.points[i].z));
     colors->emplace_back(
         convertColor<pcl::PointXYZRGBL>(pointcloud_pcl.points[i], color_map));
     // add definition of Label
-    labels->emplace_back(cur_label); 
+    labels->emplace_back(cur_label);
   }
 }
 
@@ -202,13 +203,13 @@ void serializeLayerAsMsg(
  * message.
  */
 template <typename VoxelType>
-bool deserializeMsgToLayer(const voxblox_msgs::Layer& msg,
-                           Layer<VoxelType>* layer);
+bool deserializeMsgToLayer(
+    const voxblox_msgs::Layer& msg, Layer<VoxelType>* layer);
 
 template <typename VoxelType>
-bool deserializeMsgToLayer(const voxblox_msgs::Layer& msg,
-                           const MapDerializationAction& action,
-                           Layer<VoxelType>* layer);
+bool deserializeMsgToLayer(
+    const voxblox_msgs::Layer& msg, const MapDerializationAction& action,
+    Layer<VoxelType>* layer);
 
 }  // namespace voxblox
 

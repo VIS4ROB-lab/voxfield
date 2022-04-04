@@ -2,9 +2,9 @@
 
 namespace voxblox {
 
-EsdfOccIntegrator::EsdfOccIntegrator(const Config& config,
-                                     Layer<OccupancyVoxel>* occ_layer,
-                                     Layer<EsdfVoxel>* esdf_layer)
+EsdfOccIntegrator::EsdfOccIntegrator(
+    const Config& config, Layer<OccupancyVoxel>* occ_layer,
+    Layer<EsdfVoxel>* esdf_layer)
     : config_(config), occ_layer_(occ_layer), esdf_layer_(esdf_layer) {
   CHECK_NOTNULL(occ_layer_);
   CHECK_NOTNULL(esdf_layer_);
@@ -71,8 +71,8 @@ void EsdfOccIntegrator::updateFromOccBlocks(const BlockIndexList& occ_blocks) {
         esdf_voxel.parent.setZero();
 
         esdf_voxel.in_queue = true;
-        open_.push(std::make_pair(block_index, voxel_index),
-                   esdf_voxel.distance);
+        open_.push(
+            std::make_pair(block_index, voxel_index), esdf_voxel.distance);
         num_lower++;
       } else {
         esdf_voxel.distance = config_.default_distance_m;
@@ -126,8 +126,8 @@ void EsdfOccIntegrator::processOpenSet() {
     AlignedVector<VoxelKey> neighbors;
     AlignedVector<float> distances;
     AlignedVector<Eigen::Vector3i> directions;
-    getNeighborsAndDistances(kv.first, kv.second, &neighbors, &distances,
-                             &directions);
+    getNeighborsAndDistances(
+        kv.first, kv.second, &neighbors, &distances, &directions);
 
     // Do NOT update unobserved distances.
     CHECK_EQ(neighbors.size(), distances.size());
@@ -218,8 +218,9 @@ void EsdfOccIntegrator::getNeighborsAndDistances(
   for (unsigned int i = 0; i < 3; ++i) {
     for (int j = -1; j <= 1; j += 2) {
       direction(i) = j;
-      getNeighbor(block_index, voxel_index, direction, &neighbor.first,
-                  &neighbor.second);
+      getNeighbor(
+          block_index, voxel_index, direction, &neighbor.first,
+          &neighbor.second);
       neighbors->emplace_back(neighbor);
       distances->emplace_back(1.0);
       directions->emplace_back(direction);
@@ -234,8 +235,9 @@ void EsdfOccIntegrator::getNeighborsAndDistances(
       direction(i) = j;
       for (int k = -1; k <= 1; k += 2) {
         direction(next_i) = k;
-        getNeighbor(block_index, voxel_index, direction, &neighbor.first,
-                    &neighbor.second);
+        getNeighbor(
+            block_index, voxel_index, direction, &neighbor.first,
+            &neighbor.second);
         neighbors->emplace_back(neighbor);
         distances->emplace_back(kSqrt2);
         directions->emplace_back(direction);
@@ -252,8 +254,9 @@ void EsdfOccIntegrator::getNeighborsAndDistances(
       direction(1) = j;
       for (int k = -1; k <= 1; k += 2) {
         direction(2) = k;
-        getNeighbor(block_index, voxel_index, direction, &neighbor.first,
-                    &neighbor.second);
+        getNeighbor(
+            block_index, voxel_index, direction, &neighbor.first,
+            &neighbor.second);
         neighbors->emplace_back(neighbor);
         distances->emplace_back(kSqrt3);
         directions->emplace_back(direction);
@@ -264,11 +267,10 @@ void EsdfOccIntegrator::getNeighborsAndDistances(
   CHECK_EQ(neighbors->size(), kNumNeighbors);
 }
 
-void EsdfOccIntegrator::getNeighbor(const BlockIndex& block_index,
-                                    const VoxelIndex& voxel_index,
-                                    const Eigen::Vector3i& direction,
-                                    BlockIndex* neighbor_block_index,
-                                    VoxelIndex* neighbor_voxel_index) const {
+void EsdfOccIntegrator::getNeighbor(
+    const BlockIndex& block_index, const VoxelIndex& voxel_index,
+    const Eigen::Vector3i& direction, BlockIndex* neighbor_block_index,
+    VoxelIndex* neighbor_voxel_index) const {
   DCHECK(neighbor_block_index != NULL);
   DCHECK(neighbor_voxel_index != NULL);
 
@@ -279,8 +281,9 @@ void EsdfOccIntegrator::getNeighbor(const BlockIndex& block_index,
     if ((*neighbor_voxel_index)(i) < 0) {
       (*neighbor_block_index)(i)--;
       (*neighbor_voxel_index)(i) += esdf_voxels_per_side_;
-    } else if ((*neighbor_voxel_index)(i) >=
-               static_cast<IndexElement>(esdf_voxels_per_side_)) {
+    } else if (
+        (*neighbor_voxel_index)(i) >=
+        static_cast<IndexElement>(esdf_voxels_per_side_)) {
       (*neighbor_block_index)(i)++;
       (*neighbor_voxel_index)(i) -= esdf_voxels_per_side_;
     }

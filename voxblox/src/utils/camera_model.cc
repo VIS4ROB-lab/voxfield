@@ -34,13 +34,13 @@ void CameraModel::setIntrinsicsFromFocalLength(
   double horizontal_fov = 2 * std::atan(resolution.x() / (2 * focal_length));
   double vertical_fov = 2 * std::atan(resolution.y() / (2 * focal_length));
 
-  setIntrinsicsFromFoV(horizontal_fov, vertical_fov, min_distance,
-                       max_distance);
+  setIntrinsicsFromFoV(
+      horizontal_fov, vertical_fov, min_distance, max_distance);
 }
 
-void CameraModel::setIntrinsicsFromFoV(double horizontal_fov,
-                                       double vertical_fov, double min_distance,
-                                       double max_distance) {
+void CameraModel::setIntrinsicsFromFoV(
+    double horizontal_fov, double vertical_fov, double min_distance,
+    double max_distance) {
   // Given this information, create 6 bounding planes, assuming the camera is
   // pointing with in the positive X direction.
   // We create the planes by calculating all the corner points and store them
@@ -52,43 +52,49 @@ void CameraModel::setIntrinsicsFromFoV(double horizontal_fov,
   // First compute the near plane.
   double tan_half_horizontal_fov = std::tan(horizontal_fov / 2.0);
   double tan_half_vertical_fov = std::tan(vertical_fov / 2.0);
-  corners_C_.emplace_back(Point(min_distance,
-                                min_distance * tan_half_horizontal_fov,
-                                min_distance * tan_half_vertical_fov));
-  corners_C_.emplace_back(Point(min_distance,
-                                min_distance * tan_half_horizontal_fov,
-                                -min_distance * tan_half_vertical_fov));
-  corners_C_.emplace_back(Point(min_distance,
-                                -min_distance * tan_half_horizontal_fov,
-                                -min_distance * tan_half_vertical_fov));
-  corners_C_.emplace_back(Point(min_distance,
-                                -min_distance * tan_half_horizontal_fov,
-                                min_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      min_distance, min_distance * tan_half_horizontal_fov,
+      min_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      min_distance, min_distance * tan_half_horizontal_fov,
+      -min_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      min_distance, -min_distance * tan_half_horizontal_fov,
+      -min_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      min_distance, -min_distance * tan_half_horizontal_fov,
+      min_distance * tan_half_vertical_fov));
 
   // Then the far plane is more or less the same.
-  corners_C_.emplace_back(Point(max_distance,
-                                max_distance * tan_half_horizontal_fov,
-                                max_distance * tan_half_vertical_fov));
-  corners_C_.emplace_back(Point(max_distance,
-                                max_distance * tan_half_horizontal_fov,
-                                -max_distance * tan_half_vertical_fov));
-  corners_C_.emplace_back(Point(max_distance,
-                                -max_distance * tan_half_horizontal_fov,
-                                -max_distance * tan_half_vertical_fov));
-  corners_C_.emplace_back(Point(max_distance,
-                                -max_distance * tan_half_horizontal_fov,
-                                max_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      max_distance, max_distance * tan_half_horizontal_fov,
+      max_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      max_distance, max_distance * tan_half_horizontal_fov,
+      -max_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      max_distance, -max_distance * tan_half_horizontal_fov,
+      -max_distance * tan_half_vertical_fov));
+  corners_C_.emplace_back(Point(
+      max_distance, -max_distance * tan_half_horizontal_fov,
+      max_distance * tan_half_vertical_fov));
 
   initialized_ = true;
 }
 
-void CameraModel::setExtrinsics(const Transformation& T_C_B) { T_C_B_ = T_C_B; }
+void CameraModel::setExtrinsics(const Transformation& T_C_B) {
+  T_C_B_ = T_C_B;
+}
 
 // Get and set the current poses for the camera (should be called after
 // the camera is properly set up).
-Transformation CameraModel::getCameraPose() const { return T_G_C_; }
+Transformation CameraModel::getCameraPose() const {
+  return T_G_C_;
+}
 
-Transformation CameraModel::getBodyPose() const { return T_G_C_ * T_C_B_; }
+Transformation CameraModel::getBodyPose() const {
+  return T_G_C_ * T_C_B_;
+}
 
 void CameraModel::setCameraPose(const Transformation& cam_pose) {
   T_G_C_ = cam_pose;

@@ -18,13 +18,13 @@ static const FloatingPoint kUnitCubeDiagonalLength = std::sqrt(3.0);
 
 /// Merges layers, when the voxel or block size differs resampling occurs.
 template <typename VoxelType>
-void mergeLayerAintoLayerB(const Layer<VoxelType>& layer_A,
-                           Layer<VoxelType>* layer_B) {
+void mergeLayerAintoLayerB(
+    const Layer<VoxelType>& layer_A, Layer<VoxelType>* layer_B) {
   CHECK_NOTNULL(layer_B);
   // if voxel layout is different resample layer A to match B
   const Layer<VoxelType>* layer_A_ptr;
-  Layer<VoxelType> layer_A_resampled(layer_B->voxel_size(),
-                                     layer_B->voxels_per_side());
+  Layer<VoxelType> layer_A_resampled(
+      layer_B->voxel_size(), layer_B->voxels_per_side());
 
   if ((layer_A.voxel_size() != layer_B->voxel_size()) ||
       (layer_A.voxels_per_side() != layer_B->voxels_per_side())) {
@@ -58,12 +58,11 @@ void mergeLayerAintoLayerB(const Layer<VoxelType>& layer_A,
  * transformLayer for details
  */
 template <typename VoxelType>
-void mergeLayerAintoLayerB(const Layer<VoxelType>& layer_A,
-                           const Transformation& T_B_A,
-                           Layer<VoxelType>* layer_B,
-                           bool use_naive_method = false) {
-  Layer<VoxelType> layer_A_transformed(layer_B->voxel_size(),
-                                       layer_B->voxels_per_side());
+void mergeLayerAintoLayerB(
+    const Layer<VoxelType>& layer_A, const Transformation& T_B_A,
+    Layer<VoxelType>* layer_B, bool use_naive_method = false) {
+  Layer<VoxelType> layer_A_transformed(
+      layer_B->voxel_size(), layer_B->voxels_per_side());
 
   if (use_naive_method) {
     naiveTransformLayer(layer_A, T_B_A, &layer_A_transformed);
@@ -79,8 +78,8 @@ void mergeLayerAintoLayerB(const Layer<VoxelType>& layer_A,
  * data so that it fits the voxel and block size of the output layer
  */
 template <typename VoxelType>
-void resampleLayer(const Layer<VoxelType>& layer_in,
-                   Layer<VoxelType>* layer_out) {
+void resampleLayer(
+    const Layer<VoxelType>& layer_in, Layer<VoxelType>* layer_out) {
   CHECK_NOTNULL(layer_out);
   transformLayer(layer_in, Transformation(), layer_out);
 }
@@ -92,9 +91,9 @@ void resampleLayer(const Layer<VoxelType>& layer_in,
  * several orders of magnitude faster.
  */
 template <typename VoxelType>
-void naiveTransformLayer(const Layer<VoxelType>& layer_in,
-                         const Transformation& T_out_in,
-                         Layer<VoxelType>* layer_out) {
+void naiveTransformLayer(
+    const Layer<VoxelType>& layer_in, const Transformation& T_out_in,
+    Layer<VoxelType>* layer_out) {
   BlockIndexList block_idx_list_in;
   layer_in.getAllAllocatedBlocks(&block_idx_list_in);
 
@@ -113,8 +112,8 @@ void naiveTransformLayer(const Layer<VoxelType>& layer_in,
           input_block.computeCoordinatesFromLinearIndex(input_linear_voxel_idx);
 
       const GlobalIndex global_output_voxel_idx =
-          getGridIndexFromPoint<GlobalIndex>(voxel_center,
-                                             layer_out->voxel_size_inv());
+          getGridIndexFromPoint<GlobalIndex>(
+              voxel_center, layer_out->voxel_size_inv());
 
       // allocate it in the output
       typename Block<VoxelType>::Ptr output_block =
@@ -143,9 +142,9 @@ void naiveTransformLayer(const Layer<VoxelType>& layer_in,
  * and block size of the input and output layer can differ.
  */
 template <typename VoxelType>
-void transformLayer(const Layer<VoxelType>& layer_in,
-                    const Transformation& T_out_in,
-                    Layer<VoxelType>* layer_out) {
+void transformLayer(
+    const Layer<VoxelType>& layer_in, const Transformation& T_out_in,
+    Layer<VoxelType>* layer_out) {
   CHECK_NOTNULL(layer_out);
 
   // first mark all the blocks in the output layer that may be filled by the
@@ -219,8 +218,9 @@ void transformLayer(const Layer<VoxelType>& layer_in,
   }
 }
 
-typedef std::pair<voxblox::Layer<voxblox::TsdfVoxel>::Ptr,
-                  voxblox::Layer<voxblox::TsdfVoxel>::Ptr>
+typedef std::pair<
+    voxblox::Layer<voxblox::TsdfVoxel>::Ptr,
+    voxblox::Layer<voxblox::TsdfVoxel>::Ptr>
     AlignedLayerAndErrorLayer;
 typedef std::vector<AlignedLayerAndErrorLayer> AlignedLayerAndErrorLayers;
 
@@ -239,8 +239,9 @@ void evaluateLayerRmseAtPoses(
     const Layer<VoxelType>& layer_A, const Layer<VoxelType>& layer_B,
     const std::vector<Transformation>& transforms_A_B,
     std::vector<utils::VoxelEvaluationDetails>* voxel_evaluation_details_vector,
-    std::vector<std::pair<typename voxblox::Layer<VoxelType>::Ptr,
-                          typename voxblox::Layer<VoxelType>::Ptr>>*
+    std::vector<std::pair<
+        typename voxblox::Layer<VoxelType>::Ptr,
+        typename voxblox::Layer<VoxelType>::Ptr>>*
         aligned_layers_and_error_layers = nullptr) {
   CHECK_NOTNULL(voxel_evaluation_details_vector);
 
@@ -279,8 +280,9 @@ void evaluateLayerRmseAtPoses(
 
     utils::VoxelEvaluationDetails voxel_evaluation_details;
     // Evaluate the RMSE of the merged object layer in the world layer.
-    utils::evaluateLayersRmse(layer_A, *aligned_layer_B, voxel_evaluation_mode,
-                              &voxel_evaluation_details, error_layer);
+    utils::evaluateLayersRmse(
+        layer_A, *aligned_layer_B, voxel_evaluation_mode,
+        &voxel_evaluation_details, error_layer);
     voxel_evaluation_details_vector->push_back(voxel_evaluation_details);
   }
 }
@@ -289,12 +291,13 @@ template <typename VoxelType>
 void evaluateLayerRmseAtPoses(
     const utils::VoxelEvaluationMode& voxel_evaluation_mode,
     const Layer<VoxelType>& layer_A, const Layer<VoxelType>& layer_B,
-    const std::vector<Eigen::Matrix<float, 4, 4>,
-                      Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4>>>&
-        transforms_A_B,
+    const std::vector<
+        Eigen::Matrix<float, 4, 4>,
+        Eigen::aligned_allocator<Eigen::Matrix<float, 4, 4>>>& transforms_A_B,
     std::vector<utils::VoxelEvaluationDetails>* voxel_evaluation_details_vector,
-    std::vector<std::pair<typename voxblox::Layer<VoxelType>::Ptr,
-                          typename voxblox::Layer<VoxelType>::Ptr>>*
+    std::vector<std::pair<
+        typename voxblox::Layer<VoxelType>::Ptr,
+        typename voxblox::Layer<VoxelType>::Ptr>>*
         aligned_layers_and_error_layers = nullptr) {
   CHECK_NOTNULL(voxel_evaluation_details_vector);
   std::vector<Transformation> kindr_transforms_A_B;

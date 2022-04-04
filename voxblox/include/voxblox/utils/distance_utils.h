@@ -14,11 +14,10 @@ namespace voxblox {
  * VoxelType must have a distance defined.
  */
 template <typename VoxelType>
-bool getSurfaceDistanceAlongRay(const Layer<VoxelType>& layer,
-                                const Point& ray_origin,
-                                const Point& bearing_vector,
-                                FloatingPoint max_distance,
-                                Point* triangulated_pose) {
+bool getSurfaceDistanceAlongRay(
+    const Layer<VoxelType>& layer, const Point& ray_origin,
+    const Point& bearing_vector, FloatingPoint max_distance,
+    Point* triangulated_pose) {
   CHECK_NOTNULL(triangulated_pose);
   // Make sure bearing vector is normalized.
   const Point ray_direction = bearing_vector.normalized();

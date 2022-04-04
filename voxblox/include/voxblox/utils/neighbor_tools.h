@@ -45,30 +45,32 @@ class Neighborhood : public NeighborhoodLookupTables {
   typedef Eigen::Matrix<LongIndexElement, 3, kConnectivity> IndexMatrix;
 
   /// Get the global index of all (6, 18, or 26) neighbors of the input index.
-  static void getFromGlobalIndex(const GlobalIndex& global_index,
-                                 IndexMatrix* neighbors) {
+  static void getFromGlobalIndex(
+      const GlobalIndex& global_index, IndexMatrix* neighbors) {
     CHECK_NOTNULL(neighbors);
     for (unsigned int i = 0u; i < kConnectivity; ++i) {
       neighbors->col(i) = global_index + kLongOffsets.col(i);
     }
   }
 
-  static void getFromGlobalIndexAndObstacle(const GlobalIndex& global_index, 
-                                            const GlobalIndex& coc_index,
-                                            std::vector<int> &neighbors_idx) {
-    
-    // -1,  1,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0,  0,  0, -1,  1, -1,  1, -1, -1, -1, -1,  1,  1,  1,  1,
-    //  0,  0, -1,  1,  0,  0, -1,  1, -1,  1, -1, -1,  1,  1,  0,  0,  0,  0, -1, -1,  1,  1, -1, -1,  1,  1,
-    //  0,  0,  0,  0, -1,  1,  0,  0,  0,  0, -1,  1, -1,  1, -1, -1,  1,  1, -1,  1, -1,  1, -1,  1, -1,  1;
-    //  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25;
+  static void getFromGlobalIndexAndObstacle(
+      const GlobalIndex& global_index, const GlobalIndex& coc_index,
+      std::vector<int>& neighbors_idx) {  // NOLINT
+    // -1,  1,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0,  0,  0, -1,  1, -1,  1,
+    // -1, -1, -1, -1,  1,  1,  1,  1, // NOLINT
+    //  0,  0, -1,  1,  0,  0, -1,  1, -1,  1, -1, -1,  1,  1,  0,  0,  0,  0,
+    //  -1, -1,  1,  1, -1, -1,  1,  1, // NOLINT 0,  0,  0,  0, -1,  1,  0,  0,
+    //  0,  0, -1,  1, -1,  1, -1, -1,  1,  1, -1,  1, -1,  1, -1,  1, -1,  1;
+    //  // NOLINT 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    //  16, 17, 18, 19, 20, 21, 22, 23, 24, 25; // NOLINT
 
     if (coc_index(2) <= global_index(2))
       neighbors_idx.push_back(5);
     if (coc_index(2) >= global_index(2))
       neighbors_idx.push_back(4);
-    
+
     // y > obsty
-    if (coc_index(1) <= global_index(1)) { 
+    if (coc_index(1) <= global_index(1)) {
       neighbors_idx.push_back(3);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(13);
@@ -77,22 +79,22 @@ class Neighborhood : public NeighborhoodLookupTables {
     }
 
     // y < obsty
-    if (coc_index(1) >= global_index(1)) { 
+    if (coc_index(1) >= global_index(1)) {
       neighbors_idx.push_back(2);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(11);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(10);
     }
-    
+
     // x > obstx
-    if (coc_index(0) <= global_index(0)) { 
+    if (coc_index(0) <= global_index(0)) {
       neighbors_idx.push_back(1);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(17);
       if (coc_index(2) >= global_index(2))
         neighbors_idx.push_back(15);
-      if (coc_index(1) >= global_index(1)){
+      if (coc_index(1) >= global_index(1)) {
         neighbors_idx.push_back(9);
         if (coc_index(2) <= global_index(2))
           neighbors_idx.push_back(25);
@@ -108,7 +110,7 @@ class Neighborhood : public NeighborhoodLookupTables {
       }
     }
     // x < obstx
-    if (coc_index(0) >= global_index(0)) { 
+    if (coc_index(0) >= global_index(0)) {
       neighbors_idx.push_back(0);
       if (coc_index(2) <= global_index(2))
         neighbors_idx.push_back(16);
@@ -174,18 +176,17 @@ class Neighborhood : public NeighborhoodLookupTables {
     AlignedVector<VoxelKey>& neighbors = *neighbors_ptr;
     for (unsigned int i = 0u; i < kConnectivity; ++i) {
       VoxelKey& neighbor = neighbors[i];
-      getFromBlockAndVoxelIndexAndDirection(block_index, voxel_index,
-                                            kOffsets.col(i), voxels_per_side,
-                                            &neighbor.first, &neighbor.second);
+      getFromBlockAndVoxelIndexAndDirection(
+          block_index, voxel_index, kOffsets.col(i), voxels_per_side,
+          &neighbor.first, &neighbor.second);
     }
   }
 
   /// Get the signed offset between the global indices of two voxels.
-  static SignedIndex getOffsetBetweenVoxels(const BlockIndex& start_block_index,
-                                            const VoxelIndex& start_voxel_index,
-                                            const BlockIndex& end_block_index,
-                                            const VoxelIndex& end_voxel_index,
-                                            const size_t voxels_per_side) {
+  static SignedIndex getOffsetBetweenVoxels(
+      const BlockIndex& start_block_index, const VoxelIndex& start_voxel_index,
+      const BlockIndex& end_block_index, const VoxelIndex& end_voxel_index,
+      const size_t voxels_per_side) {
     CHECK_NE(voxels_per_side, 0u);
     return (end_voxel_index - start_voxel_index) +
            (end_block_index - start_block_index) * voxels_per_side;

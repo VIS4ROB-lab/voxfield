@@ -71,25 +71,25 @@ unsigned int TsdfMap::coordPlaneSliceGetDistanceWeight(
   }
 
   if (!did_all_fit) {
-    throw std::runtime_error(std::string("Unable to store ") +
-                             std::to_string(count) + " values.");
+    throw std::runtime_error(
+        std::string("Unable to store ") + std::to_string(count) + " values.");
   }
 
   return count;
 }
 
-bool TsdfMap::getWeightAtPosition(const Eigen::Vector3d& position,
-                                  double* weight) const {
+bool TsdfMap::getWeightAtPosition(
+    const Eigen::Vector3d& position, double* weight) const {
   constexpr bool interpolate = true;
   return getWeightAtPosition(position, interpolate, weight);
 }
 
-bool TsdfMap::getWeightAtPosition(const Eigen::Vector3d& position,
-                                  const bool interpolate,
-                                  double* weight) const {
+bool TsdfMap::getWeightAtPosition(
+    const Eigen::Vector3d& position, const bool interpolate,
+    double* weight) const {
   FloatingPoint weight_fp;
-  bool success = interpolator_.getWeight(position.cast<FloatingPoint>(),
-                                         &weight_fp, interpolate);
+  bool success = interpolator_.getWeight(
+      position.cast<FloatingPoint>(), &weight_fp, interpolate);
   if (success) {
     *weight = static_cast<double>(weight_fp);
   }

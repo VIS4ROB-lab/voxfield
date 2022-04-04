@@ -14,8 +14,8 @@ NpTsdfIntegratorBase::Ptr NpTsdfIntegratorFactory::create(
   for (const std::string& valid_integrator_type_name :
        kTsdfIntegratorTypeNames) {
     if (integrator_type_name == valid_integrator_type_name) {
-      return create(static_cast<TsdfIntegratorType>(integrator_type), config,
-                    layer);
+      return create(
+          static_cast<TsdfIntegratorType>(integrator_type), config, layer);
     }
     ++integrator_type;
   }
@@ -30,11 +30,11 @@ NpTsdfIntegratorBase::Ptr NpTsdfIntegratorFactory::create(
   switch (integrator_type) {
     case TsdfIntegratorType::kSimple:
       return NpTsdfIntegratorBase::Ptr(
-          new SimpleNpTsdfIntegrator(config, layer)); // NOLINT
+          new SimpleNpTsdfIntegrator(config, layer));  // NOLINT
       break;
     case TsdfIntegratorType::kMerged:
       return NpTsdfIntegratorBase::Ptr(
-          new MergedNpTsdfIntegrator(config, layer)); // NOLINT
+          new MergedNpTsdfIntegrator(config, layer));  // NOLINT
       break;
     case TsdfIntegratorType::kFast:
       return NpTsdfIntegratorBase::Ptr(new FastNpTsdfIntegrator(config, layer));
@@ -52,8 +52,8 @@ NpTsdfIntegratorBase::Ptr NpTsdfIntegratorFactory::create(
 // passed to the functions point to objects that are guaranteed to not be
 // accessed by other threads.
 
-NpTsdfIntegratorBase::NpTsdfIntegratorBase(const Config& config,
-                                       Layer<TsdfVoxel>* layer)
+NpTsdfIntegratorBase::NpTsdfIntegratorBase(
+    const Config& config, Layer<TsdfVoxel>* layer)
     : config_(config) {
   setLayer(layer);
 
@@ -150,9 +150,9 @@ void NpTsdfIntegratorBase::updateLayerWithStoredBlocks() {
 // To do this, project the voxel_center onto the ray from origin to point G.
 // Then check if the the magnitude of the vector is smaller or greater than
 // the original distance...
-float NpTsdfIntegratorBase::computeDistance(const Point& origin,
-                                            const Point& point_G,
-                                            const Point& voxel_center) const {
+float NpTsdfIntegratorBase::computeDistance(
+    const Point& origin, const Point& point_G,
+    const Point& voxel_center) const {
   const Point v_voxel_origin = voxel_center - origin;
   const Point v_point_origin = point_G - origin;
 
@@ -178,10 +178,9 @@ float NpTsdfIntegratorBase::getVoxelWeight(const Point& point_C) const {
 }
 
 // Compute the weight for current measurement
-float NpTsdfIntegratorBase::computeVoxelWeight(const Point& point_C,
-                                               const float sdf,
-                                               const bool with_init_weight,
-                                               const float init_weight) const {
+float NpTsdfIntegratorBase::computeVoxelWeight(
+    const Point& point_C, const float sdf, const bool with_init_weight,
+    const float init_weight) const {
   float weight = 1.0;
   if (with_init_weight) {
     weight = init_weight;
@@ -229,10 +228,9 @@ float NpTsdfIntegratorBase::computeVoxelWeight(const Point& point_C,
 // each voxel has a distance and a weight
 // once a new distance and weight is calculated, update it as
 // a kind of weighted average
-void NpTsdfIntegratorBase::updateTsdfVoxelValue(TsdfVoxel *voxel,
-                                                const float sdf,
-                                                const float weight,
-                                                const Color *color) const {
+void NpTsdfIntegratorBase::updateTsdfVoxelValue(
+    TsdfVoxel* voxel, const float sdf, const float weight,
+    const Color* color) const {
   float new_weight = voxel->weight + weight;
   // it is possible to have weights very close to zero, due to the limited
   // precision of floating points dividing by this small value can cause nans
@@ -254,9 +252,8 @@ void NpTsdfIntegratorBase::updateTsdfVoxelValue(TsdfVoxel *voxel,
   }
 }
 
-void NpTsdfIntegratorBase::updateTsdfVoxelGradient(TsdfVoxel *voxel,
-                                                   const Ray normal,
-                                                   const float weight) const {
+void NpTsdfIntegratorBase::updateTsdfVoxelGradient(
+    TsdfVoxel* voxel, const Ray normal, const float weight) const {
   float new_weight = voxel->weight + weight;
   // it is possible to have weights very close to zero, due to the limited
   // precision of floating points dividing by this small value can cause nans
@@ -265,8 +262,9 @@ void NpTsdfIntegratorBase::updateTsdfVoxelGradient(TsdfVoxel *voxel,
   }
 
   if (voxel->gradient.norm() > kFloatEpsilon) {
-    voxel->gradient = ((voxel->gradient * voxel->weight + normal * weight) /
-                      new_weight).normalized();
+    voxel->gradient =
+        ((voxel->gradient * voxel->weight + normal * weight) / new_weight)
+            .normalized();
   } else {
     // newly assigned, originally zero vector
     voxel->gradient = normal.normalized();
@@ -275,16 +273,11 @@ void NpTsdfIntegratorBase::updateTsdfVoxelGradient(TsdfVoxel *voxel,
 
 // Updates tsdf_voxel. Thread safe. (basic processing unit for each voxel)
 // Frames: C: current frame, G: global frame
-void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
-                                           const Point& origin,
-                                           const Point& point_C,
-                                           const Point& point_G,
-                                           const Ray& normal_C,
-                                           const Ray& normal_G,
-                                           const GlobalIndex& global_voxel_idx,
-                                           const Color& color,
-                                           const float init_weight,
-                                           TsdfVoxel* tsdf_voxel) {
+void NpTsdfIntegratorBase::updateTsdfVoxel(
+    const Transformation& T_G_C, const Point& origin, const Point& point_C,
+    const Point& point_G, const Ray& normal_C, const Ray& normal_G,
+    const GlobalIndex& global_voxel_idx, const Color& color,
+    const float init_weight, TsdfVoxel* tsdf_voxel) {
   DCHECK(tsdf_voxel != nullptr);
 
   const Point voxel_center =
@@ -313,9 +306,10 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
         // [sin(theta+alpha)-sin(theta)]/sin(alpha)]
         float cos_theta = std::abs(gradient_C.dot(point_C) / point_C.norm());
         float cos_alpha = std::abs(gradient_C.dot(normal_C) / normal_C.norm());
-        float sin_theta = std::sqrt(1-cos_theta*cos_theta);
-        float sin_alpha = std::sqrt(1-cos_alpha*cos_alpha);
-        normal_ratio = std::abs(sin_theta * (cos_alpha-1) / sin_alpha + cos_theta); // NOLINT
+        float sin_theta = std::sqrt(1 - cos_theta * cos_theta);
+        float sin_alpha = std::sqrt(1 - cos_alpha * cos_alpha);
+        normal_ratio = std::abs(
+            sin_theta * (cos_alpha - 1) / sin_alpha + cos_theta);  // NOLINT
         if (std::isnan(normal_ratio))
           normal_ratio = cos_theta;
       } else {
@@ -328,7 +322,7 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
       // error
       if (normal_C.norm() > kFloatEpsilon) {
         // current normal is valid
-        normal_ratio = std::abs(normal_C.dot(point_C)/point_C.norm());
+        normal_ratio = std::abs(normal_C.dot(point_C) / point_C.norm());
       }
     }
     // NOTE(py): ruling out extremely large incidence angle
@@ -344,8 +338,8 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
   bool with_init_weight = false;
   if (init_weight > 0)
     with_init_weight = true;
-  float weight = computeVoxelWeight(point_C, sdf,
-    with_init_weight, init_weight);
+  float weight =
+      computeVoxelWeight(point_C, sdf, with_init_weight, init_weight);
   // it is possible to have weights very close to zero, due to the limited
   // precision of floating points dividing by this small value can cause nans
   if (weight < kFloatEpsilon) {
@@ -370,11 +364,10 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(const Transformation& T_G_C,
 
 // Simple Integrator
 // main entrance
-void SimpleNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
-                                                 const Pointcloud& points_C,
-                                                 const Pointcloud& normals_C,
-                                                 const Colors& colors,
-                                                 const bool freespace_points) {
+void SimpleNpTsdfIntegrator::integratePointCloud(
+    const Transformation& T_G_C, const Pointcloud& points_C,
+    const Pointcloud& normals_C, const Colors& colors,
+    const bool freespace_points) {
   timing::Timer integrate_timer("integrate_np_tsdf/simple");
   CHECK_EQ(points_C.size(), colors.size());
 
@@ -383,9 +376,9 @@ void SimpleNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
 
   std::list<std::thread> integration_threads;
   for (size_t i = 0; i < config_.integrator_threads; ++i) {
-    integration_threads.emplace_back(&SimpleNpTsdfIntegrator::integrateFunction,
-                                     this, T_G_C, points_C, normals_C, colors,
-                                     freespace_points, index_getter.get());
+    integration_threads.emplace_back(
+        &SimpleNpTsdfIntegrator::integrateFunction, this, T_G_C, points_C,
+        normals_C, colors, freespace_points, index_getter.get());
   }
 
   for (std::thread& thread : integration_threads) {
@@ -398,12 +391,10 @@ void SimpleNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
   // insertion_timer.Stop();
 }
 
-void SimpleNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
-                                               const Pointcloud& points_C,
-                                               const Pointcloud& normals_C,
-                                               const Colors& colors,
-                                               const bool freespace_points,
-                                               ThreadSafeIndex* index_getter) {
+void SimpleNpTsdfIntegrator::integrateFunction(
+    const Transformation& T_G_C, const Pointcloud& points_C,
+    const Pointcloud& normals_C, const Colors& colors,
+    const bool freespace_points, ThreadSafeIndex* index_getter) {
   DCHECK(index_getter != nullptr);
 
   size_t point_idx;
@@ -420,10 +411,10 @@ void SimpleNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
     const Point point_G = T_G_C * point_C;
     const Ray normal_G = T_G_C.getRotationMatrix() * normal_C;
 
-    RayCaster ray_caster(origin, point_G, is_clearing,
-                         config_.voxel_carving_enabled,
-                         config_.max_ray_length_m, voxel_size_inv_,
-                         config_.default_truncation_distance);
+    RayCaster ray_caster(
+        origin, point_G, is_clearing, config_.voxel_carving_enabled,
+        config_.max_ray_length_m, voxel_size_inv_,
+        config_.default_truncation_distance);
 
     Block<TsdfVoxel>::Ptr block = nullptr;
     BlockIndex block_idx;
@@ -431,19 +422,19 @@ void SimpleNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
     while (ray_caster.nextRayIndex(&global_voxel_idx)) {
       TsdfVoxel* voxel =
           allocateStorageAndGetVoxelPtr(global_voxel_idx, &block, &block_idx);
-      updateTsdfVoxel(T_G_C, origin, point_C, point_G, normal_C, normal_G,
-                      global_voxel_idx, color, 0.0, voxel);
+      updateTsdfVoxel(
+          T_G_C, origin, point_C, point_G, normal_C, normal_G, global_voxel_idx,
+          color, 0.0, voxel);
     }
   }
 }
 
 // Megred "Bundled" Integrator
 // main entrance
-void MergedNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
-                                                 const Pointcloud& points_C,
-                                                 const Pointcloud& normals_C,
-                                                 const Colors& colors,
-                                                 const bool freespace_points) {
+void MergedNpTsdfIntegrator::integratePointCloud(
+    const Transformation& T_G_C, const Pointcloud& points_C,
+    const Pointcloud& normals_C, const Colors& colors,
+    const bool freespace_points) {
   timing::Timer integrate_timer("integrate_np_tsdf/merged");
   CHECK_EQ(points_C.size(), colors.size());
   CHECK_EQ(points_C.size(), normals_C.size());
@@ -460,21 +451,24 @@ void MergedNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
   // bundle rays in each voxel with point inside
   // TODO(py): make it multi-thread
   timing::Timer bundle_timer("integrate_np_tsdf/merged/bundle");
-  bundleRays(T_G_C, points_C, freespace_points,
-             index_getter.get(), &voxel_map, &clear_map);
+  bundleRays(
+      T_G_C, points_C, freespace_points, index_getter.get(), &voxel_map,
+      &clear_map);
   bundle_timer.Stop();
 
   // integrate rays for non-clearing voxel (close to the surface)
   timing::Timer nonclear_timer("integrate_np_tsdf/merged/nonclear");
-  integrateRays(T_G_C, points_C, normals_C, colors,
-                config_.enable_anti_grazing, false, voxel_map, clear_map);
+  integrateRays(
+      T_G_C, points_C, normals_C, colors, config_.enable_anti_grazing, false,
+      voxel_map, clear_map);
   nonclear_timer.Stop();
 
   if (config_.merge_with_clear) {
     timing::Timer clear_timer("integrate_np_tsdf/merged/clear");
     // integrate rays for clearing voxels (away from the surface)
-    integrateRays(T_G_C, points_C, normals_C, colors,
-                  config_.enable_anti_grazing, true, voxel_map, clear_map);
+    integrateRays(
+        T_G_C, points_C, normals_C, colors, config_.enable_anti_grazing, true,
+        voxel_map, clear_map);
     clear_timer.Stop();
   }
   integrate_timer.Stop();
@@ -515,22 +509,23 @@ void MergedNpTsdfIntegrator::bundleRays(
 
 void MergedNpTsdfIntegrator::integrateRays(
     const Transformation& T_G_C, const Pointcloud& points_C,
-    const Pointcloud& normals_C,
-    const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
+    const Pointcloud& normals_C, const Colors& colors, bool enable_anti_grazing,
+    bool clearing_ray,
     const LongIndexHashMapType<AlignedVector<size_t>>::type& voxel_map,
     const LongIndexHashMapType<AlignedVector<size_t>>::type& clear_map) {
   // if only 1 thread just do function call, otherwise spawn threads
   if (config_.integrator_threads == 1) {
     constexpr size_t thread_idx = 0;
-    integrateVoxels(T_G_C, points_C, normals_C, colors, enable_anti_grazing,
-                    clearing_ray, voxel_map, clear_map, thread_idx);
+    integrateVoxels(
+        T_G_C, points_C, normals_C, colors, enable_anti_grazing, clearing_ray,
+        voxel_map, clear_map, thread_idx);
   } else {
     std::list<std::thread> integration_threads;
     for (size_t i = 0; i < config_.integrator_threads; ++i) {
       integration_threads.emplace_back(
-          &MergedNpTsdfIntegrator::integrateVoxels, this,
-          T_G_C, points_C, normals_C, colors,
-          enable_anti_grazing, clearing_ray, voxel_map, clear_map, i);
+          &MergedNpTsdfIntegrator::integrateVoxels, this, T_G_C, points_C,
+          normals_C, colors, enable_anti_grazing, clearing_ray, voxel_map,
+          clear_map, i);
     }
     for (std::thread& thread : integration_threads) {
       thread.join();
@@ -544,8 +539,8 @@ void MergedNpTsdfIntegrator::integrateRays(
 
 void MergedNpTsdfIntegrator::integrateVoxels(
     const Transformation& T_G_C, const Pointcloud& points_C,
-    const Pointcloud& normals_C,
-    const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
+    const Pointcloud& normals_C, const Colors& colors, bool enable_anti_grazing,
+    bool clearing_ray,
     const LongIndexHashMapType<AlignedVector<size_t>>::type& voxel_map,
     const LongIndexHashMapType<AlignedVector<size_t>>::type& clear_map,
     size_t thread_idx) {
@@ -561,8 +556,9 @@ void MergedNpTsdfIntegrator::integrateVoxels(
 
   for (size_t i = 0; i < map_size; ++i) {
     if (((i + thread_idx + 1) % config_.integrator_threads) == 0) {
-      integrateVoxel(T_G_C, points_C, normals_C, colors, enable_anti_grazing,
-                     clearing_ray, *it, voxel_map);
+      integrateVoxel(
+          T_G_C, points_C, normals_C, colors, enable_anti_grazing, clearing_ray,
+          *it, voxel_map);
     }
     ++it;
   }
@@ -570,9 +566,8 @@ void MergedNpTsdfIntegrator::integrateVoxels(
 
 void MergedNpTsdfIntegrator::integrateVoxel(
     const Transformation& T_G_C, const Pointcloud& points_C,
-    const Pointcloud& normals_C,
-    const Colors& colors, bool enable_anti_grazing, bool clearing_ray,
-    const std::pair<GlobalIndex, AlignedVector<size_t>>& kv,
+    const Pointcloud& normals_C, const Colors& colors, bool enable_anti_grazing,
+    bool clearing_ray, const std::pair<GlobalIndex, AlignedVector<size_t>>& kv,
     const LongIndexHashMapType<AlignedVector<size_t>>::type& voxel_map) {
   if (kv.second.empty()) {
     return;
@@ -598,8 +593,8 @@ void MergedNpTsdfIntegrator::integrateVoxel(
     merged_color =
         Color::blendTwoColors(merged_color, merged_weight, color, point_weight);
     if (config_.normal_available) {
-      merged_normal_C = merged_normal_C * merged_weight +
-        normal_C * point_weight;
+      merged_normal_C =
+          merged_normal_C * merged_weight + normal_C * point_weight;
       if (merged_normal_C.norm() > kEpsilon) {
         merged_normal_C.normalize();
       }
@@ -615,9 +610,10 @@ void MergedNpTsdfIntegrator::integrateVoxel(
   const Point merged_point_G = T_G_C * merged_point_C;
   const Ray merged_normal_G = T_G_C * merged_normal_C;
 
-  RayCaster ray_caster(origin, merged_point_G, clearing_ray,
-                       config_.voxel_carving_enabled, config_.max_ray_length_m,
-                       voxel_size_inv_, config_.default_truncation_distance);
+  RayCaster ray_caster(
+      origin, merged_point_G, clearing_ray, config_.voxel_carving_enabled,
+      config_.max_ray_length_m, voxel_size_inv_,
+      config_.default_truncation_distance);
 
   GlobalIndex global_voxel_idx;
   while (ray_caster.nextRayIndex(&global_voxel_idx)) {
@@ -635,20 +631,18 @@ void MergedNpTsdfIntegrator::integrateVoxel(
     TsdfVoxel* voxel =
         allocateStorageAndGetVoxelPtr(global_voxel_idx, &block, &block_idx);
 
-    updateTsdfVoxel(T_G_C, origin, merged_point_C, merged_point_G,
-                    merged_normal_C, merged_normal_G,
-                    global_voxel_idx, merged_color,
-                    merged_weight, voxel);
+    updateTsdfVoxel(
+        T_G_C, origin, merged_point_C, merged_point_G, merged_normal_C,
+        merged_normal_G, global_voxel_idx, merged_color, merged_weight, voxel);
   }
 }
 
 // Fast Integrator
 // main entrance
-void FastNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
-                                               const Pointcloud& points_C,
-                                               const Pointcloud& normals_C,
-                                               const Colors& colors,
-                                               const bool freespace_points) {
+void FastNpTsdfIntegrator::integratePointCloud(
+    const Transformation& T_G_C, const Pointcloud& points_C,
+    const Pointcloud& normals_C, const Colors& colors,
+    const bool freespace_points) {
   timing::Timer integrate_timer("integrate_np_tsdf/fast");
   CHECK_EQ(points_C.size(), colors.size());
   CHECK_EQ(points_C.size(), normals_C.size());
@@ -667,9 +661,9 @@ void FastNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
 
   std::list<std::thread> integration_threads;
   for (size_t i = 0; i < config_.integrator_threads; ++i) {
-    integration_threads.emplace_back(&FastNpTsdfIntegrator::integrateFunction,
-                                     this, T_G_C, points_C, normals_C, colors,
-                                     freespace_points, index_getter.get());
+    integration_threads.emplace_back(
+        &FastNpTsdfIntegrator::integrateFunction, this, T_G_C, points_C,
+        normals_C, colors, freespace_points, index_getter.get());
   }
 
   for (std::thread& thread : integration_threads) {
@@ -683,12 +677,10 @@ void FastNpTsdfIntegrator::integratePointCloud(const Transformation& T_G_C,
   // insertion_timer.Stop();
 }
 
-void FastNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
-                                           const Pointcloud& points_C,
-                                           const Pointcloud& normals_C,
-                                           const Colors& colors,
-                                           const bool freespace_points,
-                                           ThreadSafeIndex* index_getter) {
+void FastNpTsdfIntegrator::integrateFunction(
+    const Transformation& T_G_C, const Pointcloud& points_C,
+    const Pointcloud& normals_C, const Colors& colors,
+    const bool freespace_points, ThreadSafeIndex* index_getter) {
   DCHECK(index_getter != nullptr);
 
   size_t point_idx;
@@ -720,10 +712,10 @@ void FastNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
     }
 
     constexpr bool cast_from_origin = false;
-    RayCaster ray_caster(origin, point_G, is_clearing,
-                         config_.voxel_carving_enabled,
-                         config_.max_ray_length_m, voxel_size_inv_,
-                         config_.default_truncation_distance, cast_from_origin);
+    RayCaster ray_caster(
+        origin, point_G, is_clearing, config_.voxel_carving_enabled,
+        config_.max_ray_length_m, voxel_size_inv_,
+        config_.default_truncation_distance, cast_from_origin);
 
     int64_t consecutive_ray_collisions = 0;
 
@@ -746,8 +738,9 @@ void FastNpTsdfIntegrator::integrateFunction(const Transformation& T_G_C,
       TsdfVoxel* voxel =
           allocateStorageAndGetVoxelPtr(global_voxel_idx, &block, &block_idx);
 
-      updateTsdfVoxel(T_G_C, origin, point_C, point_G, normal_C, normal_G,
-                      global_voxel_idx, color, 0.0, voxel);
+      updateTsdfVoxel(
+          T_G_C, origin, point_C, point_G, normal_C, normal_G, global_voxel_idx,
+          color, 0.0, voxel);
     }
   }
 }
@@ -757,30 +750,30 @@ std::string NpTsdfIntegratorBase::Config::print() const {
   // clang-format off
   ss << "================== TSDF Integrator Config ====================\n";
   ss << " General: \n";
-  ss << " - default_truncation_distance:               " << default_truncation_distance << "\n";
-  ss << " - max_weight:                                " << max_weight << "\n";
-  ss << " - voxel_carving_enabled:                     " << voxel_carving_enabled << "\n";
-  ss << " - min_ray_length_m:                          " << min_ray_length_m << "\n";
-  ss << " - max_ray_length_m:                          " << max_ray_length_m << "\n";
-  ss << " - use_const_weight:                          " << use_const_weight << "\n";
-  ss << " - weight_reduction_exp:                      " << weight_reduction_exp << "\n";
-  ss << " - allow_clear:                               " << allow_clear << "\n";
-  ss << " - use_weight_dropoff:                        " << use_weight_dropoff << "\n";
-  ss << " - weight_dropoff_epsilon:                    " << weight_dropoff_epsilon << "\n";
-  ss << " - use_sparsity_compensation_factor:          " << use_sparsity_compensation_factor << "\n";
-  ss << " - sparsity_compensation_factor:              "  << sparsity_compensation_factor << "\n";
-  ss << " - integrator_threads:                        " << integrator_threads << "\n";
-  ss << " - normal_available:                          " << normal_available << "\n";
-  ss << " - reliable_band_ratio:                       " << reliable_band_ratio << "\n";
-  ss << " - curve_assumption:                          " << curve_assumption << "\n";
-  ss << " - reliable_normal_ratio_thre:                " << reliable_normal_ratio_thre << "\n";
+  ss << " - default_truncation_distance:               " << default_truncation_distance << "\n"; // NOLINT
+  ss << " - max_weight:                                " << max_weight << "\n"; // NOLINT
+  ss << " - voxel_carving_enabled:                     " << voxel_carving_enabled << "\n"; // NOLINT
+  ss << " - min_ray_length_m:                          " << min_ray_length_m << "\n"; // NOLINT
+  ss << " - max_ray_length_m:                          " << max_ray_length_m << "\n"; // NOLINT
+  ss << " - use_const_weight:                          " << use_const_weight << "\n"; // NOLINT
+  ss << " - weight_reduction_exp:                      " << weight_reduction_exp << "\n"; // NOLINT
+  ss << " - allow_clear:                               " << allow_clear << "\n"; // NOLINT
+  ss << " - use_weight_dropoff:                        " << use_weight_dropoff << "\n"; // NOLINT
+  ss << " - weight_dropoff_epsilon:                    " << weight_dropoff_epsilon << "\n"; // NOLINT
+  ss << " - use_sparsity_compensation_factor:          " << use_sparsity_compensation_factor << "\n"; // NOLINT
+  ss << " - sparsity_compensation_factor:              "  << sparsity_compensation_factor << "\n"; // NOLINT
+  ss << " - integrator_threads:                        " << integrator_threads << "\n"; // NOLINT
+  ss << " - normal_available:                          " << normal_available << "\n"; // NOLINT
+  ss << " - reliable_band_ratio:                       " << reliable_band_ratio << "\n"; // NOLINT
+  ss << " - curve_assumption:                          " << curve_assumption << "\n"; // NOLINT
+  ss << " - reliable_normal_ratio_thre:                " << reliable_normal_ratio_thre << "\n"; // NOLINT
   ss << " MergedNpTsdfIntegrator: \n";
-  ss << " - enable_anti_grazing:                       " << enable_anti_grazing << "\n";
+  ss << " - enable_anti_grazing:                       " << enable_anti_grazing << "\n"; // NOLINT
   ss << " FastNpTsdfIntegrator: \n";
-  ss << " - start_voxel_subsampling_factor:            " << start_voxel_subsampling_factor << "\n";
-  ss << " - max_consecutive_ray_collisions:            " << max_consecutive_ray_collisions << "\n";
-  ss << " - clear_checks_every_n_frames:               " << clear_checks_every_n_frames << "\n";
-  ss << " - max_integration_time_s:                    " << max_integration_time_s << "\n";
+  ss << " - start_voxel_subsampling_factor:            " << start_voxel_subsampling_factor << "\n"; // NOLINT
+  ss << " - max_consecutive_ray_collisions:            " << max_consecutive_ray_collisions << "\n"; // NOLINT
+  ss << " - clear_checks_every_n_frames:               " << clear_checks_every_n_frames << "\n"; // NOLINT
+  ss << " - max_integration_time_s:                    " << max_integration_time_s << "\n"; // NOLINT
   ss << "==============================================================\n";
   // clang-format on
   return ss.str();

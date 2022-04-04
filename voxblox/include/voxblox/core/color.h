@@ -26,7 +26,8 @@ inline Color rainbowColorMap(double h) {
 
   i = floor(h);
   f = h - i;
-  if (!(i & 1)) f = 1 - f;  // if i is even
+  if (!(i & 1))
+    f = 1 - f;  // if i is even
   m = v * (1 - s);
   n = v * (1 - s * f);
 
@@ -89,9 +90,9 @@ inline Color randomColor() {
 
   color.a = 255;
 
-  color.r = rand_r() % 256;
-  color.b = rand_r() % 256;
-  color.g = rand_r() % 256;
+  color.r = rand() % 256;  // NOLINT
+  color.b = rand() % 256;  // NOLINT
+  color.g = rand() % 256;  // NOLINT
 
   return color;
 }

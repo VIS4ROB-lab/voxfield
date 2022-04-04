@@ -115,14 +115,16 @@ class ICP {
    * Runs the ICP method to align the points with the tsdf_layer.
    * @return the number of mini batches that were successful.
    */
-  size_t runICP(const Layer<TsdfVoxel>& tsdf_layer, const Pointcloud& points,
-                const Transformation& inital_T_tsdf_sensor,
-                Transformation* refined_T_tsdf_sensor,
-                const unsigned seed = std::chrono::system_clock::now()
-                                          .time_since_epoch()
-                                          .count());
+  size_t runICP(
+      const Layer<TsdfVoxel>& tsdf_layer, const Pointcloud& points,
+      const Transformation& inital_T_tsdf_sensor,
+      Transformation* refined_T_tsdf_sensor,
+      const unsigned seed =
+          std::chrono::system_clock::now().time_since_epoch().count());
 
-  bool refiningRollPitch() { return config_.refine_roll_pitch; }
+  bool refiningRollPitch() {
+    return config_.refine_roll_pitch;
+  }
 
  private:
   typedef Transformation::Vector6 Vector6;
@@ -137,11 +139,12 @@ class ICP {
    * @return true if a valid rotation matrix was calculated, false otherwise.
    */
   template <size_t dim>
-  static bool getRotationFromMatchedPoints(const PointsMatrix& src_demean,
-                                           const PointsMatrix& tgt_demean,
-                                           Rotation* R_tgt_src) {
-    static_assert((dim == 3) || (dim == 2),
-                  "Rotation calculation is only meaningful for 2D or 3D data");
+  static bool getRotationFromMatchedPoints(
+      const PointsMatrix& src_demean, const PointsMatrix& tgt_demean,
+      Rotation* R_tgt_src) {
+    static_assert(
+        (dim == 3) || (dim == 2),
+        "Rotation calculation is only meaningful for 2D or 3D data");
     CHECK_NOTNULL(R_tgt_src);
 
     SquareMatrix<3> rotation_matrix = SquareMatrix<3>::Identity();
@@ -177,10 +180,9 @@ class ICP {
    * least mean-squared error.
    * @return true if T_tsdf_sensor was successfully estimated, false otherwise.
    */
-  static bool getTransformFromMatchedPoints(const PointsMatrix& src,
-                                            const PointsMatrix& tgt,
-                                            const bool refine_roll_pitch,
-                                            Transformation* T_tsdf_sensor);
+  static bool getTransformFromMatchedPoints(
+      const PointsMatrix& src, const PointsMatrix& tgt,
+      const bool refine_roll_pitch, Transformation* T_tsdf_sensor);
 
   /**
    * A measure that vaguely indicates the amount of information a point
@@ -193,30 +195,32 @@ class ICP {
    * @param info_vector vector representing the information over the 6-dof pose.
    * The points information is added to the information existing in this vector.
    */
-  static void addNormalizedPointInfo(const Point& point,
-                                     const Point& normalized_point_normal,
-                                     Vector6* info_vector);
+  static void addNormalizedPointInfo(
+      const Point& point, const Point& normalized_point_normal,
+      Vector6* info_vector);
 
   /// Generates a set of matching points from a pointcloud and tsdf layer.
-  void matchPoints(const Pointcloud& points, const size_t start_idx,
-                   const Transformation& T_tsdf_sensor, PointsMatrix* src,
-                   PointsMatrix* tgt, Vector6* info_vector);
+  void matchPoints(
+      const Pointcloud& points, const size_t start_idx,
+      const Transformation& T_tsdf_sensor, PointsMatrix* src, PointsMatrix* tgt,
+      Vector6* info_vector);
 
   /**
    * Performs one mini batch step and gives the refined transform.
    * @return true if a valid transform was generated
    */
-  bool stepICP(const Pointcloud& points, const size_t start_idx,
-               const Transformation& inital_T_tsdf_sensor,
-               Transformation* refined_T_tsdf_sensor, Vector6* info_vector);
+  bool stepICP(
+      const Pointcloud& points, const size_t start_idx,
+      const Transformation& inital_T_tsdf_sensor,
+      Transformation* refined_T_tsdf_sensor, Vector6* info_vector);
 
   /**
    * A thread safe function that will continually process points until the
    * alignment is finished. Called by runICP.
    */
-  void runThread(const Pointcloud& points,
-                 Transformation* current_T_tsdf_sensor,
-                 Vector6* base_info_vector, size_t* num_updates);
+  void runThread(
+      const Pointcloud& points, Transformation* current_T_tsdf_sensor,
+      Vector6* base_info_vector, size_t* num_updates);
 
   Config config_;
 

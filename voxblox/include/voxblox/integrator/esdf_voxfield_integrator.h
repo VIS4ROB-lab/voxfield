@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"
@@ -45,7 +45,7 @@ class EsdfVoxfieldIntegrator {
     FloatingPoint max_behind_surface_m = 1.0f;
 
     // Fixed band distance threshold, unit: m
-    FloatingPoint band_distance_m = 1.0f; 
+    FloatingPoint band_distance_m = 1.0f;
 
     // The threshold of TSDF distance is occ_voxel_size_ratio * voxel size
     FloatingPoint occ_voxel_size_ratio = 0.865;  // Sqrt(3) / 2
@@ -54,13 +54,13 @@ class EsdfVoxfieldIntegrator {
     float min_weight = 1e-6;
 
     // Default voxel unit distance square (deprecated)
-    // int default_dist_square = 50 * 50; 
+    // int default_dist_square = 50 * 50;
 
     // Number of buckets for the bucketed priority queue.
     int num_buckets = 20;
 
     // Number of the neighbor voxels (select from 6, 18, 24 and 26)
-    int num_neighbor = 24; // same as FIESTA
+    int num_neighbor = 24;
 
     // About the patch_on and early_break settings:
     // Fastest operation can be achieved by setting patch_on=false and
@@ -68,18 +68,18 @@ class EsdfVoxfieldIntegrator {
     // and early_break= false. Please set them in the config file wisely. Turn
     // on the patch code or not
     bool patch_on = true;
-    // Early break the increasing update or not    
+    // Early break the increasing update or not
     bool early_break = true;
-    
-    // Finer ESDF with the consideration of the inner voxel distance from the voxel center to the actual surface
+    // Finer ESDF with the consideration of the inner voxel distance
+    // from the voxel center to the actual surface
     // Gradient TSDF is needed for the calculation
     bool finer_esdf_on = false;
 
     // use a fixed band for esdf to directly copy the tsdf value
     bool fixed_band_esdf_on = false;
-
-     // sign (direction) of the gradient, towards or opposite to the surface, select from 1.0 or -1.0
-    float gradient_sign = 1.0f;          
+    // sign (direction) of the gradient, towards or opposite to the surface,
+    // select from 1.0 or -1.0
+    float gradient_sign = 1.0f;
 
     bool allocate_tsdf_in_range = false;
 
@@ -87,8 +87,9 @@ class EsdfVoxfieldIntegrator {
     GlobalIndex range_boundary_offset = GlobalIndex(10, 10, 5);
   };
 
-  EsdfVoxfieldIntegrator(const Config& config, Layer<TsdfVoxel>* tsdf_layer,
-                         Layer<EsdfVoxel>* esdf_layer);
+  EsdfVoxfieldIntegrator(
+      const Config& config, Layer<TsdfVoxel>* tsdf_layer,
+      Layer<EsdfVoxel>* esdf_layer);
 
   void updateFromTsdfLayer(bool clear_updated_flag);
 
@@ -126,7 +127,9 @@ class EsdfVoxfieldIntegrator {
   }
 
   /// Update some specific settings.
-  float getEsdfMaxDistance() const { return config_.max_distance_m; }
+  float getEsdfMaxDistance() const {
+    return config_.max_distance_m;
+  }
   void setEsdfMaxDistance(float max_distance) {
     config_.max_distance_m = max_distance;
     if (config_.default_distance_m < max_distance) {
@@ -140,7 +143,7 @@ class EsdfVoxfieldIntegrator {
   }
 
   inline bool isOccupied(FloatingPoint dist_m) const {
-    return std::abs(dist_m) <= config_.occ_voxel_size_ratio * esdf_voxel_size_;                             
+    return std::abs(dist_m) <= config_.occ_voxel_size_ratio * esdf_voxel_size_;
   }
 
   inline bool isOccupied(FloatingPoint dist_m, Ray gradient) const {
@@ -171,7 +174,7 @@ class EsdfVoxfieldIntegrator {
   GlobalIndexList insert_list_;
   GlobalIndexList delete_list_;
   BucketQueue<GlobalIndex> update_queue_;
-  LongIndexSet updated_voxel_;  
+  LongIndexSet updated_voxel_;
 
   size_t esdf_voxels_per_side_;
   FloatingPoint esdf_voxel_size_;

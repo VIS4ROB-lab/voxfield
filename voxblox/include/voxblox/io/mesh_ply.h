@@ -42,15 +42,15 @@ bool convertMeshLayerToMesh(
     const FloatingPoint vertex_proximity_threshold = 1e-10);
 
 /// Default behaviour is to simplify the mesh.
-bool outputMeshLayerAsPly(const std::string& filename,
-                          const MeshLayer& mesh_layer);
+bool outputMeshLayerAsPly(
+    const std::string& filename, const MeshLayer& mesh_layer);
 
 /**
  * @param connected_mesh if true vertices will be shared between triangles
  */
-bool outputMeshLayerAsPly(const std::string& filename,
-                          const bool connected_mesh,
-                          const MeshLayer& mesh_layer);
+bool outputMeshLayerAsPly(
+    const std::string& filename, const bool connected_mesh,
+    const MeshLayer& mesh_layer);
 
 bool outputMeshAsPly(const std::string& filename, const Mesh& mesh);
 

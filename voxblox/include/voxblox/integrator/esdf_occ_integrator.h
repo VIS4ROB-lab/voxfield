@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"
@@ -38,8 +38,9 @@ class EsdfOccIntegrator {
     int num_buckets = 20;
   };
 
-  EsdfOccIntegrator(const Config& config, Layer<OccupancyVoxel>* occ_layer,
-                    Layer<EsdfVoxel>* esdf_layer);
+  EsdfOccIntegrator(
+      const Config& config, Layer<OccupancyVoxel>* occ_layer,
+      Layer<EsdfVoxel>* esdf_layer);
 
   /**
    * Fixed is overloaded as occupied in this case.
@@ -60,10 +61,10 @@ class EsdfOccIntegrator {
       const BlockIndex& block_index, const VoxelIndex& voxel_index,
       AlignedVector<VoxelKey>* neighbors, AlignedVector<float>* distances,
       AlignedVector<Eigen::Vector3i>* directions) const;
-  void getNeighbor(const BlockIndex& block_index, const VoxelIndex& voxel_index,
-                   const Eigen::Vector3i& direction,
-                   BlockIndex* neighbor_block_index,
-                   VoxelIndex* neighbor_voxel_index) const;
+  void getNeighbor(
+      const BlockIndex& block_index, const VoxelIndex& voxel_index,
+      const Eigen::Vector3i& direction, BlockIndex* neighbor_block_index,
+      VoxelIndex* neighbor_voxel_index) const;
 
  protected:
   Config config_;

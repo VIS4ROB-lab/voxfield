@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"
@@ -77,8 +77,9 @@ class EsdfIntegrator {
     FloatingPoint occupied_sphere_radius = 5.0;
   };
 
-  EsdfIntegrator(const Config& config, Layer<TsdfVoxel>* tsdf_layer,
-                 Layer<EsdfVoxel>* esdf_layer);
+  EsdfIntegrator(
+      const Config& config, Layer<TsdfVoxel>* tsdf_layer,
+      Layer<EsdfVoxel>* esdf_layer);
 
   /**
    *Used for planning - allocates sphere around as observed but occupied,
@@ -103,8 +104,8 @@ class EsdfIntegrator {
    * Short-cut for pushing neighbors (i.e., incremental update) by default.
    * Not necessary in batch.
    */
-  void updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
-                            bool incremental = false);
+  void updateFromTsdfBlocks(
+      const BlockIndexList& tsdf_blocks, bool incremental = false);
 
   /**
    * For incremental updates, the raise set contains all fixed voxels whose
@@ -141,20 +142,23 @@ class EsdfIntegrator {
     raise_ = AlignedQueue<GlobalIndex>();
   }
   /// Update some specific settings.
-  float getEsdfMaxDistance() const { return config_.max_distance_m; }
+  float getEsdfMaxDistance() const {
+    return config_.max_distance_m;
+  }
   void setEsdfMaxDistance(float max_distance) {
     config_.max_distance_m = max_distance;
     if (config_.default_distance_m < max_distance) {
       config_.default_distance_m = max_distance;
     }
   }
-  bool getFullEuclidean() const { return config_.full_euclidean_distance; }
+  bool getFullEuclidean() const {
+    return config_.full_euclidean_distance;
+  }
   void setFullEuclidean(bool full_euclidean) {
     config_.full_euclidean_distance = full_euclidean;
   }
-
-  void assignError(GlobalIndex vox_idx, float esdf_error); //py: added
-                                 
+  // ADD(py):
+  void assignError(GlobalIndex vox_idx, float esdf_error);
 
  protected:
   Config config_;

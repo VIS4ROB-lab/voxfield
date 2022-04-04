@@ -161,8 +161,12 @@ class Layer {
     DCHECK(insert_status.first->second);
   }
 
-  void removeBlock(const BlockIndex& index) { block_map_.erase(index); }
-  void removeAllBlocks() { block_map_.clear(); }
+  void removeBlock(const BlockIndex& index) {
+    block_map_.erase(index);
+  }
+  void removeAllBlocks() {
+    block_map_.clear();
+  }
 
   void removeBlockByCoordinates(const Point& coords) {
     block_map_.erase(computeBlockIndexFromCoordinates(coords));
@@ -203,7 +207,9 @@ class Layer {
     }
   }
 
-  size_t getNumberOfAllocatedBlocks() const { return block_map_.size(); }
+  size_t getNumberOfAllocatedBlocks() const {
+    return block_map_.size();
+  }
 
   bool hasBlock(const BlockIndex& block_index) const {
     return block_map_.count(block_index) > 0;
@@ -257,12 +263,24 @@ class Layer {
     return block_ptr->getVoxelPtrByCoordinates(coords);
   }
 
-  FloatingPoint block_size() const { return block_size_; }
-  FloatingPoint block_size_inv() const { return block_size_inv_; }
-  FloatingPoint voxel_size() const { return voxel_size_; }
-  FloatingPoint voxel_size_inv() const { return voxel_size_inv_; }
-  size_t voxels_per_side() const { return voxels_per_side_; }
-  FloatingPoint voxels_per_side_inv() const { return voxels_per_side_inv_; }
+  FloatingPoint block_size() const {
+    return block_size_;
+  }
+  FloatingPoint block_size_inv() const {
+    return block_size_inv_;
+  }
+  FloatingPoint voxel_size() const {
+    return voxel_size_;
+  }
+  FloatingPoint voxel_size_inv() const {
+    return voxel_size_inv_;
+  }
+  size_t voxels_per_side() const {
+    return voxels_per_side_;
+  }
+  FloatingPoint voxels_per_side_inv() const {
+    return voxels_per_side_inv_;
+  }
 
   // Serialization tools.
   void getProto(LayerProto* proto) const;
@@ -270,14 +288,14 @@ class Layer {
   bool isCompatible(const BlockProto& layer_proto) const;
   bool saveToFile(const std::string& file_path, bool clear_file = true) const;
   // Default behavior is to clear the file.
-  bool saveSubsetToFile(const std::string& file_path,
-                        BlockIndexList blocks_to_include,
-                        bool include_all_blocks, bool clear_file = true) const;
-  bool saveBlocksToStream(bool include_all_blocks,
-                          BlockIndexList blocks_to_include,
-                          std::fstream* outfile_ptr) const;
-  bool addBlockFromProto(const BlockProto& block_proto,
-                         BlockMergingStrategy strategy);
+  bool saveSubsetToFile(
+      const std::string& file_path, BlockIndexList blocks_to_include,
+      bool include_all_blocks, bool clear_file = true) const;
+  bool saveBlocksToStream(
+      bool include_all_blocks, BlockIndexList blocks_to_include,
+      std::fstream* outfile_ptr) const;
+  bool addBlockFromProto(
+      const BlockProto& block_proto, BlockMergingStrategy strategy);
 
   size_t getMemorySize() const;
 

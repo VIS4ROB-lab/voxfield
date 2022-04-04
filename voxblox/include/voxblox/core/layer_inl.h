@@ -79,18 +79,17 @@ Layer<VoxelType>::Layer(const Layer& other) {
 }
 
 template <typename VoxelType>
-bool Layer<VoxelType>::saveToFile(const std::string& file_path,
-                                  bool clear_file) const {
+bool Layer<VoxelType>::saveToFile(
+    const std::string& file_path, bool clear_file) const {
   constexpr bool kIncludeAllBlocks = true;
-  return saveSubsetToFile(file_path, BlockIndexList(), kIncludeAllBlocks,
-                          clear_file);
+  return saveSubsetToFile(
+      file_path, BlockIndexList(), kIncludeAllBlocks, clear_file);
 }
 
 template <typename VoxelType>
-bool Layer<VoxelType>::saveSubsetToFile(const std::string& file_path,
-                                        BlockIndexList blocks_to_include,
-                                        bool include_all_blocks,
-                                        bool clear_file) const {
+bool Layer<VoxelType>::saveSubsetToFile(
+    const std::string& file_path, BlockIndexList blocks_to_include,
+    bool include_all_blocks, bool clear_file) const {
   CHECK_NE(getType().compare(voxel_types::kNotSerializable), 0)
       << "The voxel type of this layer is not serializable!";
 
@@ -162,9 +161,9 @@ bool Layer<VoxelType>::saveSubsetToFile(const std::string& file_path,
 }
 
 template <typename VoxelType>
-bool Layer<VoxelType>::saveBlocksToStream(bool include_all_blocks,
-                                          BlockIndexList blocks_to_include,
-                                          std::fstream* outfile_ptr) const {
+bool Layer<VoxelType>::saveBlocksToStream(
+    bool include_all_blocks, BlockIndexList blocks_to_include,
+    std::fstream* outfile_ptr) const {
   CHECK_NOTNULL(outfile_ptr);
   for (const BlockMapPair& pair : block_map_) {
     bool write_block_to_file = include_all_blocks;
@@ -189,8 +188,8 @@ bool Layer<VoxelType>::saveBlocksToStream(bool include_all_blocks,
 }
 
 template <typename VoxelType>
-bool Layer<VoxelType>::addBlockFromProto(const BlockProto& block_proto,
-                                         BlockMergingStrategy strategy) {
+bool Layer<VoxelType>::addBlockFromProto(
+    const BlockProto& block_proto, BlockMergingStrategy strategy) {
   CHECK_NE(getType().compare(voxel_types::kNotSerializable), 0)
       << "The voxel type of this layer is not serializable!";
 
@@ -236,8 +235,9 @@ bool Layer<VoxelType>::addBlockFromProto(const BlockProto& block_proto,
 template <typename VoxelType>
 bool Layer<VoxelType>::isCompatible(const LayerProto& layer_proto) const {
   bool compatible = true;
-  compatible &= (std::fabs(layer_proto.voxel_size() - voxel_size_) <
-                 std::numeric_limits<FloatingPoint>::epsilon());
+  compatible &=
+      (std::fabs(layer_proto.voxel_size() - voxel_size_) <
+       std::numeric_limits<FloatingPoint>::epsilon());
   compatible &= (layer_proto.voxels_per_side() == voxels_per_side_);
   compatible &= (getType().compare(layer_proto.type()) == 0);
 
@@ -262,8 +262,9 @@ bool Layer<VoxelType>::isCompatible(const LayerProto& layer_proto) const {
 template <typename VoxelType>
 bool Layer<VoxelType>::isCompatible(const BlockProto& block_proto) const {
   bool compatible = true;
-  compatible &= (std::fabs(block_proto.voxel_size() - voxel_size_) <
-                 std::numeric_limits<FloatingPoint>::epsilon());
+  compatible &=
+      (std::fabs(block_proto.voxel_size() - voxel_size_) <
+       std::numeric_limits<FloatingPoint>::epsilon());
   compatible &=
       (block_proto.voxels_per_side() == static_cast<int>(voxels_per_side_));
   return compatible;

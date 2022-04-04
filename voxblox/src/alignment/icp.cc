@@ -45,10 +45,9 @@ namespace voxblox {
 
 ICP::ICP(const Config& config) : config_(config) {}
 
-bool ICP::getTransformFromMatchedPoints(const PointsMatrix& src,
-                                        const PointsMatrix& tgt,
-                                        const bool refine_roll_pitch,
-                                        Transformation* T_tgt_src) {
+bool ICP::getTransformFromMatchedPoints(
+    const PointsMatrix& src, const PointsMatrix& tgt,
+    const bool refine_roll_pitch, Transformation* T_tgt_src) {
   CHECK(src.cols() == tgt.cols());
   CHECK_NOTNULL(T_tgt_src);
 
@@ -75,9 +74,9 @@ bool ICP::getTransformFromMatchedPoints(const PointsMatrix& src,
   return success;
 }
 
-void ICP::addNormalizedPointInfo(const Point& point,
-                                 const Point& normalized_point_normal,
-                                 Vector6* info_vector) {
+void ICP::addNormalizedPointInfo(
+    const Point& point, const Point& normalized_point_normal,
+    Vector6* info_vector) {
   DCHECK(info_vector != nullptr);
 
   // add translational point information
@@ -85,23 +84,25 @@ void ICP::addNormalizedPointInfo(const Point& point,
       2.0 * normalized_point_normal.cwiseProduct(normalized_point_normal);
   // add rotational point information (todo verify correct)
   info_vector->tail<3>() +=
-      2.0 * Point(point.y() * point.y() * normalized_point_normal.z() *
-                          normalized_point_normal.z() +
-                      point.z() * point.z() * normalized_point_normal.y() *
-                          normalized_point_normal.y(),
-                  point.x() * point.x() * normalized_point_normal.z() *
-                          normalized_point_normal.z() +
-                      point.z() * point.z() * normalized_point_normal.x() *
-                          normalized_point_normal.x(),
-                  point.x() * point.x() * normalized_point_normal.y() *
-                          normalized_point_normal.y() +
-                      point.y() * point.y() * normalized_point_normal.x() *
-                          normalized_point_normal.x());
+      2.0 * Point(
+                point.y() * point.y() * normalized_point_normal.z() *
+                        normalized_point_normal.z() +
+                    point.z() * point.z() * normalized_point_normal.y() *
+                        normalized_point_normal.y(),
+                point.x() * point.x() * normalized_point_normal.z() *
+                        normalized_point_normal.z() +
+                    point.z() * point.z() * normalized_point_normal.x() *
+                        normalized_point_normal.x(),
+                point.x() * point.x() * normalized_point_normal.y() *
+                        normalized_point_normal.y() +
+                    point.y() * point.y() * normalized_point_normal.x() *
+                        normalized_point_normal.x());
 }
 
-void ICP::matchPoints(const Pointcloud& points, const size_t start_idx,
-                      const Transformation& T_tsdf_sensor, PointsMatrix* src,
-                      PointsMatrix* tgt, Vector6* info_vector) {
+void ICP::matchPoints(
+    const Pointcloud& points, const size_t start_idx,
+    const Transformation& T_tsdf_sensor, PointsMatrix* src, PointsMatrix* tgt,
+    Vector6* info_vector) {
   CHECK_NOTNULL(src);
   CHECK_NOTNULL(tgt);
   CHECK_NOTNULL(info_vector);
@@ -132,8 +133,8 @@ void ICP::matchPoints(const Pointcloud& points, const size_t start_idx,
         (gradient.squaredNorm() > kMinGradMag)) {
       gradient.normalize();
 
-      addNormalizedPointInfo(point_tsdf - T_tsdf_sensor.getPosition(), gradient,
-                             info_vector);
+      addNormalizedPointInfo(
+          point_tsdf - T_tsdf_sensor.getPosition(), gradient, info_vector);
 
       // uninterpolated distance is to the center of the voxel, as we now have
       // the gradient we can use it to do better
@@ -151,9 +152,10 @@ void ICP::matchPoints(const Pointcloud& points, const size_t start_idx,
   tgt->conservativeResize(3, idx);
 }
 
-bool ICP::stepICP(const Pointcloud& points, const size_t start_idx,
-                  const Transformation& inital_T_tsdf_sensor,
-                  Transformation* delta_T_tsdf_sensor, Vector6* info_vector) {
+bool ICP::stepICP(
+    const Pointcloud& points, const size_t start_idx,
+    const Transformation& inital_T_tsdf_sensor,
+    Transformation* delta_T_tsdf_sensor, Vector6* info_vector) {
   CHECK_NOTNULL(delta_T_tsdf_sensor);
   CHECK_NOTNULL(info_vector);
 
@@ -162,22 +164,24 @@ bool ICP::stepICP(const Pointcloud& points, const size_t start_idx,
 
   matchPoints(points, start_idx, inital_T_tsdf_sensor, &src, &tgt, info_vector);
 
-  if (src.cols() < std::max(3, static_cast<int>(config_.mini_batch_size *
-                                                config_.min_match_ratio))) {
+  if (src.cols() <
+      std::max(
+          3, static_cast<int>(
+                 config_.mini_batch_size * config_.min_match_ratio))) {
     return false;
   }
 
-  if (!getTransformFromMatchedPoints(src, tgt, config_.refine_roll_pitch,
-                                     delta_T_tsdf_sensor)) {
+  if (!getTransformFromMatchedPoints(
+          src, tgt, config_.refine_roll_pitch, delta_T_tsdf_sensor)) {
     return false;
   }
 
   return true;
 }
 
-void ICP::runThread(const Pointcloud& points,
-                    Transformation* current_T_tsdf_sensor,
-                    Vector6* base_info_vector, size_t* num_updates) {
+void ICP::runThread(
+    const Pointcloud& points, Transformation* current_T_tsdf_sensor,
+    Vector6* base_info_vector, size_t* num_updates) {
   CHECK_NOTNULL(current_T_tsdf_sensor);
   CHECK_NOTNULL(base_info_vector);
   CHECK_NOTNULL(num_updates);
@@ -197,8 +201,9 @@ void ICP::runThread(const Pointcloud& points,
     Vector6 est_info_vector;
     Transformation delta_T_tsdf_sensor;
 
-    if (stepICP(points, start_idx, current_thread_T_tsdf_sensor,
-                &delta_T_tsdf_sensor, &est_info_vector)) {
+    if (stepICP(
+            points, start_idx, current_thread_T_tsdf_sensor,
+            &delta_T_tsdf_sensor, &est_info_vector)) {
       std::lock_guard<std::mutex> lock(mutex_);
 
       // flip tform order
@@ -219,9 +224,10 @@ void ICP::runThread(const Pointcloud& points,
   }
 }
 
-size_t ICP::runICP(const Layer<TsdfVoxel>& tsdf_layer, const Pointcloud& points,
-                   const Transformation& inital_T_tsdf_sensor,
-                   Transformation* refined_T_tsdf_sensor, const unsigned seed) {
+size_t ICP::runICP(
+    const Layer<TsdfVoxel>& tsdf_layer, const Pointcloud& points,
+    const Transformation& inital_T_tsdf_sensor,
+    Transformation* refined_T_tsdf_sensor, const unsigned seed) {
   CHECK_NOTNULL(refined_T_tsdf_sensor);
 
   interpolator_ = std::make_shared<Interpolator<TsdfVoxel>>(&tsdf_layer);
@@ -231,8 +237,9 @@ size_t ICP::runICP(const Layer<TsdfVoxel>& tsdf_layer, const Pointcloud& points,
   Pointcloud shuffled_points = points;
 
   // randomize point order
-  std::shuffle(shuffled_points.begin(), shuffled_points.end(),
-               std::default_random_engine(seed));
+  std::shuffle(
+      shuffled_points.begin(), shuffled_points.end(),
+      std::default_random_engine(seed));
 
   *refined_T_tsdf_sensor = inital_T_tsdf_sensor;
 
@@ -245,9 +252,9 @@ size_t ICP::runICP(const Layer<TsdfVoxel>& tsdf_layer, const Pointcloud& points,
   size_t num_updates = 0;
 
   for (size_t i = 0; i < config_.num_threads; ++i) {
-    threads.emplace_back(&ICP::runThread, this, shuffled_points,
-                         refined_T_tsdf_sensor, &base_info_vector,
-                         &num_updates);
+    threads.emplace_back(
+        &ICP::runThread, this, shuffled_points, refined_T_tsdf_sensor,
+        &base_info_vector, &num_updates);
   }
   for (std::thread& thread : threads) {
     thread.join();

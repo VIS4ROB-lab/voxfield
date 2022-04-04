@@ -14,8 +14,8 @@ void mergeVoxelAIntoVoxelB(const TsdfVoxel& voxel_A, TsdfVoxel* voxel_B) {
                          voxel_B->distance * voxel_B->weight) /
                         combined_weight;
 
-    voxel_B->color = Color::blendTwoColors(voxel_A.color, voxel_A.weight,
-                                           voxel_B->color, voxel_B->weight);
+    voxel_B->color = Color::blendTwoColors(
+        voxel_A.color, voxel_A.weight, voxel_B->color, voxel_B->weight);
 
     voxel_B->weight = combined_weight;
   }
@@ -32,8 +32,8 @@ void mergeVoxelAIntoVoxelB(const EsdfVoxel& voxel_A, EsdfVoxel* voxel_B) {
 }
 
 template <>
-void mergeVoxelAIntoVoxelB(const OccupancyVoxel& voxel_A,
-                           OccupancyVoxel* voxel_B) {
+void mergeVoxelAIntoVoxelB(
+    const OccupancyVoxel& voxel_A, OccupancyVoxel* voxel_B) {
   voxel_B->probability_log += voxel_A.probability_log;
   voxel_B->observed = voxel_B->observed || voxel_A.observed;
 }

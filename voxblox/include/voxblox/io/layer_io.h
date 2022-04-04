@@ -44,8 +44,8 @@ bool LoadBlocksFromStream(
  * layer in the file).
  */
 template <typename VoxelType>
-bool LoadLayer(const std::string& file_path,
-               typename Layer<VoxelType>::Ptr* layer_ptr);
+bool LoadLayer(
+    const std::string& file_path, typename Layer<VoxelType>::Ptr* layer_ptr);
 
 /**
  * Unlike LoadBlocks, this actually allocates the layer as well.
@@ -53,23 +53,24 @@ bool LoadLayer(const std::string& file_path,
  * layer in the file).
  */
 template <typename VoxelType>
-bool LoadLayer(const std::string& file_path, const bool multiple_layer_support,
-               typename Layer<VoxelType>::Ptr* layer_ptr);
+bool LoadLayer(
+    const std::string& file_path, const bool multiple_layer_support,
+    typename Layer<VoxelType>::Ptr* layer_ptr);
 
 /**
  * By default, clears (truncates) the output file. Set clear_file to false in
  * case writing the second (or subsequent) layer into the same file.
  */
 template <typename VoxelType>
-bool SaveLayer(const Layer<VoxelType>& layer, const std::string& file_path,
-               bool clear_file = true);
+bool SaveLayer(
+    const Layer<VoxelType>& layer, const std::string& file_path,
+    bool clear_file = true);
 
 /// Saves only some parts of the layer to the file. Clears the file by default.
 template <typename VoxelType>
-bool SaveLayerSubset(const Layer<VoxelType>& layer,
-                     const std::string& file_path,
-                     const BlockIndexList& blocks_to_include,
-                     bool include_all_blocks);
+bool SaveLayerSubset(
+    const Layer<VoxelType>& layer, const std::string& file_path,
+    const BlockIndexList& blocks_to_include, bool include_all_blocks);
 
 }  // namespace io
 }  // namespace voxblox

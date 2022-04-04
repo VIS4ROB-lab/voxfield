@@ -56,10 +56,11 @@ bool VoxbloxMeshDisplay::updateTransformation(ros::Time stamp) {
   // Look up the transform from tf. If it doesn't work we have to skip.
   Ogre::Quaternion orientation;
   Ogre::Vector3 position;
-  if (!context_->getFrameManager()->getTransform(visual_->getFrameId(), stamp,
-                                                 position, orientation)) {
-    ROS_DEBUG("Error transforming from frame '%s' to frame '%s'",
-              visual_->getFrameId().c_str(), qPrintable(fixed_frame_));
+  if (!context_->getFrameManager()->getTransform(
+          visual_->getFrameId(), stamp, position, orientation)) {
+    ROS_DEBUG(
+        "Error transforming from frame '%s' to frame '%s'",
+        visual_->getFrameId().c_str(), qPrintable(fixed_frame_));
     return false;
   }
   visual_->setPose(position, orientation);

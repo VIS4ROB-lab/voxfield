@@ -63,8 +63,9 @@ class VoxbloxMultiMeshDisplay
 class VisibilityField : public rviz::BoolProperty {
   Q_OBJECT
  public:
-  VisibilityField(const std::string& name, rviz::BoolProperty* parent,
-                  VoxbloxMultiMeshDisplay* master);
+  VisibilityField(
+      const std::string& name, rviz::BoolProperty* parent,
+      VoxbloxMultiMeshDisplay* master);
   void addField(const std::string& field_name);
   void removeField(const std::string& field_name);
   bool isEnabled(const std::string& field_name);
@@ -74,8 +75,8 @@ class VisibilityField : public rviz::BoolProperty {
   Q_SLOT void visibleSlot();
   VoxbloxMultiMeshDisplay* master_;
   std::unordered_map<std::string, std::unique_ptr<VisibilityField>> children_;
-  bool hasNameSpace(const std::string& name, std::string* ns,
-                    std::string* sub_name);
+  bool hasNameSpace(
+      const std::string& name, std::string* ns, std::string* sub_name);
 };
 
 }  // namespace voxblox_rviz_plugin

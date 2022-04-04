@@ -5,8 +5,8 @@
 namespace voxblox {
 
 // Hidden serialization helpers
-void serializeDirection(const Eigen::Vector3i& parent_direction,
-                        uint32_t* data) {
+void serializeDirection(
+    const Eigen::Vector3i& parent_direction, uint32_t* data) {
   CHECK_NOTNULL(data);
   CHECK_EQ(*data, 0u);
 
@@ -174,10 +174,11 @@ void Block<TsdfVoxel>::serializeToIntegers(std::vector<uint32_t>* data) const {
         reinterpret_cast<const uint32_t*>(&voxel.weight);
     data->push_back(*bytes_2_ptr);
 
-    data->push_back(static_cast<uint32_t>(voxel.color.a) |
-                    (static_cast<uint32_t>(voxel.color.b) << 8) |
-                    (static_cast<uint32_t>(voxel.color.g) << 16) |
-                    (static_cast<uint32_t>(voxel.color.r) << 24));
+    data->push_back(
+        static_cast<uint32_t>(voxel.color.a) |
+        (static_cast<uint32_t>(voxel.color.b) << 8) |
+        (static_cast<uint32_t>(voxel.color.g) << 16) |
+        (static_cast<uint32_t>(voxel.color.r) << 24));
   }
   CHECK_EQ(num_voxels_ * kNumDataPacketsPerVoxel, data->size());
 }

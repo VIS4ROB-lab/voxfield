@@ -107,21 +107,23 @@ TEST_F(TsdfLayerMergeToolTest, MergeTwoTsdfLayers) {
 
   const std::string kWorldAPlyFile = kFolderPrefix + "world_A.tsdf.ply";
   LOG(INFO) << "Writing world A to : " << kWorldAPlyFile;
-  io::outputLayerAsPly(*world_A_, kWorldAPlyFile,
-                       io::PlyOutputTypes::kSdfIsosurfaceConnected);
+  io::outputLayerAsPly(
+      *world_A_, kWorldAPlyFile, io::PlyOutputTypes::kSdfIsosurfaceConnected);
   const std::string kWorldASdfPlyFile = kFolderPrefix + "world_A.tsdf_sdf.ply";
-  io::outputLayerAsPly(*world_A_, kWorldASdfPlyFile,
-                       io::PlyOutputTypes::kSdfColoredDistanceField,
-                       max_sdf_value_to_visualize, max_sdf_value_to_visualize);
+  io::outputLayerAsPly(
+      *world_A_, kWorldASdfPlyFile,
+      io::PlyOutputTypes::kSdfColoredDistanceField, max_sdf_value_to_visualize,
+      max_sdf_value_to_visualize);
 
   const std::string kWorldBPlyFile = kFolderPrefix + "world_B.tsdf.ply";
   LOG(INFO) << "Writing world B to : " << kWorldBPlyFile;
-  io::outputLayerAsPly(*world_B_, kWorldBPlyFile,
-                       io::PlyOutputTypes::kSdfIsosurfaceConnected);
+  io::outputLayerAsPly(
+      *world_B_, kWorldBPlyFile, io::PlyOutputTypes::kSdfIsosurfaceConnected);
   const std::string kWorldBSdfPlyFile = kFolderPrefix + "world_B.tsdf_sdf.ply";
-  io::outputLayerAsPly(*world_B_, kWorldBSdfPlyFile,
-                       io::PlyOutputTypes::kSdfColoredDistanceField,
-                       max_sdf_value_to_visualize, max_sdf_value_to_visualize);
+  io::outputLayerAsPly(
+      *world_B_, kWorldBSdfPlyFile,
+      io::PlyOutputTypes::kSdfColoredDistanceField, max_sdf_value_to_visualize,
+      max_sdf_value_to_visualize);
 
   LOG(INFO) << "Merging world A into world B...";
   constexpr bool kUseNaiveMethod = false;
@@ -129,9 +131,9 @@ TEST_F(TsdfLayerMergeToolTest, MergeTwoTsdfLayers) {
 
   LOG(INFO) << "Evaluating merged world...";
   utils::VoxelEvaluationDetails result;
-  utils::evaluateLayersRmse(*world_B_compare_, *world_B_,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &result);
+  utils::evaluateLayersRmse(
+      *world_B_compare_, *world_B_,
+      utils::VoxelEvaluationMode::kEvaluateAllVoxels, &result);
   constexpr FloatingPoint kFloatingPointToleranceLow = 5e-5;
   EXPECT_NEAR(result.rmse, 6e-5, kFloatingPointToleranceLow);
 
@@ -151,13 +153,15 @@ TEST_F(TsdfLayerMergeToolTest, MergeTwoTsdfLayers) {
   const std::string kMergedLayerPlyFile =
       kFolderPrefix + "world_A_and_B.tsdf.ply";
   LOG(INFO) << "Writing merged world to : " << kMergedLayerPlyFile;
-  io::outputLayerAsPly(*world_B_, kMergedLayerPlyFile,
-                       io::PlyOutputTypes::kSdfIsosurfaceConnected);
+  io::outputLayerAsPly(
+      *world_B_, kMergedLayerPlyFile,
+      io::PlyOutputTypes::kSdfIsosurfaceConnected);
   const std::string kMergedLayerSdfPlyFile =
       kFolderPrefix + "world_A_and_B.tsdf_sdf.ply";
-  io::outputLayerAsPly(*world_B_, kMergedLayerSdfPlyFile,
-                       io::PlyOutputTypes::kSdfColoredDistanceField,
-                       max_sdf_value_to_visualize, max_sdf_value_to_visualize);
+  io::outputLayerAsPly(
+      *world_B_, kMergedLayerSdfPlyFile,
+      io::PlyOutputTypes::kSdfColoredDistanceField, max_sdf_value_to_visualize,
+      max_sdf_value_to_visualize);
   LOG(INFO) << "Done.";
 }
 

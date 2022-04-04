@@ -7,8 +7,9 @@ namespace voxblox {
 namespace io {
 
 template <>
-bool getColorFromVoxel(const TsdfVoxel& voxel, const float sdf_color_range,
-                       const float sdf_max_value, Color* color) {
+bool getColorFromVoxel(
+    const TsdfVoxel& voxel, const float sdf_color_range,
+    const float sdf_max_value, Color* color) {
   CHECK_NOTNULL(color);
 
   static constexpr float kTolerance = 1e-6;
@@ -35,8 +36,9 @@ bool getColorFromVoxel(const TsdfVoxel& voxel, const float sdf_color_range,
 }
 
 template <>
-bool getColorFromVoxel(const EsdfVoxel& voxel, const float sdf_color_range,
-                       const float sdf_max_value, Color* color) {
+bool getColorFromVoxel(
+    const EsdfVoxel& voxel, const float sdf_color_range,
+    const float sdf_max_value, Color* color) {
   CHECK_NOTNULL(color);
   if (!voxel.observed) {
     return false;

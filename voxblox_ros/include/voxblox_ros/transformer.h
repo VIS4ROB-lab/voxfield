@@ -20,19 +20,19 @@ class Transformer {
 
   Transformer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
 
-  bool lookupTransform(const std::string& from_frame,
-                       const std::string& to_frame, const ros::Time& timestamp,
-                       Transformation* transform);
+  bool lookupTransform(
+      const std::string& from_frame, const std::string& to_frame,
+      const ros::Time& timestamp, Transformation* transform);
 
   void transformCallback(const geometry_msgs::TransformStamped& transform_msg);
 
  private:
-  bool lookupTransformTf(const std::string& from_frame,
-                         const std::string& to_frame,
-                         const ros::Time& timestamp, Transformation* transform);
+  bool lookupTransformTf(
+      const std::string& from_frame, const std::string& to_frame,
+      const ros::Time& timestamp, Transformation* transform);
 
-  bool lookupTransformQueue(const ros::Time& timestamp,
-                            Transformation* transform);
+  bool lookupTransformQueue(
+      const ros::Time& timestamp, Transformation* transform);
 
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;

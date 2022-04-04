@@ -11,8 +11,8 @@
 namespace voxblox {
 
 template <typename VoxelType>
-void SimulationWorld::generateSdfFromWorld(FloatingPoint max_dist,
-                                           Layer<VoxelType>* layer) const {
+void SimulationWorld::generateSdfFromWorld(
+    FloatingPoint max_dist, Layer<VoxelType>* layer) const {
   timing::Timer sim_timer("sim/generate_sdf");
 
   CHECK_NOTNULL(layer);
@@ -70,8 +70,8 @@ void SimulationWorld::generateSdfFromWorld(FloatingPoint max_dist,
 }
 
 template <>
-void SimulationWorld::setVoxel(FloatingPoint dist, const Color& color,
-                               TsdfVoxel* voxel) const {
+void SimulationWorld::setVoxel(
+    FloatingPoint dist, const Color& color, TsdfVoxel* voxel) const {
   voxel->distance = static_cast<float>(dist);
   voxel->color = color;
   voxel->weight = 1.0f;  // Just to make sure it gets visualized/meshed/etc.
@@ -79,8 +79,8 @@ void SimulationWorld::setVoxel(FloatingPoint dist, const Color& color,
 
 // Color ignored.
 template <>
-void SimulationWorld::setVoxel(FloatingPoint dist, const Color& /*color*/,
-                               EsdfVoxel* voxel) const {
+void SimulationWorld::setVoxel(
+    FloatingPoint dist, const Color& /*color*/, EsdfVoxel* voxel) const {
   voxel->distance = static_cast<float>(dist);
   voxel->observed = true;
 }

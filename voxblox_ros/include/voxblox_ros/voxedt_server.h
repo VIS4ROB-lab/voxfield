@@ -6,8 +6,8 @@
 
 #include <voxblox/core/esdf_map.h>
 #include <voxblox/core/occupancy_map.h>
-#include <voxblox/integrator/esdf_occ_fiesta_integrator.h>
 #include <voxblox/integrator/esdf_occ_edt_integrator.h>
+#include <voxblox/integrator/esdf_occ_fiesta_integrator.h>
 #include <voxblox/integrator/occupancy_tsdf_integrator.h>
 #include <voxblox_msgs/Layer.h>
 
@@ -20,14 +20,15 @@ class VoxedtServer : public TsdfServer {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   VoxedtServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
-  VoxedtServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
-                 const EsdfMap::Config& esdf_config,
-                 const EsdfOccEdtIntegrator::Config& esdf_integrator_config,
-                 const TsdfMap::Config& tsdf_config,
-                 const TsdfIntegratorBase::Config& tsdf_integrator_config,
-                 const OccupancyMap::Config& occ_config,
-                 const OccTsdfIntegrator::Config& occ_tsdf_integrator_config,
-                 const MeshIntegratorConfig& mesh_config);
+  VoxedtServer(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
+      const EsdfMap::Config& esdf_config,
+      const EsdfOccEdtIntegrator::Config& esdf_integrator_config,
+      const TsdfMap::Config& tsdf_config,
+      const TsdfIntegratorBase::Config& tsdf_integrator_config,
+      const OccupancyMap::Config& occ_config,
+      const OccTsdfIntegrator::Config& occ_tsdf_integrator_config,
+      const MeshIntegratorConfig& mesh_config);
   virtual ~VoxedtServer() {}
 
   void publishAllUpdatedEsdfVoxels();
@@ -66,7 +67,9 @@ class VoxedtServer : public TsdfServer {
   // Overwrites the layer with what's coming from the topic!
   void esdfMapCallback(const voxblox_msgs::Layer& layer_msg);
 
-  inline std::shared_ptr<EsdfMap> getEsdfMapPtr() { return esdf_map_; }
+  inline std::shared_ptr<EsdfMap> getEsdfMapPtr() {
+    return esdf_map_;
+  }
   inline std::shared_ptr<const EsdfMap> getEsdfMapPtr() const {
     return esdf_map_;
   }
@@ -83,7 +86,9 @@ class VoxedtServer : public TsdfServer {
       voxblox_msgs::FilePath::Request& request,     // NOLINT
       voxblox_msgs::FilePath::Response& response);  // NOLINT
 
-  bool getClearSphere() const { return clear_sphere_for_planning_; }
+  bool getClearSphere() const {
+    return clear_sphere_for_planning_;
+  }
   void setClearSphere(bool clear_sphere_for_planning) {
     clear_sphere_for_planning_ = clear_sphere_for_planning;
   }
@@ -98,8 +103,12 @@ class VoxedtServer : public TsdfServer {
    * These are for enabling or disabling incremental update of the ESDF. Use
    * carefully.
    */
-  void disableIncrementalUpdate() { incremental_update_ = false; }
-  void enableIncrementalUpdate() { incremental_update_ = true; }
+  void disableIncrementalUpdate() {
+    incremental_update_ = false;
+  }
+  void enableIncrementalUpdate() {
+    incremental_update_ = true;
+  }
 
   virtual void clear();
 

@@ -128,8 +128,9 @@ TEST_P(SdfIntegratorsTest, TsdfIntegrators) {
     Pointcloud ptcloud, ptcloud_C;
     Colors colors;
 
-    world_.getPointcloudFromTransform(poses_[i], depth_camera_resolution_,
-                                      fov_h_rad_, max_dist_, &ptcloud, &colors);
+    world_.getPointcloudFromTransform(
+        poses_[i], depth_camera_resolution_, fov_h_rad_, max_dist_, &ptcloud,
+        &colors);
     transformPointcloud(poses_[i].inverse(), ptcloud, &ptcloud_C);
     simple_integrator.integratePointCloud(poses_[i], ptcloud_C, colors);
     merged_integrator.integratePointCloud(poses_[i], ptcloud_C, colors);
@@ -137,15 +138,15 @@ TEST_P(SdfIntegratorsTest, TsdfIntegrators) {
   }
 
   utils::VoxelEvaluationDetails simple_result, merged_result, fast_result;
-  utils::evaluateLayersRmse(*tsdf_gt_, simple_layer,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &simple_result);
-  utils::evaluateLayersRmse(*tsdf_gt_, merged_layer,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &merged_result);
-  utils::evaluateLayersRmse(*tsdf_gt_, fast_layer,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &fast_result);
+  utils::evaluateLayersRmse(
+      *tsdf_gt_, simple_layer, utils::VoxelEvaluationMode::kEvaluateAllVoxels,
+      &simple_result);
+  utils::evaluateLayersRmse(
+      *tsdf_gt_, merged_layer, utils::VoxelEvaluationMode::kEvaluateAllVoxels,
+      &merged_result);
+  utils::evaluateLayersRmse(
+      *tsdf_gt_, fast_layer, utils::VoxelEvaluationMode::kEvaluateAllVoxels,
+      &fast_result);
   std::cout << "Simple Integrator: " << simple_result.toString();
   std::cout << "Merged Integrator: " << merged_result.toString();
   std::cout << "Fast Integrator: " << fast_result.toString();
@@ -159,10 +160,12 @@ TEST_P(SdfIntegratorsTest, TsdfIntegrators) {
   size_t one_percent_of_voxels = static_cast<size_t>(total_voxels * 0.01);
 
   // Make sure they're all similar.
-  EXPECT_NEAR(simple_result.num_overlapping_voxels,
-              merged_result.num_overlapping_voxels, one_percent_of_voxels);
-  EXPECT_NEAR(simple_result.num_overlapping_voxels,
-              fast_result.num_overlapping_voxels, one_percent_of_voxels);
+  EXPECT_NEAR(
+      simple_result.num_overlapping_voxels,
+      merged_result.num_overlapping_voxels, one_percent_of_voxels);
+  EXPECT_NEAR(
+      simple_result.num_overlapping_voxels, fast_result.num_overlapping_voxels,
+      one_percent_of_voxels);
 
   // Make sure they're all reasonable.
   EXPECT_NEAR(simple_result.min_error, 0.0, kFloatingPointToleranceHigh);
@@ -201,19 +204,20 @@ TEST_P(SdfIntegratorsTest, EsdfIntegrators) {
   esdf_config.full_euclidean_distance = false;
   esdf_config.add_occupied_crust = false;
   esdf_config.multi_queue = true;
-  EsdfIntegrator incremental_integrator(esdf_config, &tsdf_layer,
-                                        &incremental_layer);
+  EsdfIntegrator incremental_integrator(
+      esdf_config, &tsdf_layer, &incremental_layer);
   EsdfIntegrator batch_integrator(esdf_config, &tsdf_layer, &batch_layer);
   esdf_config.full_euclidean_distance = true;
-  EsdfIntegrator batch_full_euclidean_integrator(esdf_config, &tsdf_layer,
-                                                 &batch_full_euclidean_layer);
+  EsdfIntegrator batch_full_euclidean_integrator(
+      esdf_config, &tsdf_layer, &batch_full_euclidean_layer);
 
   for (size_t i = 0; i < poses_.size(); i++) {
     Pointcloud ptcloud, ptcloud_C;
     Colors colors;
 
-    world_.getPointcloudFromTransform(poses_[i], depth_camera_resolution_,
-                                      fov_h_rad_, max_dist_, &ptcloud, &colors);
+    world_.getPointcloudFromTransform(
+        poses_[i], depth_camera_resolution_, fov_h_rad_, max_dist_, &ptcloud,
+        &colors);
     transformPointcloud(poses_[i].inverse(), ptcloud, &ptcloud_C);
     tsdf_integrator.integratePointCloud(poses_[i], ptcloud_C, colors);
 
@@ -228,15 +232,16 @@ TEST_P(SdfIntegratorsTest, EsdfIntegrators) {
 
   utils::VoxelEvaluationDetails incremental_result, batch_result,
       batch_full_euclidean_result;
-  utils::evaluateLayersRmse(*esdf_gt_, incremental_layer,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &incremental_result);
-  utils::evaluateLayersRmse(*esdf_gt_, batch_layer,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &batch_result);
-  utils::evaluateLayersRmse(*esdf_gt_, batch_full_euclidean_layer,
-                            utils::VoxelEvaluationMode::kEvaluateAllVoxels,
-                            &batch_full_euclidean_result);
+  utils::evaluateLayersRmse(
+      *esdf_gt_, incremental_layer,
+      utils::VoxelEvaluationMode::kEvaluateAllVoxels, &incremental_result);
+  utils::evaluateLayersRmse(
+      *esdf_gt_, batch_layer, utils::VoxelEvaluationMode::kEvaluateAllVoxels,
+      &batch_result);
+  utils::evaluateLayersRmse(
+      *esdf_gt_, batch_full_euclidean_layer,
+      utils::VoxelEvaluationMode::kEvaluateAllVoxels,
+      &batch_full_euclidean_result);
   std::cout << "Incremental Integrator: " << incremental_result.toString();
   std::cout << "Batch Integrator: " << batch_result.toString();
   std::cout << "Batch Full Euclidean Integrator: "
@@ -251,8 +256,8 @@ TEST_P(SdfIntegratorsTest, EsdfIntegrators) {
   // Make sure they're all reasonable.
   EXPECT_NEAR(incremental_result.min_error, 0.0, kFloatingPointToleranceHigh);
   EXPECT_NEAR(batch_result.min_error, 0.0, kFloatingPointToleranceHigh);
-  EXPECT_NEAR(batch_full_euclidean_result.min_error, 0.0,
-              kFloatingPointToleranceHigh);
+  EXPECT_NEAR(
+      batch_full_euclidean_result.min_error, 0.0, kFloatingPointToleranceHigh);
 
   EXPECT_LT(incremental_result.max_error, esdf_max_distance_);
   EXPECT_LT(batch_result.max_error, esdf_max_distance_);
@@ -263,18 +268,20 @@ TEST_P(SdfIntegratorsTest, EsdfIntegrators) {
   EXPECT_LT(batch_full_euclidean_result.rmse, esdf_max_distance_ * voxel_size_);
 
   // Make sure they're all similar.
-  EXPECT_EQ(incremental_result.num_overlapping_voxels,
-            batch_result.num_overlapping_voxels);
-  EXPECT_EQ(incremental_result.num_overlapping_voxels,
-            batch_full_euclidean_result.num_overlapping_voxels);
+  EXPECT_EQ(
+      incremental_result.num_overlapping_voxels,
+      batch_result.num_overlapping_voxels);
+  EXPECT_EQ(
+      incremental_result.num_overlapping_voxels,
+      batch_full_euclidean_result.num_overlapping_voxels);
   EXPECT_NEAR(incremental_result.rmse, batch_result.rmse, kKindaSimilar);
-  EXPECT_NEAR(incremental_result.max_error, batch_result.max_error,
-              kCloseEnough);
+  EXPECT_NEAR(
+      incremental_result.max_error, batch_result.max_error, kCloseEnough);
 
   // Output for debugging.
   io::SaveLayer(tsdf_layer, "esdf_euclidean_test.voxblox", true);
-  io::SaveLayer(batch_full_euclidean_layer, "esdf_euclidean_test.voxblox",
-                false);
+  io::SaveLayer(
+      batch_full_euclidean_layer, "esdf_euclidean_test.voxblox", false);
   io::SaveLayer(tsdf_layer, "esdf_batch_test.voxblox", true);
   io::SaveLayer(batch_layer, "esdf_batch_test.voxblox", false);
   io::SaveLayer(tsdf_layer, "esdf_incremental_test.voxblox", true);
@@ -283,8 +290,9 @@ TEST_P(SdfIntegratorsTest, EsdfIntegrators) {
   io::SaveLayer(*esdf_gt_, "esdf_gt.voxblox", false);
 }
 
-INSTANTIATE_TEST_CASE_P(VoxelSizes, SdfIntegratorsTest,
-                        ::testing::Values(0.1f, 0.2f, 0.3f, 0.4f, 0.5f));
+INSTANTIATE_TEST_CASE_P(
+    VoxelSizes, SdfIntegratorsTest,
+    ::testing::Values(0.1f, 0.2f, 0.3f, 0.4f, 0.5f));
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

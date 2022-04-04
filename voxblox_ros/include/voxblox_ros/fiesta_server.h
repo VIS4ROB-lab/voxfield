@@ -20,14 +20,15 @@ class FiestaServer : public TsdfServer {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   FiestaServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
-  FiestaServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
-               const EsdfMap::Config& esdf_config,
-               const EsdfOccFiestaIntegrator::Config& esdf_integrator_config,
-               const TsdfMap::Config& tsdf_config,
-               const TsdfIntegratorBase::Config& tsdf_integrator_config,
-               const OccupancyMap::Config& occ_config,
-               const OccTsdfIntegrator::Config& occ_tsdf_integrator_config,
-               const MeshIntegratorConfig& mesh_config);
+  FiestaServer(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
+      const EsdfMap::Config& esdf_config,
+      const EsdfOccFiestaIntegrator::Config& esdf_integrator_config,
+      const TsdfMap::Config& tsdf_config,
+      const TsdfIntegratorBase::Config& tsdf_integrator_config,
+      const OccupancyMap::Config& occ_config,
+      const OccTsdfIntegrator::Config& occ_tsdf_integrator_config,
+      const MeshIntegratorConfig& mesh_config);
   virtual ~FiestaServer() {}
 
   void publishAllUpdatedEsdfVoxels();
@@ -66,7 +67,9 @@ class FiestaServer : public TsdfServer {
   // Overwrites the layer with what's coming from the topic!
   void esdfMapCallback(const voxblox_msgs::Layer& layer_msg);
 
-  inline std::shared_ptr<EsdfMap> getEsdfMapPtr() { return esdf_map_; }
+  inline std::shared_ptr<EsdfMap> getEsdfMapPtr() {
+    return esdf_map_;
+  }
   inline std::shared_ptr<const EsdfMap> getEsdfMapPtr() const {
     return esdf_map_;
   }
@@ -83,7 +86,9 @@ class FiestaServer : public TsdfServer {
       voxblox_msgs::FilePath::Request& request,     // NOLINT
       voxblox_msgs::FilePath::Response& response);  // NOLINT
 
-  bool getClearSphere() const { return clear_sphere_for_planning_; }
+  bool getClearSphere() const {
+    return clear_sphere_for_planning_;
+  }
   void setClearSphere(bool clear_sphere_for_planning) {
     clear_sphere_for_planning_ = clear_sphere_for_planning;
   }
@@ -98,8 +103,12 @@ class FiestaServer : public TsdfServer {
    * These are for enabling or disabling incremental update of the ESDF. Use
    * carefully.
    */
-  void disableIncrementalUpdate() { incremental_update_ = false; }
-  void enableIncrementalUpdate() { incremental_update_ = true; }
+  void disableIncrementalUpdate() {
+    incremental_update_ = false;
+  }
+  void enableIncrementalUpdate() {
+    incremental_update_ = true;
+  }
 
   virtual void clear();
 

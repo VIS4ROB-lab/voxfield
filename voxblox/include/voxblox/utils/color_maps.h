@@ -14,9 +14,13 @@ class ColorMap {
   ColorMap() : min_value_(0.0), max_value_(1.0) {}
   virtual ~ColorMap() {}
 
-  void setMinValue(float min_value) { min_value_ = min_value; }
+  void setMinValue(float min_value) {
+    min_value_ = min_value;
+  }
 
-  void setMaxValue(float max_value) { max_value_ = max_value; }
+  void setMaxValue(float max_value) {
+    max_value_ = max_value;
+  }
 
   virtual Color colorLookup(float value) const = 0;
 
@@ -108,7 +112,9 @@ class IrrationalIdColorMap : IdColorMap {
  public:
   IrrationalIdColorMap() : irrational_base_(3.f * M_PI) {}
 
-  void setIrrationalBase(float value) { irrational_base_ = value; }
+  void setIrrationalBase(float value) {
+    irrational_base_ = value;
+  }
 
   virtual Color colorLookup(const size_t value) const {
     const float normalized_color = std::fmod(value / irrational_base_, 1.f);
@@ -128,7 +134,9 @@ class ExponentialOffsetIdColorMap : IdColorMap {
  public:
   ExponentialOffsetIdColorMap() : items_per_revolution_(10u) {}
 
-  void setItemsPerRevolution(uint value) { items_per_revolution_ = value; }
+  void setItemsPerRevolution(uint value) {
+    items_per_revolution_ = value;
+  }
 
   virtual Color colorLookup(const size_t value) const {
     const size_t revolution = value / items_per_revolution_;

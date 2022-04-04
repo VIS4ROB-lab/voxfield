@@ -18,13 +18,14 @@ class LayerTest {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  void CompareLayers(const Layer<VoxelType>& layer_A,
-                     const Layer<VoxelType>& layer_B) const {
+  void CompareLayers(
+      const Layer<VoxelType>& layer_A, const Layer<VoxelType>& layer_B) const {
     EXPECT_NEAR(layer_A.voxel_size(), layer_B.voxel_size(), kTolerance);
     EXPECT_NEAR(layer_A.block_size(), layer_B.block_size(), kTolerance);
     EXPECT_EQ(layer_A.voxels_per_side(), layer_B.voxels_per_side());
-    EXPECT_EQ(layer_A.getNumberOfAllocatedBlocks(),
-              layer_B.getNumberOfAllocatedBlocks());
+    EXPECT_EQ(
+        layer_A.getNumberOfAllocatedBlocks(),
+        layer_B.getNumberOfAllocatedBlocks());
 
     BlockIndexList blocks_A, blocks_B;
     layer_A.getAllAllocatedBlocks(&blocks_A);
@@ -60,8 +61,8 @@ class LayerTest {
     EXPECT_EQ(layer_A.getMemorySize(), layer_B.getMemorySize());
   }
 
-  void CompareBlocks(const Block<VoxelType>& block_A,
-                     const Block<VoxelType>& block_B) const {
+  void CompareBlocks(
+      const Block<VoxelType>& block_A, const Block<VoxelType>& block_B) const {
     EXPECT_NEAR(block_A.voxel_size(), block_B.voxel_size(), kTolerance);
     EXPECT_NEAR(block_A.block_size(), block_B.block_size(), kTolerance);
     EXPECT_EQ(block_A.voxels_per_side(), block_B.voxels_per_side());
@@ -72,8 +73,9 @@ class LayerTest {
 
     EXPECT_EQ(block_A.num_voxels(), block_B.num_voxels());
     for (size_t voxel_idx = 0u; voxel_idx < block_A.num_voxels(); ++voxel_idx) {
-      CompareVoxel(block_A.getVoxelByLinearIndex(voxel_idx),
-                   block_B.getVoxelByLinearIndex(voxel_idx));
+      CompareVoxel(
+          block_A.getVoxelByLinearIndex(voxel_idx),
+          block_B.getVoxelByLinearIndex(voxel_idx));
     }
   }
 
@@ -83,14 +85,14 @@ class LayerTest {
 };
 
 template <typename VoxelType>
-void LayerTest<VoxelType>::CompareVoxel(const VoxelType& /* voxel_A */,
-                                        const VoxelType& /* voxel_B */) const {
+void LayerTest<VoxelType>::CompareVoxel(
+    const VoxelType& /* voxel_A */, const VoxelType& /* voxel_B */) const {
   LOG(FATAL) << "Not implemented for this voxel type!";
 }
 
 template <>
-void LayerTest<EsdfVoxel>::CompareVoxel(const EsdfVoxel& voxel_A,
-                                        const EsdfVoxel& voxel_B) const {
+void LayerTest<EsdfVoxel>::CompareVoxel(
+    const EsdfVoxel& voxel_A, const EsdfVoxel& voxel_B) const {
   constexpr double kTolerance = 1e-10;
 
   EXPECT_NEAR(voxel_A.distance, voxel_B.distance, kTolerance);
@@ -116,8 +118,8 @@ void LayerTest<OccupancyVoxel>::CompareVoxel(
 }
 
 template <>
-void LayerTest<TsdfVoxel>::CompareVoxel(const TsdfVoxel& voxel_A,
-                                        const TsdfVoxel& voxel_B) const {
+void LayerTest<TsdfVoxel>::CompareVoxel(
+    const TsdfVoxel& voxel_A, const TsdfVoxel& voxel_B) const {
   EXPECT_NEAR(voxel_A.distance, voxel_B.distance, kTolerance);
   EXPECT_NEAR(voxel_A.weight, voxel_B.weight, kTolerance);
   EXPECT_EQ(voxel_A.color.r, voxel_B.color.r);
@@ -137,9 +139,9 @@ template <typename VoxelType>
 void fillVoxelWithTestData(size_t x, size_t y, size_t z, VoxelType* voxel);
 
 template <typename VoxelType>
-void SetUpTestLayer(const IndexElement block_volume_diameter,
-                    const IndexElement block_volume_offset,
-                    Layer<VoxelType>* layer) {
+void SetUpTestLayer(
+    const IndexElement block_volume_diameter,
+    const IndexElement block_volume_offset, Layer<VoxelType>* layer) {
   CHECK_NOTNULL(layer);
 
   const IndexElement half_idx_range = block_volume_diameter / 2;
@@ -169,15 +171,15 @@ void SetUpTestLayer(const IndexElement block_volume_diameter,
 }
 
 template <typename VoxelType>
-void SetUpTestLayer(const IndexElement block_volume_diameter,
-                    Layer<VoxelType>* layer) {
+void SetUpTestLayer(
+    const IndexElement block_volume_diameter, Layer<VoxelType>* layer) {
   constexpr IndexElement kBlockVolumeOffset = 0u;
   SetUpTestLayer(block_volume_diameter, kBlockVolumeOffset, layer);
 }
 
 template <>
-inline void fillVoxelWithTestData(size_t x, size_t y, size_t z,
-                                  TsdfVoxel* voxel) {
+inline void fillVoxelWithTestData(
+    size_t x, size_t y, size_t z, TsdfVoxel* voxel) {
   CHECK_NOTNULL(voxel);
   voxel->distance = x * y * 0.66 + z;
   voxel->weight = y * z * 0.33 + x;
@@ -188,8 +190,8 @@ inline void fillVoxelWithTestData(size_t x, size_t y, size_t z,
 }
 
 template <>
-inline void fillVoxelWithTestData(size_t x, size_t y, size_t z,
-                                  EsdfVoxel* voxel) {
+inline void fillVoxelWithTestData(
+    size_t x, size_t y, size_t z, EsdfVoxel* voxel) {
   CHECK_NOTNULL(voxel);
   voxel->distance = x * y * 0.66 + z;
   voxel->parent.x() = x % INT8_MAX;
@@ -202,16 +204,16 @@ inline void fillVoxelWithTestData(size_t x, size_t y, size_t z,
 }
 
 template <>
-inline void fillVoxelWithTestData(size_t x, size_t y, size_t z,
-                                  OccupancyVoxel* voxel) {
+inline void fillVoxelWithTestData(
+    size_t x, size_t y, size_t z, OccupancyVoxel* voxel) {
   CHECK_NOTNULL(voxel);
   voxel->probability_log = x * y * 0.66 + z;
   voxel->observed = true;
 }
 
 template <>
-inline void fillVoxelWithTestData(size_t x, size_t y, size_t z,
-                                  IntensityVoxel* voxel) {
+inline void fillVoxelWithTestData(
+    size_t x, size_t y, size_t z, IntensityVoxel* voxel) {
   CHECK_NOTNULL(voxel);
   voxel->intensity = x * y * 0.66 + z;
   voxel->weight = y * z * 0.33 + x;

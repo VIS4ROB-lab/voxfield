@@ -12,9 +12,9 @@
 #include <utility>
 #include <vector>
 
+#include <Eigen/Core>
 #include <glog/logging.h>
 #include <kindr/minimal/quat-transformation.h>
-#include <Eigen/Core>
 
 namespace voxblox {
 
@@ -33,8 +33,9 @@ using AlignedList = std::list<Type, Eigen::aligned_allocator<Type>>;
 template <typename Type, typename... Arguments>
 inline std::shared_ptr<Type> aligned_shared(Arguments&&... arguments) {
   typedef typename std::remove_const<Type>::type TypeNonConst;
-  return std::allocate_shared<Type>(Eigen::aligned_allocator<TypeNonConst>(),
-                                    std::forward<Arguments>(arguments)...);
+  return std::allocate_shared<Type>(
+      Eigen::aligned_allocator<TypeNonConst>(),
+      std::forward<Arguments>(arguments)...);
 }
 
 // Types.
@@ -109,10 +110,9 @@ struct Color {
   uint8_t b;
   uint8_t a;
 
-  static Color blendTwoColors(const Color& first_color,
-                              FloatingPoint first_weight,
-                              const Color& second_color,
-                              FloatingPoint second_weight) {
+  static Color blendTwoColors(
+      const Color& first_color, FloatingPoint first_weight,
+      const Color& second_color, FloatingPoint second_weight) {
     FloatingPoint total_weight = first_weight + second_weight;
 
     first_weight /= total_weight;
@@ -132,48 +132,68 @@ struct Color {
   }
 
   // Now a bunch of static colors to use! :)
-  static const Color White() { return Color(255, 255, 255); }
-  static const Color Black() { return Color(0, 0, 0); }
-  static const Color Gray() { return Color(127, 127, 127); }
-  static const Color Red() { return Color(255, 0, 0); }
-  static const Color Green() { return Color(0, 255, 0); }
-  static const Color Blue() { return Color(0, 0, 255); }
-  static const Color Yellow() { return Color(255, 255, 0); }
-  static const Color Orange() { return Color(255, 127, 0); }
-  static const Color Purple() { return Color(127, 0, 255); }
-  static const Color Teal() { return Color(0, 255, 255); }
-  static const Color Pink() { return Color(255, 0, 127); }
+  static const Color White() {
+    return Color(255, 255, 255);
+  }
+  static const Color Black() {
+    return Color(0, 0, 0);
+  }
+  static const Color Gray() {
+    return Color(127, 127, 127);
+  }
+  static const Color Red() {
+    return Color(255, 0, 0);
+  }
+  static const Color Green() {
+    return Color(0, 255, 0);
+  }
+  static const Color Blue() {
+    return Color(0, 0, 255);
+  }
+  static const Color Yellow() {
+    return Color(255, 255, 0);
+  }
+  static const Color Orange() {
+    return Color(255, 127, 0);
+  }
+  static const Color Purple() {
+    return Color(127, 0, 255);
+  }
+  static const Color Teal() {
+    return Color(0, 255, 255);
+  }
+  static const Color Pink() {
+    return Color(255, 0, 127);
+  }
 };
-
 
 // Constants used across the library.
 constexpr FloatingPoint kEpsilon = 1e-6; /**< Used for coordinates. */
 constexpr float kFloatEpsilon = 1e-6;    /**< Used for weights. */
-constexpr int kKITTIMaxIntstance = 1000;    /**< Used for assign an unqiue panoptic label. */
+constexpr int kKITTIMaxIntstance = 1000;
+/**< Used for assign an unqiue panoptic label. */  // NOLINT
 
 struct Label {
   Label() : sem_label(0), ins_label(0) {}
-  Label(short int _sem_label, short int _ins_label) 
+  Label(uint16_t _sem_label, uint16_t _ins_label)  // NOLINT
       : sem_label(_sem_label), ins_label(_ins_label) {}
-  Label(uint32_t label) {
+  explicit Label(uint32_t label) {
     full_label = label;
-    sem_label = label & 0xFFFF; 
-    ins_label = label >> 16; 
+    sem_label = label & 0xFFFF;
+    ins_label = label >> 16;
     // TODO(py): to do a better hashing or increase the number of 1000 here
-    id_label = sem_label * kKITTIMaxIntstance + ins_label; 
+    id_label = sem_label * kKITTIMaxIntstance + ins_label;
     // name = semanticKittiLabelNameLUT(sem_label);
   }
 
-  int id_label; 
+  int id_label;
   uint32_t full_label;
-  short int sem_label; //int16_t
-  short int ins_label; //int16_t
-  //std::string name;
+  uint16_t sem_label;
+  uint16_t ins_label;
+  // std::string name;
 };
 
-
 // Grid <-> point conversion functions.
-
 /**
  * NOTE: Due the limited accuracy of the FloatingPoint type, this
  * function doesn't always compute the correct grid index for coordinates
@@ -181,11 +201,12 @@ struct Label {
  * the origin point is available.
  */
 template <typename IndexType>
-inline IndexType getGridIndexFromPoint(const Point& point,
-                                       const FloatingPoint grid_size_inv) {
-  return IndexType(std::floor(point.x() * grid_size_inv + kEpsilon),
-                   std::floor(point.y() * grid_size_inv + kEpsilon),
-                   std::floor(point.z() * grid_size_inv + kEpsilon));
+inline IndexType getGridIndexFromPoint(
+    const Point& point, const FloatingPoint grid_size_inv) {
+  return IndexType(
+      std::floor(point.x() * grid_size_inv + kEpsilon),
+      std::floor(point.y() * grid_size_inv + kEpsilon),
+      std::floor(point.z() * grid_size_inv + kEpsilon));
 }
 
 /**
@@ -195,9 +216,10 @@ inline IndexType getGridIndexFromPoint(const Point& point,
  */
 template <typename IndexType>
 inline IndexType getGridIndexFromPoint(const Point& scaled_point) {
-  return IndexType(std::floor(scaled_point.x() + kEpsilon),
-                   std::floor(scaled_point.y() + kEpsilon),
-                   std::floor(scaled_point.z() + kEpsilon));
+  return IndexType(
+      std::floor(scaled_point.x() + kEpsilon),
+      std::floor(scaled_point.y() + kEpsilon),
+      std::floor(scaled_point.z() + kEpsilon));
 }
 
 /**
@@ -209,25 +231,28 @@ inline IndexType getGridIndexFromPoint(const Point& scaled_point) {
 template <typename IndexType>
 inline IndexType getGridIndexFromOriginPoint(
     const Point& point, const FloatingPoint grid_size_inv) {
-  return IndexType(std::round(point.x() * grid_size_inv),
-                   std::round(point.y() * grid_size_inv),
-                   std::round(point.z() * grid_size_inv));
+  return IndexType(
+      std::round(point.x() * grid_size_inv),
+      std::round(point.y() * grid_size_inv),
+      std::round(point.z() * grid_size_inv));
 }
 
 template <typename IndexType>
-inline Point getCenterPointFromGridIndex(const IndexType& idx,
-                                         FloatingPoint grid_size) {
-  return Point((static_cast<FloatingPoint>(idx.x()) + 0.5) * grid_size,
-               (static_cast<FloatingPoint>(idx.y()) + 0.5) * grid_size,
-               (static_cast<FloatingPoint>(idx.z()) + 0.5) * grid_size);
+inline Point getCenterPointFromGridIndex(
+    const IndexType& idx, FloatingPoint grid_size) {
+  return Point(
+      (static_cast<FloatingPoint>(idx.x()) + 0.5) * grid_size,
+      (static_cast<FloatingPoint>(idx.y()) + 0.5) * grid_size,
+      (static_cast<FloatingPoint>(idx.z()) + 0.5) * grid_size);
 }
 
 template <typename IndexType>
-inline Point getOriginPointFromGridIndex(const IndexType& idx,
-                                         FloatingPoint grid_size) {
-  return Point(static_cast<FloatingPoint>(idx.x()) * grid_size,
-               static_cast<FloatingPoint>(idx.y()) * grid_size,
-               static_cast<FloatingPoint>(idx.z()) * grid_size);
+inline Point getOriginPointFromGridIndex(
+    const IndexType& idx, FloatingPoint grid_size) {
+  return Point(
+      static_cast<FloatingPoint>(idx.x()) * grid_size,
+      static_cast<FloatingPoint>(idx.y()) * grid_size,
+      static_cast<FloatingPoint>(idx.z()) * grid_size);
 }
 
 /**
@@ -238,22 +263,28 @@ inline Point getOriginPointFromGridIndex(const IndexType& idx,
 inline GlobalIndex getGlobalVoxelIndexFromBlockAndVoxelIndex(
     const BlockIndex& block_index, const VoxelIndex& voxel_index,
     int voxels_per_side) {
-  return GlobalIndex(block_index.cast<LongIndexElement>() * voxels_per_side +
-                     voxel_index.cast<LongIndexElement>());
+  return GlobalIndex(
+      block_index.cast<LongIndexElement>() * voxels_per_side +
+      voxel_index.cast<LongIndexElement>());
 }
 
 inline BlockIndex getBlockIndexFromGlobalVoxelIndex(
     const GlobalIndex& global_voxel_idx, FloatingPoint voxels_per_side_inv) {
   return BlockIndex(
-      std::floor(static_cast<FloatingPoint>(global_voxel_idx.x()) *
-                 voxels_per_side_inv),
-      std::floor(static_cast<FloatingPoint>(global_voxel_idx.y()) *
-                 voxels_per_side_inv),
-      std::floor(static_cast<FloatingPoint>(global_voxel_idx.z()) *
-                 voxels_per_side_inv));
+      std::floor(
+          static_cast<FloatingPoint>(global_voxel_idx.x()) *
+          voxels_per_side_inv),
+      std::floor(
+          static_cast<FloatingPoint>(global_voxel_idx.y()) *
+          voxels_per_side_inv),
+      std::floor(
+          static_cast<FloatingPoint>(global_voxel_idx.z()) *
+          voxels_per_side_inv));
 }
 
-inline bool isPowerOfTwo(int x) { return (x & (x - 1)) == 0; }
+inline bool isPowerOfTwo(int x) {
+  return (x & (x - 1)) == 0;
+}
 
 /**
  * Converts from a global voxel index to the index inside a block.
@@ -267,9 +298,10 @@ inline VoxelIndex getLocalFromGlobalVoxelIndex(
 
   CHECK(isPowerOfTwo(voxels_per_side));
 
-  return VoxelIndex((global_voxel_idx.x() + offset) & (voxels_per_side - 1),
-                    (global_voxel_idx.y() + offset) & (voxels_per_side - 1),
-                    (global_voxel_idx.z() + offset) & (voxels_per_side - 1));
+  return VoxelIndex(
+      (global_voxel_idx.x() + offset) & (voxels_per_side - 1),
+      (global_voxel_idx.y() + offset) & (voxels_per_side - 1),
+      (global_voxel_idx.z() + offset) & (voxels_per_side - 1));
 }
 
 inline void getBlockAndVoxelIndexFromGlobalVoxelIndex(
@@ -285,7 +317,9 @@ inline void getBlockAndVoxelIndexFromGlobalVoxelIndex(
 }
 
 // Math functions.
-inline int signum(FloatingPoint x) { return (x == 0) ? 0 : x < 0 ? -1 : 1; }
+inline int signum(FloatingPoint x) {
+  return (x == 0) ? 0 : x < 0 ? -1 : 1;
+}
 
 // For occupancy/octomap-style mapping.
 inline float logOddsFromProbability(float probability) {
@@ -297,9 +331,9 @@ inline float probabilityFromLogOdds(float log_odds) {
   return 1.0 - (1.0 / (1.0 + exp(log_odds)));
 }
 
-inline void transformPointcloud(const Transformation& T_N_O,
-                                const Pointcloud& ptcloud,
-                                Pointcloud* ptcloud_out) {
+inline void transformPointcloud(
+    const Transformation& T_N_O, const Pointcloud& ptcloud,
+    Pointcloud* ptcloud_out) {
   ptcloud_out->clear();
   ptcloud_out->resize(ptcloud.size());
 

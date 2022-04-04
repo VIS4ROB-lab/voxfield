@@ -17,11 +17,11 @@
 
 /* Adapted from Paul Furgale Schweizer Messer sm_timing*/
 
-#include <math.h>
-#include <stdio.h>
 #include <algorithm>
+#include <math.h>
 #include <ostream>
 #include <sstream>
+#include <stdio.h>
 #include <string>
 
 #include <glog/logging.h>
@@ -78,12 +78,14 @@ std::string Timing::GetTag(size_t handle) {
 // Class functions used for timing.
 Timer::Timer(size_t handle, bool constructStopped)
     : timing_(false), handle_(handle) {
-  if (!constructStopped) Start();
+  if (!constructStopped)
+    Start();
 }
 
 Timer::Timer(std::string const& tag, bool constructStopped)
     : timing_(false), handle_(Timing::GetHandle(tag)) {
-  if (!constructStopped) Start();
+  if (!constructStopped)
+    Start();
 }
 
 Timer::~Timer() {
@@ -136,7 +138,9 @@ void Timer::Unpause() {
   time_ = std::chrono::system_clock::now();
 }
 
-bool Timer::IsTiming() const { return timing_; }
+bool Timer::IsTiming() const {
+  return timing_;
+}
 
 void Timing::AddTime(size_t handle, double seconds) {
   std::lock_guard<std::mutex> lock(Instance().mutex_);
@@ -192,7 +196,9 @@ double Timing::GetHz(size_t handle) {
   return 1.0 / rolling_mean;
 }
 
-double Timing::GetHz(std::string const& tag) { return GetHz(GetHandle(tag)); }
+double Timing::GetHz(std::string const& tag) {
+  return GetHz(GetHandle(tag));
+}
 
 std::string Timing::SecondsToTimeString(double seconds) {
   char buffer[256];

@@ -52,7 +52,9 @@ class OccupancyMap {
     return *occupancy_layer_;
   }
 
-  FloatingPoint block_size() const { return block_size_; }
+  FloatingPoint block_size() const {
+    return block_size_;
+  }
 
  protected:
   FloatingPoint block_size_;

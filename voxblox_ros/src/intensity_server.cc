@@ -2,35 +2,35 @@
 
 namespace voxblox {
 
-IntensityServer::IntensityServer(const ros::NodeHandle& nh,
-                                 const ros::NodeHandle& nh_private)
+IntensityServer::IntensityServer(
+    const ros::NodeHandle& nh, const ros::NodeHandle& nh_private)
     : TsdfServer(nh, nh_private),
       focal_length_px_(400.0f),
       subsample_factor_(12) {
   cache_mesh_ = true;
 
-  intensity_layer_.reset(
-      new Layer<IntensityVoxel>(tsdf_map_->getTsdfLayer().voxel_size(),
-                                tsdf_map_->getTsdfLayer().voxels_per_side()));
-  intensity_integrator_.reset(new IntensityIntegrator(tsdf_map_->getTsdfLayer(),
-                                                      intensity_layer_.get()));
+  intensity_layer_.reset(new Layer<IntensityVoxel>(
+      tsdf_map_->getTsdfLayer().voxel_size(),
+      tsdf_map_->getTsdfLayer().voxels_per_side()));
+  intensity_integrator_.reset(new IntensityIntegrator(
+      tsdf_map_->getTsdfLayer(), intensity_layer_.get()));
 
   // Get ROS params:
-  nh_private_.param("intensity_focal_length", focal_length_px_,
-                    focal_length_px_);
+  nh_private_.param(
+      "intensity_focal_length", focal_length_px_, focal_length_px_);
   nh_private_.param("subsample_factor", subsample_factor_, subsample_factor_);
 
   float intensity_min_value = 10.0f;
   float intensity_max_value = 40.0f;
-  nh_private_.param("intensity_min_value", intensity_min_value,
-                    intensity_min_value);
-  nh_private_.param("intensity_max_value", intensity_max_value,
-                    intensity_max_value);
+  nh_private_.param(
+      "intensity_min_value", intensity_min_value, intensity_min_value);
+  nh_private_.param(
+      "intensity_max_value", intensity_max_value, intensity_max_value);
 
   FloatingPoint intensity_max_distance =
       intensity_integrator_->getMaxDistance();
-  nh_private_.param("intensity_max_distance", intensity_max_distance,
-                    intensity_max_distance);
+  nh_private_.param(
+      "intensity_max_distance", intensity_max_distance, intensity_max_distance);
   intensity_integrator_->setMaxDistance(intensity_max_distance);
 
   // Publishers for output.
@@ -54,8 +54,8 @@ void IntensityServer::updateMesh() {
 
   // Now recolor the mesh...
   timing::Timer publish_mesh_timer("intensity_mesh/publish");
-  recolorVoxbloxMeshMsgByIntensity(*intensity_layer_, color_map_,
-                                   &cached_mesh_msg_);
+  recolorVoxbloxMeshMsgByIntensity(
+      *intensity_layer_, color_map_, &cached_mesh_msg_);
   intensity_mesh_pub_.publish(cached_mesh_msg_);
   publish_mesh_timer.Stop();
 }
@@ -79,8 +79,8 @@ void IntensityServer::intensityImageCallback(
   CHECK(image);
   // Look up transform first...
   Transformation T_G_C;
-  if (!transformer_.lookupTransform(image->header.frame_id, world_frame_,
-                                    image->header.stamp, &T_G_C)) {
+  if (!transformer_.lookupTransform(
+          image->header.frame_id, world_frame_, image->header.stamp, &T_G_C)) {
     ROS_WARN_THROTTLE(10, "Failed to look up intensity transform!");
     return;
   }

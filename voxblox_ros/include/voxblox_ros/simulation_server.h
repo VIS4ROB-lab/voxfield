@@ -24,14 +24,15 @@ namespace voxblox {
 
 class SimulationServer {
  public:
-  SimulationServer(const ros::NodeHandle& nh,
-                   const ros::NodeHandle& nh_private);
+  SimulationServer(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
 
-  SimulationServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
-                   const EsdfMap::Config& esdf_config,
-                   const EsdfIntegrator::Config& esdf_integrator_config,
-                   const TsdfMap::Config& tsdf_config,
-                   const TsdfIntegratorBase::Config& tsdf_integrator_config);
+  SimulationServer(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
+      const EsdfMap::Config& esdf_config,
+      const EsdfIntegrator::Config& esdf_integrator_config,
+      const TsdfMap::Config& tsdf_config,
+      const TsdfIntegratorBase::Config& tsdf_integrator_config);
 
   virtual ~SimulationServer() {}
 
@@ -54,8 +55,9 @@ class SimulationServer {
   void getServerConfigFromRosParam(const ros::NodeHandle& nh_private);
 
   /// Convenience function to generate valid viewpoints.
-  bool generatePlausibleViewpoint(FloatingPoint min_distance, Point* ray_origin,
-                                  Point* ray_direction) const;
+  bool generatePlausibleViewpoint(
+      FloatingPoint min_distance, Point* ray_origin,
+      Point* ray_direction) const;
 
   ros::NodeHandle nh_;
   ros::NodeHandle nh_private_;

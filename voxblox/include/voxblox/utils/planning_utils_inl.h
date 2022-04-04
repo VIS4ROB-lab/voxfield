@@ -11,9 +11,9 @@ namespace voxblox {
 namespace utils {
 
 template <typename VoxelType>
-void getSphereAroundPoint(const Layer<VoxelType>& layer, const Point& center,
-                          FloatingPoint radius,
-                          HierarchicalIndexMap* block_voxel_list) {
+void getSphereAroundPoint(
+    const Layer<VoxelType>& layer, const Point& center, FloatingPoint radius,
+    HierarchicalIndexMap* block_voxel_list) {
   CHECK_NOTNULL(block_voxel_list);
   float voxel_size = layer.voxel_size();
   float voxel_size_inv = 1.0 / layer.voxel_size();
@@ -30,9 +30,10 @@ void getSphereAroundPoint(const Layer<VoxelType>& layer, const Point& center,
 
         // check if point is inside the spheres radius
         if (point_voxel_space.norm() <= radius_in_voxels) {
-          GlobalIndex voxel_offset_index(std::floor(point_voxel_space.x()),
-                                         std::floor(point_voxel_space.y()),
-                                         std::floor(point_voxel_space.z()));
+          GlobalIndex voxel_offset_index(
+              std::floor(point_voxel_space.x()),
+              std::floor(point_voxel_space.y()),
+              std::floor(point_voxel_space.z()));
           // Get the block and voxel indices from this.
           BlockIndex block_index;
           VoxelIndex voxel_index;
@@ -48,9 +49,9 @@ void getSphereAroundPoint(const Layer<VoxelType>& layer, const Point& center,
 }
 
 template <typename VoxelType>
-void getAndAllocateSphereAroundPoint(const Point& center, FloatingPoint radius,
-                                     Layer<VoxelType>* layer,
-                                     HierarchicalIndexMap* block_voxel_list) {
+void getAndAllocateSphereAroundPoint(
+    const Point& center, FloatingPoint radius, Layer<VoxelType>* layer,
+    HierarchicalIndexMap* block_voxel_list) {
   CHECK_NOTNULL(layer);
   CHECK_NOTNULL(block_voxel_list);
   getSphereAroundPoint(*layer, center, radius, block_voxel_list);
@@ -65,9 +66,9 @@ void getAndAllocateSphereAroundPoint(const Point& center, FloatingPoint radius,
 // making it a filled sphere with that center and radius.
 // Marks the new points as halllucinated and fixed.
 template <typename VoxelType>
-void fillSphereAroundPoint(const Point& center, const FloatingPoint radius,
-                           const FloatingPoint max_distance_m,
-                           Layer<VoxelType>* layer) {
+void fillSphereAroundPoint(
+    const Point& center, const FloatingPoint radius,
+    const FloatingPoint max_distance_m, Layer<VoxelType>* layer) {
   CHECK_NOTNULL(layer);
   HierarchicalIndexMap block_voxel_list;
   getAndAllocateSphereAroundPoint(center, radius, layer, &block_voxel_list);
@@ -102,9 +103,9 @@ void fillSphereAroundPoint(const Point& center, const FloatingPoint radius,
 // Similar to above, clears the area around the specified point, marking it as
 // hallucinated and fixed.
 template <typename VoxelType>
-void clearSphereAroundPoint(const Point& center, const FloatingPoint radius,
-                            const FloatingPoint max_distance_m,
-                            Layer<VoxelType>* layer) {
+void clearSphereAroundPoint(
+    const Point& center, const FloatingPoint radius,
+    const FloatingPoint max_distance_m, Layer<VoxelType>* layer) {
   CHECK_NOTNULL(layer);
   HierarchicalIndexMap block_voxel_list;
   getAndAllocateSphereAroundPoint(center, radius, layer, &block_voxel_list);
@@ -136,9 +137,9 @@ void clearSphereAroundPoint(const Point& center, const FloatingPoint radius,
 
 // Utility function to get map bounds from an arbitrary layer.
 template <typename VoxelType>
-void computeMapBoundsFromLayer(const voxblox::Layer<VoxelType>& layer,
-                               Eigen::Vector3d* lower_bound,
-                               Eigen::Vector3d* upper_bound) {
+void computeMapBoundsFromLayer(
+    const voxblox::Layer<VoxelType>& layer, Eigen::Vector3d* lower_bound,
+    Eigen::Vector3d* upper_bound) {
   FloatingPoint block_size = layer.block_size();
 
   BlockIndexList all_blocks;

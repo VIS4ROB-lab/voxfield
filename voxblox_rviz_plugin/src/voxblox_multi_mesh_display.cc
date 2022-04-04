@@ -11,9 +11,9 @@
 namespace voxblox_rviz_plugin {
 
 VoxbloxMultiMeshDisplay::VoxbloxMultiMeshDisplay()
-    : toggle_visibility_all_property_("Toggle Visibility All", true,
-                                      "Set the visibility for all meshes.",
-                                      this, SLOT(toggleVisibilityAllSLOT())),
+    : toggle_visibility_all_property_(
+          "Toggle Visibility All", true, "Set the visibility for all meshes.",
+          this, SLOT(toggleVisibilityAllSLOT())),
       dt_since_last_update_(0.f) {
   voxblox_rviz_plugin::MaterialLoader::loadMaterials();
   // Initialize the top level of the visibility hierarchy.
@@ -25,7 +25,9 @@ void VoxbloxMultiMeshDisplay::reset() {
   visuals_.clear();
 }
 
-void VoxbloxMultiMeshDisplay::visibleSlot() { updateVisible(); }
+void VoxbloxMultiMeshDisplay::visibleSlot() {
+  updateVisible();
+}
 
 void VoxbloxMultiMeshDisplay::updateVisible() {
   // Set visibility of all visuals and update poses if visibility is turned on.
@@ -91,15 +93,16 @@ void VoxbloxMultiMeshDisplay::processMessage(
   }
 }
 
-bool VoxbloxMultiMeshDisplay::updateTransformation(VoxbloxMeshVisual* visual,
-                                                   ros::Time stamp) {
+bool VoxbloxMultiMeshDisplay::updateTransformation(
+    VoxbloxMeshVisual* visual, ros::Time stamp) {
   // Look up the transform from tf. If it doesn't work we have to skip.
   Ogre::Quaternion orientation;
   Ogre::Vector3 position;
-  if (!context_->getFrameManager()->getTransform(visual->getFrameId(), stamp,
-                                                 position, orientation)) {
-    ROS_DEBUG("Error transforming from frame '%s' to frame '%s'",
-              visual->getFrameId().c_str(), qPrintable(fixed_frame_));
+  if (!context_->getFrameManager()->getTransform(
+          visual->getFrameId(), stamp, position, orientation)) {
+    ROS_DEBUG(
+        "Error transforming from frame '%s' to frame '%s'",
+        visual->getFrameId().c_str(), qPrintable(fixed_frame_));
     return false;
   }
   visual->setPose(position, orientation);
@@ -139,12 +142,14 @@ void VoxbloxMultiMeshDisplay::subscribe() {
     if (unreliable_property_->getBool()) {
       transport_hint = ros::TransportHints().unreliable();
     }
-    sub_.subscribe(update_nh_, topic_property_->getTopicStd(),
-                   kSubscriberQueueLength, transport_hint);
+    sub_.subscribe(
+        update_nh_, topic_property_->getTopicStd(), kSubscriberQueueLength,
+        transport_hint);
     setStatus(rviz::StatusProperty::Ok, "Topic", "OK");
   } catch (ros::Exception& e) {
-    setStatus(rviz::StatusProperty::Error, "Topic",
-              QString("Error subscribing: ") + e.what());
+    setStatus(
+        rviz::StatusProperty::Error, "Topic",
+        QString("Error subscribing: ") + e.what());
   }
 }
 
@@ -155,9 +160,9 @@ void VoxbloxMultiMeshDisplay::onInitialize() {
   tf_filter_->setQueueSize(kSubscriberQueueLength);
 }
 
-VisibilityField::VisibilityField(const std::string& name,
-                                 rviz::BoolProperty* parent,
-                                 VoxbloxMultiMeshDisplay* master)
+VisibilityField::VisibilityField(
+    const std::string& name, rviz::BoolProperty* parent,
+    VoxbloxMultiMeshDisplay* master)
     : rviz::BoolProperty(
           name.c_str(), true,
           "Show or hide the mesh. If the mesh is hidden but not disabled, it "
@@ -167,10 +172,12 @@ VisibilityField::VisibilityField(const std::string& name,
   setDisableChildrenIfFalse(true);
 }
 
-void VisibilityField::visibleSlot() { master_->updateVisible(); }
+void VisibilityField::visibleSlot() {
+  master_->updateVisible();
+}
 
-bool VisibilityField::hasNameSpace(const std::string& name, std::string* ns,
-                                   std::string* sub_name) {
+bool VisibilityField::hasNameSpace(
+    const std::string& name, std::string* ns, std::string* sub_name) {
   std::size_t ns_indicator = name.find('/');
   if (ns_indicator != std::string::npos) {
     *sub_name = name.substr(ns_indicator + 1);
@@ -197,8 +204,8 @@ void VisibilityField::addField(const std::string& field_name) {
     it->second->addField(sub_name);
   } else {
     auto it = children_
-                  .insert(std::make_pair(field_name,
-                                         std::unique_ptr<VisibilityField>()))
+                  .insert(std::make_pair(
+                      field_name, std::unique_ptr<VisibilityField>()))
                   .first;
     it->second.reset(new VisibilityField(field_name, this, master_));
   }
@@ -256,5 +263,5 @@ void VisibilityField::setEnabledForAll(bool enabled) {
 }  // namespace voxblox_rviz_plugin
 
 #include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(voxblox_rviz_plugin::VoxbloxMultiMeshDisplay,
-                       rviz::Display)
+PLUGINLIB_EXPORT_CLASS(
+    voxblox_rviz_plugin::VoxbloxMultiMeshDisplay, rviz::Display)

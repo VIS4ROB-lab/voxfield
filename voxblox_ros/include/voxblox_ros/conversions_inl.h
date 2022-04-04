@@ -6,9 +6,9 @@
 namespace voxblox {
 
 template <typename VoxelType>
-void serializeLayerAsMsg(const Layer<VoxelType>& layer, const bool only_updated,
-                         voxblox_msgs::Layer* msg,
-                         const MapDerializationAction& action) {
+void serializeLayerAsMsg(
+    const Layer<VoxelType>& layer, const bool only_updated,
+    voxblox_msgs::Layer* msg, const MapDerializationAction& action) {
   CHECK_NOTNULL(msg);
   msg->voxels_per_side = layer.voxels_per_side();
   msg->voxel_size = layer.voxel_size();
@@ -40,17 +40,17 @@ void serializeLayerAsMsg(const Layer<VoxelType>& layer, const bool only_updated,
 }  // namespace voxblox
 
 template <typename VoxelType>
-bool deserializeMsgToLayer(const voxblox_msgs::Layer& msg,
-                           Layer<VoxelType>* layer) {
+bool deserializeMsgToLayer(
+    const voxblox_msgs::Layer& msg, Layer<VoxelType>* layer) {
   CHECK_NOTNULL(layer);
   return deserializeMsgToLayer<VoxelType>(
       msg, static_cast<MapDerializationAction>(msg.action), layer);
 }
 
 template <typename VoxelType>
-bool deserializeMsgToLayer(const voxblox_msgs::Layer& msg,
-                           const MapDerializationAction& action,
-                           Layer<VoxelType>* layer) {
+bool deserializeMsgToLayer(
+    const voxblox_msgs::Layer& msg, const MapDerializationAction& action,
+    Layer<VoxelType>* layer) {
   CHECK_NOTNULL(layer);
   if (getVoxelType<VoxelType>().compare(msg.layer_type) != 0) {
     return false;

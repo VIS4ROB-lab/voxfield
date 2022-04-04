@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"
@@ -25,14 +25,17 @@ class IntensityIntegrator {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  IntensityIntegrator(const Layer<TsdfVoxel>& tsdf_layer,
-                      Layer<IntensityVoxel>* intensity_layer);
+  IntensityIntegrator(
+      const Layer<TsdfVoxel>& tsdf_layer,
+      Layer<IntensityVoxel>* intensity_layer);
 
   /// Set the max distance for projecting into the TSDF layer.
   void setMaxDistance(const FloatingPoint max_distance) {
     max_distance_ = max_distance;
   }
-  FloatingPoint getMaxDistance() const { return max_distance_; }
+  FloatingPoint getMaxDistance() const {
+    return max_distance_;
+  }
 
   /**
    * Integrates intensities into the intensity layer by projecting normalized
@@ -40,9 +43,9 @@ class IntensityIntegrator {
    * the world coordinate frame) into the TSDF layer, and then setting the
    * intensities near the surface boundaries.
    */
-  void addIntensityBearingVectors(const Point& origin,
-                                  const Pointcloud& bearing_vectors,
-                                  const std::vector<float>& intensities);
+  void addIntensityBearingVectors(
+      const Point& origin, const Pointcloud& bearing_vectors,
+      const std::vector<float>& intensities);
 
  private:
   FloatingPoint max_distance_;

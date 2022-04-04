@@ -25,8 +25,8 @@ struct AnyIndexHash {
   static constexpr size_t sl2 = sl * sl;
 
   std::size_t operator()(const AnyIndex& index) const {
-    return static_cast<unsigned int>(index.x() + index.y() * sl +
-                                     index.z() * sl2);
+    return static_cast<unsigned int>(
+        index.x() + index.y() * sl + index.z() * sl2);
   }
 };
 
@@ -40,8 +40,9 @@ struct AnyIndexHashMapType {
       type;
 };
 
-typedef std::unordered_set<AnyIndex, AnyIndexHash, std::equal_to<AnyIndex>,
-                           Eigen::aligned_allocator<AnyIndex> >
+typedef std::unordered_set<
+    AnyIndex, AnyIndexHash, std::equal_to<AnyIndex>,
+    Eigen::aligned_allocator<AnyIndex> >
     IndexSet;
 
 typedef typename AnyIndexHashMapType<IndexVector>::type HierarchicalIndexMap;
@@ -58,8 +59,8 @@ struct LongIndexHash {
   static constexpr size_t sl2 = sl * sl;
 
   std::size_t operator()(const LongIndex& index) const {
-    return static_cast<unsigned int>(index.x() + index.y() * sl +
-                                     index.z() * sl2);
+    return static_cast<unsigned int>(
+        index.x() + index.y() * sl + index.z() * sl2);
   }
 };
 
@@ -73,8 +74,9 @@ struct LongIndexHashMapType {
       type;
 };
 
-typedef std::unordered_set<LongIndex, LongIndexHash, std::equal_to<LongIndex>,
-                           Eigen::aligned_allocator<LongIndex> >
+typedef std::unordered_set<
+    LongIndex, LongIndexHash, std::equal_to<LongIndex>,
+    Eigen::aligned_allocator<LongIndex> >
     LongIndexSet;
 
 }  // namespace voxblox

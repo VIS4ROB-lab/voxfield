@@ -34,8 +34,9 @@ class SimulationWorld {
    * desired behavior, can use addObject to add walls manually one by one.
    * If infinite walls are undesirable, then use cubes.
    */
-  void addPlaneBoundaries(FloatingPoint x_min, FloatingPoint x_max,
-                          FloatingPoint y_min, FloatingPoint y_max);
+  void addPlaneBoundaries(
+      FloatingPoint x_min, FloatingPoint x_max, FloatingPoint y_min,
+      FloatingPoint y_max);
 
   /// Deletes all objects!
   void clear();
@@ -44,44 +45,37 @@ class SimulationWorld {
    * Generates a synthetic view
    * Assumes square pixels for ease... Takes in FoV in radians.
    */
-  void getPointcloudFromViewpoint(const Point& view_origin,
-                                  const Point& view_direction,
-                                  const Eigen::Vector2i& camera_res,
-                                  FloatingPoint fov_h_rad,
-                                  FloatingPoint max_dist, Pointcloud* ptcloud,
-                                  Colors* colors) const;
-  void getPointcloudFromTransform(const Transformation& pose,
-                                  const Eigen::Vector2i& camera_res,
-                                  FloatingPoint fov_h_rad,
-                                  FloatingPoint max_dist, Pointcloud* ptcloud,
-                                  Colors* colors) const;
+  void getPointcloudFromViewpoint(
+      const Point& view_origin, const Point& view_direction,
+      const Eigen::Vector2i& camera_res, FloatingPoint fov_h_rad,
+      FloatingPoint max_dist, Pointcloud* ptcloud, Colors* colors) const;
+  void getPointcloudFromTransform(
+      const Transformation& pose, const Eigen::Vector2i& camera_res,
+      FloatingPoint fov_h_rad, FloatingPoint max_dist, Pointcloud* ptcloud,
+      Colors* colors) const;
 
   /**
    * Same thing as getPointcloudFromViewpoint, but also adds a noise in the
    * *distance* of the measurement, given by noise_sigma (Gaussian noise). No
    * noise in the bearing.
    */
-  void getNoisyPointcloudFromViewpoint(const Point& view_origin,
-                                       const Point& view_direction,
-                                       const Eigen::Vector2i& camera_res,
-                                       FloatingPoint fov_h_rad,
-                                       FloatingPoint max_dist,
-                                       FloatingPoint noise_sigma,
-                                       Pointcloud* ptcloud, Colors* colors);
-  void getNoisyPointcloudFromTransform(const Transformation& pose,
-                                       const Eigen::Vector2i& camera_res,
-                                       FloatingPoint fov_h_rad,
-                                       FloatingPoint max_dist,
-                                       FloatingPoint noise_sigma,
-                                       Pointcloud* ptcloud, Colors* colors);
+  void getNoisyPointcloudFromViewpoint(
+      const Point& view_origin, const Point& view_direction,
+      const Eigen::Vector2i& camera_res, FloatingPoint fov_h_rad,
+      FloatingPoint max_dist, FloatingPoint noise_sigma, Pointcloud* ptcloud,
+      Colors* colors);
+  void getNoisyPointcloudFromTransform(
+      const Transformation& pose, const Eigen::Vector2i& camera_res,
+      FloatingPoint fov_h_rad, FloatingPoint max_dist,
+      FloatingPoint noise_sigma, Pointcloud* ptcloud, Colors* colors);
 
   // === Computing ground truth SDFs ===
   template <typename VoxelType>
-  void generateSdfFromWorld(FloatingPoint max_dist,
-                            Layer<VoxelType>* layer) const;
+  void generateSdfFromWorld(
+      FloatingPoint max_dist, Layer<VoxelType>* layer) const;
 
-  FloatingPoint getDistanceToPoint(const Point& coords,
-                                   FloatingPoint max_dist) const;
+  FloatingPoint getDistanceToPoint(
+      const Point& coords, FloatingPoint max_dist) const;
 
   /// Set and get the map generation and display bounds.
   void setBounds(const Point& min_bound, const Point& max_bound) {
@@ -89,8 +83,12 @@ class SimulationWorld {
     max_bound_ = max_bound;
   }
 
-  Point getMinBound() const { return min_bound_; }
-  Point getMaxBound() const { return max_bound_; }
+  Point getMinBound() const {
+    return min_bound_;
+  }
+  Point getMaxBound() const {
+    return max_bound_;
+  }
 
  protected:
   template <typename VoxelType>

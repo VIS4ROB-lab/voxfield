@@ -6,8 +6,8 @@
 
 namespace voxblox {
 
-Transformer::Transformer(const ros::NodeHandle& nh,
-                         const ros::NodeHandle& nh_private)
+Transformer::Transformer(
+    const ros::NodeHandle& nh, const ros::NodeHandle& nh_private)
     : nh_(nh),
       nh_private_(nh_private),
       world_frame_("world"),
@@ -20,14 +20,15 @@ Transformer::Transformer(const ros::NodeHandle& nh,
   const double kNanoSecondsInSecond = 1.0e9;
   double timestamp_tolerance_sec =
       timestamp_tolerance_ns_ / kNanoSecondsInSecond;
-  nh_private_.param("timestamp_tolerance_sec", timestamp_tolerance_sec,
-                    timestamp_tolerance_sec);
+  nh_private_.param(
+      "timestamp_tolerance_sec", timestamp_tolerance_sec,
+      timestamp_tolerance_sec);
   timestamp_tolerance_ns_ =
       static_cast<int64_t>(timestamp_tolerance_sec * kNanoSecondsInSecond);
 
   // Transform settings.
-  nh_private_.param("use_tf_transforms", use_tf_transforms_,
-                    use_tf_transforms_);
+  nh_private_.param(
+      "use_tf_transforms", use_tf_transforms_, use_tf_transforms_);
   // If we use topic transforms, we have 2 parts: a dynamic transform from a
   // topic and a static transform from parameters (calibration).
   // Dynamic transform should be T_G_D (where D is whatever sensor the
@@ -45,8 +46,8 @@ Transformer::Transformer(const ros::NodeHandle& nh,
 
       // See if we need to invert it.
       bool invert_static_tranform = false;
-      nh_private_.param("invert_T_B_D", invert_static_tranform,
-                        invert_static_tranform);
+      nh_private_.param(
+          "invert_T_B_D", invert_static_tranform, invert_static_tranform);
       if (invert_static_tranform) {
         T_B_D_ = T_B_D_.inverse();
       }
@@ -57,8 +58,8 @@ Transformer::Transformer(const ros::NodeHandle& nh,
 
       // See if we need to invert it.
       bool invert_static_tranform = false;
-      nh_private_.param("invert_T_B_C", invert_static_tranform,
-                        invert_static_tranform);
+      nh_private_.param(
+          "invert_T_B_C", invert_static_tranform, invert_static_tranform);
       if (invert_static_tranform) {
         T_B_C_ = T_B_C_.inverse();
       }
@@ -73,10 +74,9 @@ void Transformer::transformCallback(
   transform_queue_.push_back(transform_msg);
 }
 
-bool Transformer::lookupTransform(const std::string& from_frame,
-                                  const std::string& to_frame,
-                                  const ros::Time& timestamp,
-                                  Transformation* transform) {
+bool Transformer::lookupTransform(
+    const std::string& from_frame, const std::string& to_frame,
+    const ros::Time& timestamp, Transformation* transform) {
   CHECK_NOTNULL(transform);
   if (use_tf_transforms_) {
     return lookupTransformTf(from_frame, to_frame, timestamp, transform);
@@ -86,10 +86,9 @@ bool Transformer::lookupTransform(const std::string& from_frame,
 }
 
 // Stolen from octomap_manager
-bool Transformer::lookupTransformTf(const std::string& from_frame,
-                                    const std::string& to_frame,
-                                    const ros::Time& timestamp,
-                                    Transformation* transform) {
+bool Transformer::lookupTransformTf(
+    const std::string& from_frame, const std::string& to_frame,
+    const ros::Time& timestamp, Transformation* transform) {
   CHECK_NOTNULL(transform);
   tf::StampedTransform tf_transform;
   ros::Time time_to_lookup = timestamp;
@@ -102,14 +101,14 @@ bool Transformer::lookupTransformTf(const std::string& from_frame,
 
   // Previous behavior was just to use the latest transform if the time is in
   // the future. Now we will just wait.
-  if (!tf_listener_.canTransform(to_frame, from_frame_modified,
-                                 time_to_lookup)) {
+  if (!tf_listener_.canTransform(
+          to_frame, from_frame_modified, time_to_lookup)) {
     return false;
   }
 
   try {
-    tf_listener_.lookupTransform(to_frame, from_frame_modified, time_to_lookup,
-                                 tf_transform);
+    tf_listener_.lookupTransform(
+        to_frame, from_frame_modified, time_to_lookup, tf_transform);
   } catch (tf::TransformException& ex) {  // NOLINT
     ROS_ERROR_STREAM(
         "Error getting TF transform from sensor data: " << ex.what());
@@ -120,13 +119,13 @@ bool Transformer::lookupTransformTf(const std::string& from_frame,
   return true;
 }
 
-bool Transformer::lookupTransformQueue(const ros::Time& timestamp,
-                                       Transformation* transform) {
+bool Transformer::lookupTransformQueue(
+    const ros::Time& timestamp, Transformation* transform) {
   CHECK_NOTNULL(transform);
   if (transform_queue_.empty()) {
-    ROS_WARN_STREAM_THROTTLE(30, "No match found for transform timestamp: "
-                                     << timestamp
-                                     << " as transform queue is empty.");
+    ROS_WARN_STREAM_THROTTLE(
+        30, "No match found for transform timestamp: "
+                << timestamp << " as transform queue is empty.");
     return false;
   }
   // Try to match the transforms in the queue.

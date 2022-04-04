@@ -28,19 +28,22 @@ void SimulationServer::getServerConfigFromRosParam(
   nh_private.param("generate_mesh", generate_mesh_, generate_mesh_);
 
   nh_private.param("visualize", visualize_, visualize_);
-  nh_private.param("visualization_slice_level", visualization_slice_level_,
-                   visualization_slice_level_);
+  nh_private.param(
+      "visualization_slice_level", visualization_slice_level_,
+      visualization_slice_level_);
 
-  nh_private.param("generate_occupancy", generate_occupancy_,
-                   generate_occupancy_);
+  nh_private.param(
+      "generate_occupancy", generate_occupancy_, generate_occupancy_);
   nh_private.param("add_robot_pose", add_robot_pose_, add_robot_pose_);
-  nh_private.param("truncation_distance", truncation_distance_,
-                   truncation_distance_);
+  nh_private.param(
+      "truncation_distance", truncation_distance_, truncation_distance_);
 
-  nh_private.param("depth_camera_resolution_u", depth_camera_resolution_[0],
-                   depth_camera_resolution_[0]);
-  nh_private.param("depth_camera_resolution_v", depth_camera_resolution_[1],
-                   depth_camera_resolution_[1]);
+  nh_private.param(
+      "depth_camera_resolution_u", depth_camera_resolution_[0],
+      depth_camera_resolution_[0]);
+  nh_private.param(
+      "depth_camera_resolution_v", depth_camera_resolution_[1],
+      depth_camera_resolution_[1]);
 
   nh_private.param("fov_h_rad", fov_h_rad_, fov_h_rad_);
 
@@ -52,9 +55,9 @@ void SimulationServer::getServerConfigFromRosParam(
   // NOTE(mfehr): needed because ros params does not support size_t.
   int max_attempts_to_generate_viewpoint =
       static_cast<int>(max_attempts_to_generate_viewpoint_);
-  nh_private.param("max_attempts_to_generate_viewpoint",
-                   max_attempts_to_generate_viewpoint,
-                   max_attempts_to_generate_viewpoint);
+  nh_private.param(
+      "max_attempts_to_generate_viewpoint", max_attempts_to_generate_viewpoint,
+      max_attempts_to_generate_viewpoint);
   CHECK_GT(max_attempts_to_generate_viewpoint, 0);
   max_attempts_to_generate_viewpoint_ =
       static_cast<size_t>(max_attempts_to_generate_viewpoint);
@@ -90,10 +93,10 @@ SimulationServer::SimulationServer(
       world_(new SimulationWorld()) {
   CHECK_EQ(voxel_size_, tsdf_config.tsdf_voxel_size);
   CHECK_EQ(voxel_size_, esdf_config.esdf_voxel_size);
-  CHECK_EQ(static_cast<size_t>(voxels_per_side_),
-           tsdf_config.tsdf_voxels_per_side);
-  CHECK_EQ(static_cast<size_t>(voxels_per_side_),
-           esdf_config.esdf_voxels_per_side);
+  CHECK_EQ(
+      static_cast<size_t>(voxels_per_side_), tsdf_config.tsdf_voxels_per_side);
+  CHECK_EQ(
+      static_cast<size_t>(voxels_per_side_), esdf_config.esdf_voxels_per_side);
 
   getServerConfigFromRosParam(nh_private);
 
@@ -152,16 +155,16 @@ SimulationServer::SimulationServer(
   srand(0);
 }
 
-SimulationServer::SimulationServer(const ros::NodeHandle& nh,
-                                   const ros::NodeHandle& nh_private)
-    : SimulationServer(nh, nh_private, getEsdfMapConfigFromRosParam(nh_private),
-                       getEsdfIntegratorConfigFromRosParam(nh_private),
-                       getTsdfMapConfigFromRosParam(nh_private),
-                       getTsdfIntegratorConfigFromRosParam(nh_private)) {}
+SimulationServer::SimulationServer(
+    const ros::NodeHandle& nh, const ros::NodeHandle& nh_private)
+    : SimulationServer(
+          nh, nh_private, getEsdfMapConfigFromRosParam(nh_private),
+          getEsdfIntegratorConfigFromRosParam(nh_private),
+          getTsdfMapConfigFromRosParam(nh_private),
+          getTsdfIntegratorConfigFromRosParam(nh_private)) {}
 
-bool SimulationServer::generatePlausibleViewpoint(FloatingPoint min_distance,
-                                                  Point* ray_origin,
-                                                  Point* ray_direction) const {
+bool SimulationServer::generatePlausibleViewpoint(
+    FloatingPoint min_distance, Point* ray_origin, Point* ray_direction) const {
   CHECK_NOTNULL(world_);
   // Generate a viewpoint at least min_distance from any objects (if you want
   // just outside an object, just call this with min_distance = 0).
@@ -219,14 +222,14 @@ void SimulationServer::generateSDF() {
     colors.clear();
 
     CHECK_NOTNULL(world_);
-    world_->getPointcloudFromViewpoint(view_origin, view_direction,
-                                       depth_camera_resolution_, fov_h_rad_,
-                                       max_dist_, &ptcloud, &colors);
+    world_->getPointcloudFromViewpoint(
+        view_origin, view_direction, depth_camera_resolution_, fov_h_rad_,
+        max_dist_, &ptcloud, &colors);
 
     // Get T_G_C from ray origin and ray direction.
-    Transformation T_G_C(view_origin,
-                         Eigen::Quaternion<FloatingPoint>::FromTwoVectors(
-                             Point(0.0, 0.0, 1.0), view_direction));
+    Transformation T_G_C(
+        view_origin, Eigen::Quaternion<FloatingPoint>::FromTwoVectors(
+                         Point(0.0, 0.0, 1.0), view_direction));
 
     // Transform back into camera frame.
     Pointcloud ptcloud_C;
@@ -324,8 +327,8 @@ void SimulationServer::visualize() {
     // Generate TSDF GT mesh.
     MeshIntegratorConfig mesh_config;
     MeshLayer::Ptr mesh(new MeshLayer(tsdf_gt_->block_size()));
-    MeshIntegrator<TsdfVoxel> mesh_integrator(mesh_config, tsdf_gt_.get(),
-                                              mesh.get());
+    MeshIntegrator<TsdfVoxel> mesh_integrator(
+        mesh_config, tsdf_gt_.get(), mesh.get());
 
     constexpr bool only_mesh_updated_blocks = false;
     constexpr bool clear_updated_flag = true;
@@ -342,8 +345,8 @@ void SimulationServer::visualize() {
     MeshLayer::Ptr mesh_test(new MeshLayer(tsdf_test_->block_size()));
     MeshIntegrator<TsdfVoxel> mesh_integrator_test(
         mesh_config, tsdf_test_.get(), mesh_test.get());
-    mesh_integrator_test.generateMesh(only_mesh_updated_blocks,
-                                      clear_updated_flag);
+    mesh_integrator_test.generateMesh(
+        only_mesh_updated_blocks, clear_updated_flag);
     marker_array.markers.clear();
     marker_array.markers.resize(1);
     fillMarkerWithMesh(mesh_test, color_mode, &marker_array.markers[0]);

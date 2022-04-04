@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/block_hash.h"
 #include "voxblox/core/layer.h"
@@ -75,8 +75,8 @@ class OccupancyIntegrator {
         clamp_max_log_);
   }
 
-  void integratePointCloud(const Transformation& T_G_C,
-                           const Pointcloud& points_C) {
+  void integratePointCloud(
+      const Transformation& T_G_C, const Pointcloud& points_C) {
     timing::Timer integrate_timer("integrate_occ");
 
     const Point& origin = T_G_C.getPosition();
@@ -106,8 +106,8 @@ class OccupancyIntegrator {
         if (free_cells.find(getGridIndexFromPoint<GlobalIndex>(end_scaled)) ==
             free_cells.end()) {
           castRay(start_scaled, end_scaled, &global_voxel_indices);
-          free_cells.insert(global_voxel_indices.begin(),
-                            global_voxel_indices.end());
+          free_cells.insert(
+              global_voxel_indices.begin(), global_voxel_indices.end());
         }
       } else {
         end_scaled = point_G * voxel_size_inv_;
@@ -116,8 +116,8 @@ class OccupancyIntegrator {
           castRay(start_scaled, end_scaled, &global_voxel_indices);
 
           if (global_voxel_indices.size() > 2) {
-            free_cells.insert(global_voxel_indices.begin(),
-                              global_voxel_indices.end() - 1);
+            free_cells.insert(
+                global_voxel_indices.begin(), global_voxel_indices.end() - 1);
             occupied_cells.insert(global_voxel_indices.back());
           }
         }

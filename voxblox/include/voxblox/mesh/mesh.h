@@ -53,12 +53,22 @@ struct Mesh {
   }
   virtual ~Mesh() {}
 
-  inline bool hasVertices() const { return !vertices.empty(); }
-  inline bool hasNormals() const { return !normals.empty(); }
-  inline bool hasColors() const { return !colors.empty(); }
-  inline bool hasTriangles() const { return !indices.empty(); }
+  inline bool hasVertices() const {
+    return !vertices.empty();
+  }
+  inline bool hasNormals() const {
+    return !normals.empty();
+  }
+  inline bool hasColors() const {
+    return !colors.empty();
+  }
+  inline bool hasTriangles() const {
+    return !indices.empty();
+  }
 
-  inline size_t size() const { return vertices.size(); }
+  inline size_t size() const {
+    return vertices.size();
+  }
   inline size_t getMemorySize() const {
     size_t size_bytes = 0u;
     size_bytes += sizeof(Pointcloud) + vertices.size() * sizeof(Point);
@@ -80,13 +90,19 @@ struct Mesh {
     indices.clear();
   }
 
-  inline void clearTriangles() { indices.clear(); }
-  inline void clearNormals() { normals.clear(); }
-  inline void clearColors() { colors.clear(); }
+  inline void clearTriangles() {
+    indices.clear();
+  }
+  inline void clearNormals() {
+    normals.clear();
+  }
+  inline void clearColors() {
+    colors.clear();
+  }
 
-  inline void resize(const size_t size, const bool has_normals = true,
-                     const bool has_colors = true,
-                     const bool has_indices = true) {
+  inline void resize(
+      const size_t size, const bool has_normals = true,
+      const bool has_colors = true, const bool has_indices = true) {
     vertices.resize(size);
 
     if (has_normals) {
@@ -102,9 +118,9 @@ struct Mesh {
     }
   }
 
-  inline void reserve(const size_t size, const bool has_normals = true,
-                      const bool has_colors = true,
-                      const bool has_triangles = true) {
+  inline void reserve(
+      const size_t size, const bool has_normals = true,
+      const bool has_colors = true, const bool has_triangles = true) {
     vertices.reserve(size);
 
     if (has_normals) {
@@ -130,8 +146,8 @@ struct Mesh {
     CHECK_EQ(other_mesh.hasNormals(), hasNormals());
     CHECK_EQ(other_mesh.hasTriangles(), hasTriangles());
 
-    reserve(size() + other_mesh.size(), hasNormals(), hasColors(),
-            hasTriangles());
+    reserve(
+        size() + other_mesh.size(), hasNormals(), hasColors(), hasTriangles());
 
     const size_t num_vertices_before = vertices.size();
 

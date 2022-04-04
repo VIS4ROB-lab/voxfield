@@ -5,8 +5,8 @@
 #include <cmath>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/block_hash.h"
 #include "voxblox/core/layer.h"
@@ -32,8 +32,9 @@ class OccTsdfIntegrator {
     FloatingPoint occ_voxel_size_ratio = 0.865;  // Sqrt(3)/2
   };
 
-  OccTsdfIntegrator(const Config& config, Layer<TsdfVoxel>* tsdf_layer,
-                    Layer<OccupancyVoxel>* occ_layer)
+  OccTsdfIntegrator(
+      const Config& config, Layer<TsdfVoxel>* tsdf_layer,
+      Layer<OccupancyVoxel>* occ_layer)
       : config_(config), tsdf_layer_(tsdf_layer), occ_layer_(occ_layer) {
     CHECK_NOTNULL(tsdf_layer_);
     CHECK_NOTNULL(occ_layer_);
@@ -61,8 +62,8 @@ class OccTsdfIntegrator {
     }
   }
 
-  void updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
-                            bool kIncremental) {
+  void updateFromTsdfBlocks(
+      const BlockIndexList& tsdf_blocks, bool kIncremental) {
     CHECK_EQ(tsdf_layer_->voxels_per_side(), occ_layer_->voxels_per_side());
     CHECK_EQ(tsdf_layer_->voxel_size(), occ_layer_->voxel_size());
 
@@ -76,7 +77,8 @@ class OccTsdfIntegrator {
       for (const BlockIndex& block_index : tsdf_blocks) {
         Block<TsdfVoxel>::ConstPtr tsdf_block =
             tsdf_layer_->getBlockPtrByIndex(block_index);
-        if (!tsdf_block) continue;
+        if (!tsdf_block)
+          continue;
 
         // Allocate the same block in the occupancy layer.
         // Block indices are the same across all layers.
@@ -95,8 +97,9 @@ class OccTsdfIntegrator {
             occ_voxel.observed = true;
             occ_voxel.behind = (tsdf_voxel.distance < 0.0);
             bool original_occ_state = occ_voxel.occupied;
-            occ_voxel.occupied = (std::abs(tsdf_voxel.distance) <=
-                                  config_.occ_voxel_size_ratio * voxel_size_);
+            occ_voxel.occupied =
+                (std::abs(tsdf_voxel.distance) <=
+                 config_.occ_voxel_size_ratio * voxel_size_);
             if (occ_voxel.occupied)
               occ_voxel.probability_log = 1.0;  // only for visualization
             else
@@ -119,9 +122,13 @@ class OccTsdfIntegrator {
     allocate_timer.Stop();
   }
 
-  GlobalIndexList getInsertList() { return insert_list_; }
+  GlobalIndexList getInsertList() {
+    return insert_list_;
+  }
 
-  GlobalIndexList getDeleteList() { return delete_list_; }
+  GlobalIndexList getDeleteList() {
+    return delete_list_;
+  }
 
   inline void clearList() {
     GlobalIndexList().swap(insert_list_);

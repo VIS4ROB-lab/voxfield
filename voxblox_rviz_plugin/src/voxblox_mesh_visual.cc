@@ -11,9 +11,9 @@ namespace voxblox_rviz_plugin {
 
 unsigned int VoxbloxMeshVisual::instance_counter_ = 0;
 
-VoxbloxMeshVisual::VoxbloxMeshVisual(Ogre::SceneManager* scene_manager,
-                                     Ogre::SceneNode* parent_node,
-                                     std::string name_space)
+VoxbloxMeshVisual::VoxbloxMeshVisual(
+    Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node,
+    std::string name_space)
     : scene_manager_(scene_manager),
       name_space_(std::move(name_space)),
       is_enabled_(true) {
@@ -28,17 +28,17 @@ VoxbloxMeshVisual::~VoxbloxMeshVisual() {
   }
 }
 
-void VoxbloxMeshVisual::setPose(const Ogre::Vector3& position,
-                                const Ogre::Quaternion& orientation) {
+void VoxbloxMeshVisual::setPose(
+    const Ogre::Vector3& position, const Ogre::Quaternion& orientation) {
   frame_node_->setPosition(position);
   frame_node_->setOrientation(orientation);
 }
 
-void VoxbloxMeshVisual::setMessage(const voxblox_msgs::Mesh::ConstPtr& msg,
-                                   uint8_t alpha) {
+void VoxbloxMeshVisual::setMessage(
+    const voxblox_msgs::Mesh::ConstPtr& msg, uint8_t alpha) {
   for (const voxblox_msgs::MeshBlock& mesh_block : msg->mesh_blocks) {
-    const voxblox::BlockIndex index(mesh_block.index[0], mesh_block.index[1],
-                                    mesh_block.index[2]);
+    const voxblox::BlockIndex index(
+        mesh_block.index[0], mesh_block.index[1], mesh_block.index[2]);
 
     size_t vertex_index = 0u;
     voxblox::Mesh mesh;
@@ -149,13 +149,13 @@ void VoxbloxMeshVisual::setMessage(const voxblox_msgs::Mesh::ConstPtr& msg,
     for (size_t i = 0; i < connected_mesh.vertices.size(); ++i) {
       // note calling position changes what vertex the color and normal calls
       // point to
-      ogre_object->position(connected_mesh.vertices[i].x(),
-                            connected_mesh.vertices[i].y(),
-                            connected_mesh.vertices[i].z());
+      ogre_object->position(
+          connected_mesh.vertices[i].x(), connected_mesh.vertices[i].y(),
+          connected_mesh.vertices[i].z());
 
-      ogre_object->normal(connected_mesh.normals[i].x(),
-                          connected_mesh.normals[i].y(),
-                          connected_mesh.normals[i].z());
+      ogre_object->normal(
+          connected_mesh.normals[i].x(), connected_mesh.normals[i].y(),
+          connected_mesh.normals[i].z());
       constexpr float color_conv_factor =
           1.0f / std::numeric_limits<uint8_t>::max();
       ogre_object->colour(

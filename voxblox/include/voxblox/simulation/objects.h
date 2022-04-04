@@ -32,15 +32,18 @@ class Object {
   /// Map-building accessors.
   virtual FloatingPoint getDistanceToPoint(const Point& point) const = 0;
 
-  Color getColor() const { return color_; }
-  Type getType() const { return type_; }
+  Color getColor() const {
+    return color_;
+  }
+  Type getType() const {
+    return type_;
+  }
 
   /// Raycasting accessors.
-  virtual bool getRayIntersection(const Point& ray_origin,
-                                  const Point& ray_direction,
-                                  FloatingPoint max_dist,
-                                  Point* intersect_point,
-                                  FloatingPoint* intersect_dist) const = 0;
+  virtual bool getRayIntersection(
+      const Point& ray_origin, const Point& ray_direction,
+      FloatingPoint max_dist, Point* intersect_point,
+      FloatingPoint* intersect_dist) const = 0;
 
  protected:
   Point center_;
@@ -62,11 +65,10 @@ class Sphere : public Object {
     return distance;
   }
 
-  virtual bool getRayIntersection(const Point& ray_origin,
-                                  const Point& ray_direction,
-                                  FloatingPoint max_dist,
-                                  Point* intersect_point,
-                                  FloatingPoint* intersect_dist) const {
+  virtual bool getRayIntersection(
+      const Point& ray_origin, const Point& ray_direction,
+      FloatingPoint max_dist, Point* intersect_point,
+      FloatingPoint* intersect_dist) const {
     // From https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
     // x = o + dl is the ray equation
     // r = sphere radius, c = sphere center
@@ -115,46 +117,49 @@ class Cube : public Object {
     // calculating-distance-between-a-point-and-a-rectangular-box-nearest-point
 
     Point distance_vector = Point::Zero();
-    distance_vector.x() =
-        std::max(std::max(center_.x() - size_.x() / 2.0 - point.x(), 0.0),
-                 point.x() - center_.x() - size_.x() / 2.0);
-    distance_vector.y() =
-        std::max(std::max(center_.y() - size_.y() / 2.0 - point.y(), 0.0),
-                 point.y() - center_.y() - size_.y() / 2.0);
-    distance_vector.z() =
-        std::max(std::max(center_.z() - size_.z() / 2.0 - point.z(), 0.0),
-                 point.z() - center_.z() - size_.z() / 2.0);
+    distance_vector.x() = std::max(
+        std::max(center_.x() - size_.x() / 2.0 - point.x(), 0.0),
+        point.x() - center_.x() - size_.x() / 2.0);
+    distance_vector.y() = std::max(
+        std::max(center_.y() - size_.y() / 2.0 - point.y(), 0.0),
+        point.y() - center_.y() - size_.y() / 2.0);
+    distance_vector.z() = std::max(
+        std::max(center_.z() - size_.z() / 2.0 - point.z(), 0.0),
+        point.z() - center_.z() - size_.z() / 2.0);
 
     FloatingPoint distance = distance_vector.norm();
 
     // Basically 0... Means it's inside!
     if (distance < kEpsilon) {
-      distance_vector.x() = std::max(center_.x() - size_.x() / 2.0 - point.x(),
-                                     point.x() - center_.x() - size_.x() / 2.0);
-      distance_vector.y() = std::max(center_.y() - size_.y() / 2.0 - point.y(),
-                                     point.y() - center_.y() - size_.y() / 2.0);
-      distance_vector.z() = std::max(center_.z() - size_.z() / 2.0 - point.z(),
-                                     point.z() - center_.z() - size_.z() / 2.0);
+      distance_vector.x() = std::max(
+          center_.x() - size_.x() / 2.0 - point.x(),
+          point.x() - center_.x() - size_.x() / 2.0);
+      distance_vector.y() = std::max(
+          center_.y() - size_.y() / 2.0 - point.y(),
+          point.y() - center_.y() - size_.y() / 2.0);
+      distance_vector.z() = std::max(
+          center_.z() - size_.z() / 2.0 - point.z(),
+          point.z() - center_.z() - size_.z() / 2.0);
       distance = distance_vector.maxCoeff();
     }
 
     return distance;
   }
 
-  virtual bool getRayIntersection(const Point& ray_origin,
-                                  const Point& ray_direction,
-                                  FloatingPoint max_dist,
-                                  Point* intersect_point,
-                                  FloatingPoint* intersect_dist) const {
+  virtual bool getRayIntersection(
+      const Point& ray_origin, const Point& ray_direction,
+      FloatingPoint max_dist, Point* intersect_point,
+      FloatingPoint* intersect_dist) const {
     // Adapted from https://www.scratchapixel.com/lessons/3d-basic-rendering/
     // minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
     // Compute min and max limits in 3D.
 
     // Precalculate signs and inverse directions.
-    Point inv_dir(1.0 / ray_direction.x(), 1.0 / ray_direction.y(),
-                  1.0 / ray_direction.z());
-    Eigen::Vector3i ray_sign(inv_dir.x() < 0.0, inv_dir.y() < 0.0,
-                             inv_dir.z() < 0.0);
+    Point inv_dir(
+        1.0 / ray_direction.x(), 1.0 / ray_direction.y(),
+        1.0 / ray_direction.z());
+    Eigen::Vector3i ray_sign(
+        inv_dir.x() < 0.0, inv_dir.y() < 0.0, inv_dir.z() < 0.0);
 
     Point bounds[2];
     bounds[0] = center_ - size_ / 2.0;
@@ -169,18 +174,24 @@ class Cube : public Object {
     FloatingPoint tymax =
         (bounds[1 - ray_sign.y()].y() - ray_origin.y()) * inv_dir.y();
 
-    if ((tmin > tymax) || (tymin > tmax)) return false;
-    if (tymin > tmin) tmin = tymin;
-    if (tymax < tmax) tmax = tymax;
+    if ((tmin > tymax) || (tymin > tmax))
+      return false;
+    if (tymin > tmin)
+      tmin = tymin;
+    if (tymax < tmax)
+      tmax = tymax;
 
     FloatingPoint tzmin =
         (bounds[ray_sign.z()].z() - ray_origin.z()) * inv_dir.z();
     FloatingPoint tzmax =
         (bounds[1 - ray_sign.z()].z() - ray_origin.z()) * inv_dir.z();
 
-    if ((tmin > tzmax) || (tzmin > tmax)) return false;
-    if (tzmin > tmin) tmin = tzmin;
-    if (tzmax < tmax) tmax = tzmax;
+    if ((tmin > tzmax) || (tzmin > tmax))
+      return false;
+    if (tzmin > tmin)
+      tmin = tzmin;
+    if (tzmax < tmax)
+      tmax = tzmax;
 
     FloatingPoint t = tmin;
     if (t < 0.0) {
@@ -226,11 +237,10 @@ class PlaneObject : public Object {
     return distance;
   }
 
-  virtual bool getRayIntersection(const Point& ray_origin,
-                                  const Point& ray_direction,
-                                  FloatingPoint max_dist,
-                                  Point* intersect_point,
-                                  FloatingPoint* intersect_dist) const {
+  virtual bool getRayIntersection(
+      const Point& ray_origin, const Point& ray_direction,
+      FloatingPoint max_dist, Point* intersect_point,
+      FloatingPoint* intersect_dist) const {
     // From https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection
     // Following notation of sphere more...
     // x = o + dl is the ray equation
@@ -262,8 +272,9 @@ class Cylinder : public Object {
 
   Cylinder(const Point& center, FloatingPoint radius, FloatingPoint height)
       : Object(center, Type::kCylinder), radius_(radius), height_(height) {}
-  Cylinder(const Point& center, FloatingPoint radius, FloatingPoint height,
-           const Color& color)
+  Cylinder(
+      const Point& center, FloatingPoint radius, FloatingPoint height,
+      const Color& color)
       : Object(center, Type::kCylinder, color),
         radius_(radius),
         height_(height) {}
@@ -282,26 +293,27 @@ class Cylinder : public Object {
     } else if (point.z() > max_z_limit) {
       // Case 2: above the cylinder.
       distance = std::sqrt(
-          std::max((point.head<2>() - center_.head<2>()).squaredNorm() -
-                       radius_ * radius_,
-                   static_cast<FloatingPoint>(0.0)) +
+          std::max(
+              (point.head<2>() - center_.head<2>()).squaredNorm() -
+                  radius_ * radius_,
+              static_cast<FloatingPoint>(0.0)) +
           (point.z() - max_z_limit) * (point.z() - max_z_limit));
     } else {
       // Case 3: below cylinder.
       distance = std::sqrt(
-          std::max((point.head<2>() - center_.head<2>()).squaredNorm() -
-                       radius_ * radius_,
-                   static_cast<FloatingPoint>(0.0)) +
+          std::max(
+              (point.head<2>() - center_.head<2>()).squaredNorm() -
+                  radius_ * radius_,
+              static_cast<FloatingPoint>(0.0)) +
           (point.z() - min_z_limit) * (point.z() - min_z_limit));
     }
     return distance;
   }
 
-  virtual bool getRayIntersection(const Point& ray_origin,
-                                  const Point& ray_direction,
-                                  FloatingPoint max_dist,
-                                  Point* intersect_point,
-                                  FloatingPoint* intersect_dist) const {
+  virtual bool getRayIntersection(
+      const Point& ray_origin, const Point& ray_direction,
+      FloatingPoint max_dist, Point* intersect_point,
+      FloatingPoint* intersect_dist) const {
     // From http://woo4.me/wootracer/cylinder-intersection/
     // and http://www.cl.cam.ac.uk/teaching/1999/AGraphHCI/SMAG/node2.html
     // Define ray as P = E + tD, where E is ray_origin and D is ray_direction.

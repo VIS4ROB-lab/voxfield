@@ -70,9 +70,9 @@ InteractiveSlider::InteractiveSlider(
 
   // Add interactive marker to server.
   interactive_marker_server_.insert(
-      interactive_marker,
-      std::bind(&InteractiveSlider::interactiveMarkerFeedback, this,
-                std::placeholders::_1, slider_callback));
+      interactive_marker, std::bind(
+                              &InteractiveSlider::interactiveMarkerFeedback,
+                              this, std::placeholders::_1, slider_callback));
   interactive_marker_server_.applyChanges();
 
   // Initial callback.

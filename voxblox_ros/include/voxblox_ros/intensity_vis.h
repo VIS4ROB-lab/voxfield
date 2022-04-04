@@ -26,9 +26,10 @@ inline void recolorVoxbloxMeshMsgByIntensity(
       mesh_block.g.resize(mesh_block.x.size());
       mesh_block.b.resize(mesh_block.x.size());
 
-      const IntensityVoxel* voxel = intensity_layer.getVoxelPtrByCoordinates(
-          Point(mesh_block.x[vert_idx], mesh_block.y[vert_idx],
-                mesh_block.z[vert_idx]));
+      const IntensityVoxel* voxel =
+          intensity_layer.getVoxelPtrByCoordinates(Point(
+              mesh_block.x[vert_idx], mesh_block.y[vert_idx],
+              mesh_block.z[vert_idx]));
       if (voxel != nullptr && voxel->weight > 0.0) {
         float intensity = voxel->intensity;
         Color new_color = color_map->colorLookup(intensity);

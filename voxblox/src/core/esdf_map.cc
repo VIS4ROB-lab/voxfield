@@ -2,17 +2,17 @@
 
 namespace voxblox {
 
-bool EsdfMap::getDistanceAtPosition(const Eigen::Vector3d& position,
-                                    double* distance) const {
+bool EsdfMap::getDistanceAtPosition(
+    const Eigen::Vector3d& position, double* distance) const {
   constexpr bool interpolate = true;
   return getDistanceAtPosition(position, interpolate, distance);
 }
 
-bool EsdfMap::getDistanceAtPosition(const Eigen::Vector3d& position,
-                                    bool interpolate, double* distance) const {
+bool EsdfMap::getDistanceAtPosition(
+    const Eigen::Vector3d& position, bool interpolate, double* distance) const {
   FloatingPoint distance_fp;
-  bool success = interpolator_.getDistance(position.cast<FloatingPoint>(),
-                                           &distance_fp, interpolate);
+  bool success = interpolator_.getDistance(
+      position.cast<FloatingPoint>(), &distance_fp, interpolate);
   if (success) {
     *distance = static_cast<double>(distance_fp);
   }
@@ -23,8 +23,8 @@ bool EsdfMap::getDistanceAndGradientAtPosition(
     const Eigen::Vector3d& position, double* distance,
     Eigen::Vector3d* gradient) const {
   constexpr bool interpolate = true;
-  return getDistanceAndGradientAtPosition(position, interpolate, distance,
-                                          gradient);
+  return getDistanceAndGradientAtPosition(
+      position, interpolate, distance, gradient);
 }
 
 bool EsdfMap::getDistanceAndGradientAtPosition(
@@ -38,10 +38,10 @@ bool EsdfMap::getDistanceAndGradientAtPosition(
     success = interpolator_.getAdaptiveDistanceAndGradient(
         position.cast<FloatingPoint>(), &distance_fp, &gradient_fp);
   } else {
-    success = interpolator_.getDistance(position.cast<FloatingPoint>(),
-                                        &distance_fp, interpolate);
-    success &= interpolator_.getGradient(position.cast<FloatingPoint>(),
-                                         &gradient_fp, interpolate);
+    success = interpolator_.getDistance(
+        position.cast<FloatingPoint>(), &distance_fp, interpolate);
+    success &= interpolator_.getGradient(
+        position.cast<FloatingPoint>(), &gradient_fp, interpolate);
   }
 
   *distance = static_cast<double>(distance_fp);
@@ -104,8 +104,8 @@ void EsdfMap::batchGetDistanceAndGradientAtPosition(
 
   for (int i = 0; i < positions.cols(); i++) {
     Eigen::Vector3d gradient;
-    observed[i] = getDistanceAndGradientAtPosition(positions.col(i),
-                                                   &distances[i], &gradient);
+    observed[i] = getDistanceAndGradientAtPosition(
+        positions.col(i), &distances[i], &gradient);
 
     gradients.col(i) = gradient;
   }
@@ -186,8 +186,8 @@ unsigned int EsdfMap::coordPlaneSliceGetDistance(
   }
 
   if (!did_all_fit) {
-    throw std::runtime_error(std::string("Unable to store ") +
-                             std::to_string(count) + " values.");
+    throw std::runtime_error(
+        std::string("Unable to store ") + std::to_string(count) + " values.");
   }
 
   return count;

@@ -20,8 +20,8 @@ size_t Block<VoxelType>::computeLinearIndexFromVoxelIndex(
   DCHECK(index.y() >= 0 && index.y() < static_cast<int>(voxels_per_side_));
   DCHECK(index.z() >= 0 && index.z() < static_cast<int>(voxels_per_side_));
 
-  DCHECK_LT(linear_index,
-            voxels_per_side_ * voxels_per_side_ * voxels_per_side_);
+  DCHECK_LT(
+      linear_index, voxels_per_side_ * voxels_per_side_ * voxels_per_side_);
   DCHECK_GE(linear_index, 0u);
   return linear_index;
 }
@@ -34,9 +34,10 @@ VoxelIndex Block<VoxelType>::computeTruncatedVoxelIndexFromCoordinates(
       getGridIndexFromPoint<VoxelIndex>(coords - origin_, voxel_size_inv_);
   // check is needed as getGridIndexFromPoint gives results that have a tiny
   // chance of being outside the valid voxel range.
-  return VoxelIndex(std::max(std::min(voxel_index.x(), max_value), 0),
-                    std::max(std::min(voxel_index.y(), max_value), 0),
-                    std::max(std::min(voxel_index.z(), max_value), 0));
+  return VoxelIndex(
+      std::max(std::min(voxel_index.x(), max_value), 0),
+      std::max(std::min(voxel_index.y(), max_value), 0),
+      std::max(std::min(voxel_index.z(), max_value), 0));
 }
 
 template <typename VoxelType>
@@ -72,8 +73,9 @@ bool Block<VoxelType>::isValidVoxelIndex(const VoxelIndex& index) const {
 
 template <typename VoxelType>
 Block<VoxelType>::Block(const BlockProto& proto)
-    : Block(proto.voxels_per_side(), proto.voxel_size(),
-            Point(proto.origin_x(), proto.origin_y(), proto.origin_z())) {
+    : Block(
+          proto.voxels_per_side(), proto.voxel_size(),
+          Point(proto.origin_x(), proto.origin_y(), proto.origin_z())) {
   has_data_ = proto.has_data();
 
   // Convert the data into a vector of integers.

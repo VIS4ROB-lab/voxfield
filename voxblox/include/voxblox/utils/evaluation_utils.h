@@ -111,10 +111,10 @@ FloatingPoint evaluateLayersRmse(
     for (size_t linear_index = 0u; linear_index < num_voxels_per_block;
          ++linear_index) {
       FloatingPoint error = 0.0;
-      const VoxelEvaluationResult result =
-          computeVoxelError(gt_block.getVoxelByLinearIndex(linear_index),
-                            test_block.getVoxelByLinearIndex(linear_index),
-                            voxel_evaluation_mode, &error);
+      const VoxelEvaluationResult result = computeVoxelError(
+          gt_block.getVoxelByLinearIndex(linear_index),
+          test_block.getVoxelByLinearIndex(linear_index), voxel_evaluation_mode,
+          &error);
 
       switch (result) {
         case VoxelEvaluationResult::kEvaluated:
@@ -189,8 +189,8 @@ FloatingPoint evaluateLayersRmse(
  * evaluate errors behind the test surface.
  */
 template <typename VoxelType>
-FloatingPoint evaluateLayersRmse(const Layer<VoxelType>& layer_gt,
-                                 const Layer<VoxelType>& layer_test) {
+FloatingPoint evaluateLayersRmse(
+    const Layer<VoxelType>& layer_gt, const Layer<VoxelType>& layer_test) {
   return evaluateLayersRmse<VoxelType>(
       layer_gt, layer_test, VoxelEvaluationMode::kIgnoreErrorBehindTestSurface);
 }

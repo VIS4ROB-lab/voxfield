@@ -19,16 +19,18 @@ class VoxfieldServer : public NpTsdfServer {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   VoxfieldServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
-  VoxfieldServer(const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
-                 const EsdfMap::Config& esdf_config,
-                 const EsdfVoxfieldIntegrator::Config& esdf_integrator_config,
-                 const TsdfMap::Config& tsdf_config,
-                 const NpTsdfIntegratorBase::Config& tsdf_integrator_config,
-                 const MeshIntegratorConfig& mesh_config);
+  VoxfieldServer(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private,
+      const EsdfMap::Config& esdf_config,
+      const EsdfVoxfieldIntegrator::Config& esdf_integrator_config,
+      const TsdfMap::Config& tsdf_config,
+      const NpTsdfIntegratorBase::Config& tsdf_integrator_config,
+      const MeshIntegratorConfig& mesh_config);
   virtual ~VoxfieldServer() {}
 
-  bool generateEsdfCallback(std_srvs::Empty::Request& request,     // NOLINT
-                            std_srvs::Empty::Response& response);  // NOLINT
+  bool generateEsdfCallback(
+      std_srvs::Empty::Request& request,     // NOLINT
+      std_srvs::Empty::Response& response);  // NOLINT
 
   void publishAllUpdatedEsdfVoxels();
   virtual void publishSlices();
@@ -57,12 +59,16 @@ class VoxfieldServer : public NpTsdfServer {
       voxblox_msgs::FilePath::Request& request,     // NOLINT
       voxblox_msgs::FilePath::Response& response);  // NOLINT
 
-  inline std::shared_ptr<EsdfMap> getEsdfMapPtr() { return esdf_map_; }
+  inline std::shared_ptr<EsdfMap> getEsdfMapPtr() {
+    return esdf_map_;
+  }
   inline std::shared_ptr<const EsdfMap> getEsdfMapPtr() const {
     return esdf_map_;
   }
 
-  bool getClearSphere() const { return clear_sphere_for_planning_; }
+  bool getClearSphere() const {
+    return clear_sphere_for_planning_;
+  }
   void setClearSphere(bool clear_sphere_for_planning) {
     clear_sphere_for_planning_ = clear_sphere_for_planning;
   }
@@ -75,8 +81,12 @@ class VoxfieldServer : public NpTsdfServer {
    * These are for enabling or disabling incremental update of the ESDF. Use
    * carefully.
    */
-  void disableIncrementalUpdate() { incremental_update_ = false; }
-  void enableIncrementalUpdate() { incremental_update_ = true; }
+  void disableIncrementalUpdate() {
+    incremental_update_ = false;
+  }
+  void enableIncrementalUpdate() {
+    incremental_update_ = true;
+  }
 
   virtual void clear();
 

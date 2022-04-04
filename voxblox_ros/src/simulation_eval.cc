@@ -7,8 +7,8 @@
 namespace voxblox {
 class SimulationServerImpl : public voxblox::SimulationServer {
  public:
-  SimulationServerImpl(const ros::NodeHandle& nh,
-                       const ros::NodeHandle& nh_private)
+  SimulationServerImpl(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private)
       : SimulationServer(nh, nh_private) {}
 
   void prepareWorld() {

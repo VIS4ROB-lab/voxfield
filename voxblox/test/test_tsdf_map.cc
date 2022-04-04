@@ -58,8 +58,8 @@ TEST_F(TsdfMapTest, IndexLookups) {
           point_in_0_0_0_v2),
       AnyIndex(0, 0, 0)));
   EXPECT_EQ(block_0_0_0, block_0_0_0_v2);
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(block_0_0_0_v2->origin(), Point(0.0, 0.0, 0.0),
-                                kEpsilon));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      block_0_0_0_v2->origin(), Point(0.0, 0.0, 0.0), kEpsilon));
   EXPECT_TRUE(
       EIGEN_MATRIX_EQUAL(block_0_0_0_v2->block_index(), AnyIndex(0, 0, 0)));
   EXPECT_NEAR(block_0_0_0_v2->block_size(), block_size_, kEpsilon);
@@ -72,16 +72,16 @@ TEST_F(TsdfMapTest, IndexLookups) {
   EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
       map_->getTsdfLayerPtr()->computeBlockIndexFromCoordinates(point_in_1_1_1),
       AnyIndex(1, 1, 1)));
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(block_1_1_1->origin(),
-                                Point(block_size_, block_size_, block_size_),
-                                kEpsilon));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      block_1_1_1->origin(), Point(block_size_, block_size_, block_size_),
+      kEpsilon));
   EXPECT_TRUE(
       EIGEN_MATRIX_EQUAL(block_1_1_1->block_index(), AnyIndex(1, 1, 1)));
   EXPECT_NEAR(block_1_1_1->block_size(), block_size_, kEpsilon);
 
   // BLOCK 1 1 1 (coordinate within block)
-  Point point_in_1_1_1_v2(block_size_, block_size_ + config_.tsdf_voxel_size,
-                          block_size_);
+  Point point_in_1_1_1_v2(
+      block_size_, block_size_ + config_.tsdf_voxel_size, block_size_);
   Block<TsdfVoxel>::Ptr block_1_1_1_v2 =
       map_->getTsdfLayerPtr()->getBlockPtrByCoordinates(point_in_1_1_1_v2);
   ASSERT_TRUE(block_1_1_1_v2.get() != nullptr);
@@ -90,9 +90,9 @@ TEST_F(TsdfMapTest, IndexLookups) {
           point_in_1_1_1_v2),
       AnyIndex(1, 1, 1)));
   EXPECT_EQ(block_1_1_1, block_1_1_1_v2);
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(block_1_1_1_v2->origin(),
-                                Point(block_size_, block_size_, block_size_),
-                                kEpsilon));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      block_1_1_1_v2->origin(), Point(block_size_, block_size_, block_size_),
+      kEpsilon));
   EXPECT_TRUE(
       EIGEN_MATRIX_EQUAL(block_1_1_1_v2->block_index(), AnyIndex(1, 1, 1)));
   EXPECT_NEAR(block_1_1_1_v2->block_size(), block_size_, kEpsilon);
@@ -107,11 +107,11 @@ TEST_F(TsdfMapTest, IndexLookups) {
       map_->getTsdfLayerPtr()->computeBlockIndexFromCoordinates(
           point_in_neg_1_1_1),
       AnyIndex(-1, -1, -1)));
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(block_negative_1_1_1->origin(),
-                                Point(-block_size_, -block_size_, -block_size_),
-                                kEpsilon));
-  EXPECT_TRUE(EIGEN_MATRIX_EQUAL(block_negative_1_1_1->block_index(),
-                                 AnyIndex(-1, -1, -1)));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      block_negative_1_1_1->origin(),
+      Point(-block_size_, -block_size_, -block_size_), kEpsilon));
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
+      block_negative_1_1_1->block_index(), AnyIndex(-1, -1, -1)));
   EXPECT_NEAR(block_negative_1_1_1->block_size(), block_size_, kEpsilon);
 
   // BLOCK -1 -1 -1 (coordinate within block)
@@ -126,11 +126,11 @@ TEST_F(TsdfMapTest, IndexLookups) {
       AnyIndex(-1, -1, -1)));
   ASSERT_TRUE(block_negative_1_1_1_v2.get() != nullptr);
   EXPECT_EQ(block_negative_1_1_1, block_negative_1_1_1_v2);
-  EXPECT_TRUE(EIGEN_MATRIX_NEAR(block_negative_1_1_1_v2->origin(),
-                                Point(-block_size_, -block_size_, -block_size_),
-                                kEpsilon));
-  EXPECT_TRUE(EIGEN_MATRIX_EQUAL(block_negative_1_1_1_v2->block_index(),
-                                 AnyIndex(-1, -1, -1)));
+  EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+      block_negative_1_1_1_v2->origin(),
+      Point(-block_size_, -block_size_, -block_size_), kEpsilon));
+  EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
+      block_negative_1_1_1_v2->block_index(), AnyIndex(-1, -1, -1)));
   EXPECT_NEAR(block_negative_1_1_1_v2->block_size(), block_size_, kEpsilon);
 
   // Check voxel indexing.
@@ -186,9 +186,9 @@ TEST_F(TsdfMapTest, IndexLookups) {
   }
   {
     // Test Voxel 7 7 7
-    Point point_in_0_0_0(7.0 * config_.tsdf_voxel_size,
-                         7.0 * config_.tsdf_voxel_size,
-                         7.0 * config_.tsdf_voxel_size);
+    Point point_in_0_0_0(
+        7.0 * config_.tsdf_voxel_size, 7.0 * config_.tsdf_voxel_size,
+        7.0 * config_.tsdf_voxel_size);
     EXPECT_NE(block_0_0_0->getVoxelPtrByCoordinates(point_in_0_0_0), nullptr);
 
     size_t linear_index =
@@ -196,10 +196,11 @@ TEST_F(TsdfMapTest, IndexLookups) {
     EXPECT_EQ(linear_index, block_0_0_0->num_voxels() - 1u);
     VoxelIndex voxel_index =
         block_0_0_0->computeTruncatedVoxelIndexFromCoordinates(point_in_0_0_0);
-    EXPECT_TRUE(EIGEN_MATRIX_EQUAL(voxel_index,
-                                   AnyIndex(config_.tsdf_voxels_per_side - 1,
-                                            config_.tsdf_voxels_per_side - 1,
-                                            config_.tsdf_voxels_per_side - 1)));
+    EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
+        voxel_index,
+        AnyIndex(
+            config_.tsdf_voxels_per_side - 1, config_.tsdf_voxels_per_side - 1,
+            config_.tsdf_voxels_per_side - 1)));
 
     EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
         voxel_index,
@@ -216,9 +217,10 @@ TEST_F(TsdfMapTest, IndexLookups) {
   // Test in Block -1 -1 -1
   {
     // Test Voxel 0 0 0
-    Point point_in_neg_1_1_1(-block_negative_1_1_1->block_size(),
-                             -block_negative_1_1_1->block_size(),
-                             -block_negative_1_1_1->block_size());
+    Point point_in_neg_1_1_1(
+        -block_negative_1_1_1->block_size(),
+        -block_negative_1_1_1->block_size(),
+        -block_negative_1_1_1->block_size());
     EXPECT_NE(
         block_negative_1_1_1->getVoxelPtrByCoordinates(point_in_neg_1_1_1),
         nullptr);
@@ -258,10 +260,11 @@ TEST_F(TsdfMapTest, IndexLookups) {
     VoxelIndex voxel_index =
         block_negative_1_1_1->computeTruncatedVoxelIndexFromCoordinates(
             point_in_neg_1_1_1);
-    EXPECT_TRUE(EIGEN_MATRIX_EQUAL(voxel_index,
-                                   AnyIndex(config_.tsdf_voxels_per_side - 1,
-                                            config_.tsdf_voxels_per_side - 1,
-                                            config_.tsdf_voxels_per_side - 1)));
+    EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
+        voxel_index,
+        AnyIndex(
+            config_.tsdf_voxels_per_side - 1, config_.tsdf_voxels_per_side - 1,
+            config_.tsdf_voxels_per_side - 1)));
 
     EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
         voxel_index,
@@ -279,9 +282,9 @@ TEST_F(TsdfMapTest, IndexLookups) {
   // Test in Block -1 -1 0
   {
     // Test Voxel 3 6 5
-    Point point_in_neg_1_1_0(-5. * config_.tsdf_voxel_size,
-                             -2. * config_.tsdf_voxel_size,
-                             5. * config_.tsdf_voxel_size);
+    Point point_in_neg_1_1_0(
+        -5. * config_.tsdf_voxel_size, -2. * config_.tsdf_voxel_size,
+        5. * config_.tsdf_voxel_size);
     Block<TsdfVoxel>::Ptr block_neg_1_neg_1_0 =
         map_->getTsdfLayerPtr()->allocateNewBlockByCoordinates(
             point_in_neg_1_1_0);
@@ -290,13 +293,14 @@ TEST_F(TsdfMapTest, IndexLookups) {
         map_->getTsdfLayerPtr()->computeBlockIndexFromCoordinates(
             point_in_neg_1_1_0),
         AnyIndex(-1, -1, 0)));
-    EXPECT_NE(block_neg_1_neg_1_0->getVoxelPtrByCoordinates(point_in_neg_1_1_0),
-              nullptr);
-    EXPECT_TRUE(EIGEN_MATRIX_NEAR(block_neg_1_neg_1_0->origin(),
-                                  Point(-block_size_, -block_size_, 0.0),
-                                  kEpsilon));
-    EXPECT_TRUE(EIGEN_MATRIX_EQUAL(block_neg_1_neg_1_0->block_index(),
-                                   AnyIndex(-1, -1, 0)));
+    EXPECT_NE(
+        block_neg_1_neg_1_0->getVoxelPtrByCoordinates(point_in_neg_1_1_0),
+        nullptr);
+    EXPECT_TRUE(EIGEN_MATRIX_NEAR(
+        block_neg_1_neg_1_0->origin(), Point(-block_size_, -block_size_, 0.0),
+        kEpsilon));
+    EXPECT_TRUE(EIGEN_MATRIX_EQUAL(
+        block_neg_1_neg_1_0->block_index(), AnyIndex(-1, -1, 0)));
     EXPECT_NEAR(block_neg_1_neg_1_0->block_size(), block_size_, kEpsilon);
 
     size_t linear_index =
@@ -335,8 +339,8 @@ TEST_F(TsdfMapTest, ComputeBlockIndexFromOriginFromBlockIndexTest) {
         BlockIndex block_idx = {x, y, z};
         Point block_origin = getOriginPointFromGridIndex(block_idx, kBlockSize);
         BlockIndex block_idx_from_origin =
-            getGridIndexFromOriginPoint<BlockIndex>(block_origin,
-                                                    kBlockSizeInv);
+            getGridIndexFromOriginPoint<BlockIndex>(
+                block_origin, kBlockSizeInv);
 
         EXPECT_EQ(block_idx.x(), block_idx_from_origin.x());
         EXPECT_EQ(block_idx.y(), block_idx_from_origin.y());

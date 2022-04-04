@@ -36,8 +36,8 @@ bool LoadBlocksFromFile(
   do {
     // Get number of messages
     uint32_t num_protos;
-    if (!utils::readProtoMsgCountFromStream(&proto_file, &num_protos,
-                                            &tmp_byte_offset)) {
+    if (!utils::readProtoMsgCountFromStream(
+            &proto_file, &num_protos, &tmp_byte_offset)) {
       LOG(ERROR) << "Could not read number of messages.";
       return false;
     }
@@ -49,8 +49,8 @@ bool LoadBlocksFromFile(
 
     // Get header and check if it is compatible with existing layer.
     LayerProto layer_proto;
-    if (!utils::readProtoMsgFromStream(&proto_file, &layer_proto,
-                                       &tmp_byte_offset)) {
+    if (!utils::readProtoMsgFromStream(
+            &proto_file, &layer_proto, &tmp_byte_offset)) {
       LOG(ERROR) << "Could not read layer protobuf message.";
       return false;
     }
@@ -70,8 +70,8 @@ bool LoadBlocksFromFile(
       const size_t num_blocks = num_protos - 1;
       for (uint32_t block_idx = 0u; block_idx < num_blocks; ++block_idx) {
         BlockProto block_proto;
-        if (!utils::readProtoMsgFromStream(&proto_file, &block_proto,
-                                           &tmp_byte_offset)) {
+        if (!utils::readProtoMsgFromStream(
+                &proto_file, &block_proto, &tmp_byte_offset)) {
           LOG(ERROR) << "Could not read block protobuf message number "
                      << block_idx;
           return false;
@@ -82,8 +82,8 @@ bool LoadBlocksFromFile(
 
     // Read all blocks and add them to the layer.
     const size_t num_blocks = num_protos - 1;
-    if (!LoadBlocksFromStream(num_blocks, strategy, &proto_file, layer_ptr,
-                              &tmp_byte_offset)) {
+    if (!LoadBlocksFromStream(
+            num_blocks, strategy, &proto_file, layer_ptr, &tmp_byte_offset)) {
       return false;
     }
   } while (multiple_layer_support && !layer_found && !proto_file.eof());
@@ -96,8 +96,8 @@ bool LoadBlocksFromFile(
     typename Layer<VoxelType>::BlockMergingStrategy strategy,
     Layer<VoxelType>* layer_ptr) {
   constexpr bool multiple_layer_support = false;
-  return LoadBlocksFromFile(file_path, strategy, multiple_layer_support,
-                            layer_ptr);
+  return LoadBlocksFromFile(
+      file_path, strategy, multiple_layer_support, layer_ptr);
 }
 
 template <typename VoxelType>
@@ -112,8 +112,8 @@ bool LoadBlocksFromStream(
   // Read all blocks and add them to the layer.
   for (uint32_t block_idx = 0u; block_idx < num_blocks; ++block_idx) {
     BlockProto block_proto;
-    if (!utils::readProtoMsgFromStream(proto_file_ptr, &block_proto,
-                                       tmp_byte_offset_ptr)) {
+    if (!utils::readProtoMsgFromStream(
+            proto_file_ptr, &block_proto, tmp_byte_offset_ptr)) {
       LOG(ERROR) << "Could not read block protobuf message number "
                  << block_idx;
       return false;
@@ -128,8 +128,9 @@ bool LoadBlocksFromStream(
 }
 
 template <typename VoxelType>
-bool LoadLayer(const std::string& file_path, const bool multiple_layer_support,
-               typename Layer<VoxelType>::Ptr* layer_ptr) {
+bool LoadLayer(
+    const std::string& file_path, const bool multiple_layer_support,
+    typename Layer<VoxelType>::Ptr* layer_ptr) {
   CHECK_NOTNULL(layer_ptr);
   CHECK(!file_path.empty());
 
@@ -150,8 +151,8 @@ bool LoadLayer(const std::string& file_path, const bool multiple_layer_support,
   do {
     // Get number of messages
     uint32_t num_protos;
-    if (!utils::readProtoMsgCountFromStream(&proto_file, &num_protos,
-                                            &tmp_byte_offset)) {
+    if (!utils::readProtoMsgCountFromStream(
+            &proto_file, &num_protos, &tmp_byte_offset)) {
       LOG(ERROR) << "Could not read number of messages.";
       return false;
     }
@@ -163,8 +164,8 @@ bool LoadLayer(const std::string& file_path, const bool multiple_layer_support,
 
     // Get header and check if it is compatible with existing layer.
     LayerProto layer_proto;
-    if (!utils::readProtoMsgFromStream(&proto_file, &layer_proto,
-                                       &tmp_byte_offset)) {
+    if (!utils::readProtoMsgFromStream(
+            &proto_file, &layer_proto, &tmp_byte_offset)) {
       LOG(ERROR) << "Could not read layer protobuf message.";
       return false;
     }
@@ -191,8 +192,8 @@ bool LoadLayer(const std::string& file_path, const bool multiple_layer_support,
       const size_t num_blocks = num_protos - 1;
       for (uint32_t block_idx = 0u; block_idx < num_blocks; ++block_idx) {
         BlockProto block_proto;
-        if (!utils::readProtoMsgFromStream(&proto_file, &block_proto,
-                                           &tmp_byte_offset)) {
+        if (!utils::readProtoMsgFromStream(
+                &proto_file, &block_proto, &tmp_byte_offset)) {
           LOG(ERROR) << "Could not read block protobuf message number "
                      << block_idx;
           return false;
@@ -218,27 +219,27 @@ bool LoadLayer(const std::string& file_path, const bool multiple_layer_support,
 // By default loads without multiple layer support (i.e., only checks the first
 // layer in the file).
 template <typename VoxelType>
-bool LoadLayer(const std::string& file_path,
-               typename Layer<VoxelType>::Ptr* layer_ptr) {
+bool LoadLayer(
+    const std::string& file_path, typename Layer<VoxelType>::Ptr* layer_ptr) {
   constexpr bool multiple_layer_support = false;
   return LoadLayer<VoxelType>(file_path, multiple_layer_support, layer_ptr);
 }
 
 template <typename VoxelType>
-bool SaveLayer(const Layer<VoxelType>& layer, const std::string& file_path,
-               bool clear_file) {
+bool SaveLayer(
+    const Layer<VoxelType>& layer, const std::string& file_path,
+    bool clear_file) {
   CHECK(!file_path.empty());
   return layer.saveToFile(file_path, clear_file);
 }
 
 template <typename VoxelType>
-bool SaveLayerSubset(const Layer<VoxelType>& layer,
-                     const std::string& file_path,
-                     const BlockIndexList& blocks_to_include,
-                     bool include_all_blocks) {
+bool SaveLayerSubset(
+    const Layer<VoxelType>& layer, const std::string& file_path,
+    const BlockIndexList& blocks_to_include, bool include_all_blocks) {
   CHECK(!file_path.empty());
-  return layer.saveSubsetToFile(file_path, blocks_to_include,
-                                include_all_blocks);
+  return layer.saveSubsetToFile(
+      file_path, blocks_to_include, include_all_blocks);
 }
 
 }  // namespace io

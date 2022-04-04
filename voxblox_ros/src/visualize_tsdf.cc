@@ -50,14 +50,17 @@ class SimpleTsdfVisualizer {
 
     ROS_DEBUG_STREAM("\tRetreiving ROS parameters...");
 
-    nh_private_.param("tsdf_surface_distance_threshold_factor",
-                      tsdf_surface_distance_threshold_factor_,
-                      tsdf_surface_distance_threshold_factor_);
+    nh_private_.param(
+        "tsdf_surface_distance_threshold_factor",
+        tsdf_surface_distance_threshold_factor_,
+        tsdf_surface_distance_threshold_factor_);
     nh_private_.param("tsdf_world_frame", tsdf_world_frame_, tsdf_world_frame_);
-    nh_private_.param("tsdf_voxel_ply_output_path", tsdf_voxel_ply_output_path_,
-                      tsdf_voxel_ply_output_path_);
-    nh_private_.param("tsdf_mesh_output_path", tsdf_mesh_output_path_,
-                      tsdf_mesh_output_path_);
+    nh_private_.param(
+        "tsdf_voxel_ply_output_path", tsdf_voxel_ply_output_path_,
+        tsdf_voxel_ply_output_path_);
+    nh_private_.param(
+        "tsdf_mesh_output_path", tsdf_mesh_output_path_,
+        tsdf_mesh_output_path_);
 
     std::string color_mode = "color";
     nh_private_.param("tsdf_mesh_color_mode", color_mode, color_mode);
@@ -99,14 +102,14 @@ class SimpleTsdfVisualizer {
 };
 
 void SimpleTsdfVisualizer::run(const Layer<TsdfVoxel>& tsdf_layer) {
-  ROS_INFO_STREAM("\nTSDF Layer info:\n"
-                  << "\tVoxel size:\t\t " << tsdf_layer.voxel_size() << "\n"
-                  << "\t# Voxels per side:\t " << tsdf_layer.voxels_per_side()
-                  << "\n"
-                  << "\tMemory size:\t\t "
-                  << tsdf_layer.getMemorySize() / 1024 / 1024 << "MB\n"
-                  << "\t# Allocated blocks:\t "
-                  << tsdf_layer.getNumberOfAllocatedBlocks() << "\n");
+  ROS_INFO_STREAM(
+      "\nTSDF Layer info:\n"
+      << "\tVoxel size:\t\t " << tsdf_layer.voxel_size() << "\n"
+      << "\t# Voxels per side:\t " << tsdf_layer.voxels_per_side() << "\n"
+      << "\tMemory size:\t\t " << tsdf_layer.getMemorySize() / 1024 / 1024
+      << "MB\n"
+      << "\t# Allocated blocks:\t " << tsdf_layer.getNumberOfAllocatedBlocks()
+      << "\n");
 
   ROS_DEBUG_STREAM("\tVisualize voxels near surface...");
   {
@@ -141,8 +144,8 @@ void SimpleTsdfVisualizer::run(const Layer<TsdfVoxel>& tsdf_layer) {
     mesh_layer.reset(new MeshLayer(tsdf_layer.block_size()));
     MeshIntegratorConfig mesh_config;
     std::shared_ptr<MeshIntegrator<TsdfVoxel>> mesh_integrator;
-    mesh_integrator.reset(new MeshIntegrator<TsdfVoxel>(mesh_config, tsdf_layer,
-                                                        mesh_layer.get()));
+    mesh_integrator.reset(new MeshIntegrator<TsdfVoxel>(
+        mesh_config, tsdf_layer, mesh_layer.get()));
 
     constexpr bool kOnlyMeshUpdatedBlocks = false;
     constexpr bool kClearUpdatedFlag = false;
@@ -199,8 +202,8 @@ int main(int argc, char** argv) {
 
   ROS_INFO_STREAM("Loading...");
   voxblox::Layer<voxblox::TsdfVoxel>::Ptr tsdf_layer;
-  if (!voxblox::io::LoadLayer<voxblox::TsdfVoxel>(tsdf_proto_path,
-                                                  &tsdf_layer)) {
+  if (!voxblox::io::LoadLayer<voxblox::TsdfVoxel>(
+          tsdf_proto_path, &tsdf_layer)) {
     ROS_FATAL_STREAM("Unable to load a TSDF grid from: " << tsdf_proto_path);
     ros::shutdown();
     return 1;

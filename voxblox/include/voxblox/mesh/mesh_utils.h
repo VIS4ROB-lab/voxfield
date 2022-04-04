@@ -39,8 +39,9 @@ inline void createConnectedMesh(
     // Make sure there are 3 distinct vertices for every triangle before
     // merging.
     CHECK_EQ(mesh->vertices.size(), mesh->indices.size());
-    CHECK_EQ(mesh->vertices.size() % 3u,
-             0u);  // TODO(py): sometimes this check would fail
+    CHECK_EQ(
+        mesh->vertices.size() % 3u,
+        0u);  // TODO(py): sometimes this check would fail
     CHECK_EQ(mesh->indices.size() % 3u, 0u);
 
     // Stores the mapping from old vertex index to the new one in the combined
@@ -182,8 +183,8 @@ inline void createConnectedMesh(
     const FloatingPoint approximate_vertex_proximity_threshold = 1e-10) {
   AlignedVector<Mesh::ConstPtr> meshes;
   meshes.push_back(Mesh::ConstPtr(&mesh, [](Mesh const*) {}));
-  createConnectedMesh(meshes, connected_mesh,
-                      approximate_vertex_proximity_threshold);
+  createConnectedMesh(
+      meshes, connected_mesh, approximate_vertex_proximity_threshold);
 }
 
 };  // namespace voxblox

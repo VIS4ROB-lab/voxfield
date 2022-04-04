@@ -79,9 +79,13 @@ class BucketQueue {
     return buckets_[last_bucket_index_].front();
   }
 
-  bool empty() { return num_elements_ == 0; }
+  bool empty() {
+    return num_elements_ == 0;
+  }
 
-  size_t size() { return num_elements_; }
+  size_t size() {
+    return num_elements_;
+  }
 
   void clear() {
     buckets_.clear();

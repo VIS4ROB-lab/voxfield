@@ -2,8 +2,8 @@
 
 namespace voxblox {
 
-ThreadSafeIndex* ThreadSafeIndexFactory::get(const std::string& mode,
-                                             const Pointcloud& points_C) {
+ThreadSafeIndex* ThreadSafeIndexFactory::get(
+    const std::string& mode, const Pointcloud& points_C) {
   if (mode == "mixed") {
     return new MixedThreadSafeIndex(points_C.size());
   } else if (mode == "sorted") {
@@ -49,7 +49,9 @@ bool ThreadSafeIndex::getNextIndex(size_t* idx) {
   }
 }
 
-void ThreadSafeIndex::reset() { atomic_idx_.store(0); }
+void ThreadSafeIndex::reset() {
+  atomic_idx_.store(0);
+}
 
 size_t MixedThreadSafeIndex::getNextIndexImpl(size_t sequential_idx) {
   if (number_of_groups_ * step_size_ <= sequential_idx) {
@@ -69,21 +71,20 @@ size_t SortedThreadSafeIndex::getNextIndexImpl(size_t sequential_idx) {
 // This class assumes PRE-SCALED coordinates, where one unit = one voxel size.
 // The indices are also returned in this scales coordinate system, which should
 // map to voxel indices.
-RayCaster::RayCaster(const Point& origin, const Point& point_G,
-                     const bool is_clearing_ray,
-                     const bool voxel_carving_enabled,
-                     const FloatingPoint max_ray_length_m,
-                     const FloatingPoint voxel_size_inv,
-                     const FloatingPoint truncation_distance,
-                     const bool cast_from_origin) {
+RayCaster::RayCaster(
+    const Point& origin, const Point& point_G, const bool is_clearing_ray,
+    const bool voxel_carving_enabled, const FloatingPoint max_ray_length_m,
+    const FloatingPoint voxel_size_inv, const FloatingPoint truncation_distance,
+    const bool cast_from_origin) {
   const Ray unit_ray = (point_G - origin).normalized();
 
   Point ray_start, ray_end;
   if (is_clearing_ray) {
     FloatingPoint ray_length = (point_G - origin).norm();
-    ray_length = std::min(std::max(ray_length - truncation_distance,
-                                   static_cast<FloatingPoint>(0.0)),
-                          max_ray_length_m);
+    ray_length = std::min(
+        std::max(
+            ray_length - truncation_distance, static_cast<FloatingPoint>(0.0)),
+        max_ray_length_m);
     ray_end = origin + unit_ray * ray_length;
     ray_start = voxel_carving_enabled ? origin : ray_end;
   } else {
@@ -125,8 +126,8 @@ bool RayCaster::nextRayIndex(GlobalIndex* ray_index) {
   return true;
 }
 
-void RayCaster::setupRayCaster(const Point& start_scaled,
-                               const Point& end_scaled) {
+void RayCaster::setupRayCaster(
+    const Point& start_scaled, const Point& end_scaled) {
   if (std::isnan(start_scaled.x()) || std::isnan(start_scaled.y()) ||
       std::isnan(start_scaled.z()) || std::isnan(end_scaled.x()) ||
       std::isnan(end_scaled.y()) || std::isnan(end_scaled.z())) {
@@ -145,28 +146,29 @@ void RayCaster::setupRayCaster(const Point& start_scaled,
 
   const Ray ray_scaled = end_scaled - start_scaled;
 
-  ray_step_signs_ = AnyIndex(signum(ray_scaled.x()), signum(ray_scaled.y()),
-                             signum(ray_scaled.z()));
+  ray_step_signs_ = AnyIndex(
+      signum(ray_scaled.x()), signum(ray_scaled.y()), signum(ray_scaled.z()));
 
-  const AnyIndex corrected_step(std::max(0, ray_step_signs_.x()),
-                                std::max(0, ray_step_signs_.y()),
-                                std::max(0, ray_step_signs_.z()));
+  const AnyIndex corrected_step(
+      std::max(0, ray_step_signs_.x()), std::max(0, ray_step_signs_.y()),
+      std::max(0, ray_step_signs_.z()));
 
   const Point start_scaled_shifted =
       start_scaled - curr_index_.cast<FloatingPoint>();
 
-  Ray distance_to_boundaries(corrected_step.cast<FloatingPoint>() -
-                             start_scaled_shifted);
+  Ray distance_to_boundaries(
+      corrected_step.cast<FloatingPoint>() - start_scaled_shifted);
 
-  t_to_next_boundary_ = Ray((std::abs(ray_scaled.x()) < 0.0)
-                                ? 2.0
-                                : distance_to_boundaries.x() / ray_scaled.x(),
-                            (std::abs(ray_scaled.y()) < 0.0)
-                                ? 2.0
-                                : distance_to_boundaries.y() / ray_scaled.y(),
-                            (std::abs(ray_scaled.z()) < 0.0)
-                                ? 2.0
-                                : distance_to_boundaries.z() / ray_scaled.z());
+  t_to_next_boundary_ =
+      Ray((std::abs(ray_scaled.x()) < 0.0)
+              ? 2.0
+              : distance_to_boundaries.x() / ray_scaled.x(),
+          (std::abs(ray_scaled.y()) < 0.0)
+              ? 2.0
+              : distance_to_boundaries.y() / ray_scaled.y(),
+          (std::abs(ray_scaled.z()) < 0.0)
+              ? 2.0
+              : distance_to_boundaries.z() / ray_scaled.z());
 
   // Distance to cross one grid cell along the ray in t.
   // Same as absolute inverse value of delta_coord.

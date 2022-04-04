@@ -16,8 +16,8 @@ template <>
 void mergeVoxelAIntoVoxelB(const EsdfVoxel& voxel_A, EsdfVoxel* voxel_B);
 
 template <>
-void mergeVoxelAIntoVoxelB(const OccupancyVoxel& voxel_A,
-                           OccupancyVoxel* voxel_B);
+void mergeVoxelAIntoVoxelB(
+    const OccupancyVoxel& voxel_A, OccupancyVoxel* voxel_B);
 
 }  // namespace voxblox
 

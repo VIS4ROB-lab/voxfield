@@ -14,10 +14,9 @@ void SimulationWorld::addGroundLevel(FloatingPoint height) {
       new PlaneObject(Point(0.0, 0.0, height), Point(0.0, 0.0, 1.0)));
 }
 
-void SimulationWorld::addPlaneBoundaries(FloatingPoint x_min,
-                                         FloatingPoint x_max,
-                                         FloatingPoint y_min,
-                                         FloatingPoint y_max) {
+void SimulationWorld::addPlaneBoundaries(
+    FloatingPoint x_min, FloatingPoint x_max, FloatingPoint y_min,
+    FloatingPoint y_max) {
   // X planes:
   objects_.emplace_back(
       new PlaneObject(Point(x_min, 0.0, 0.0), Point(1.0, 0.0, 0.0)));
@@ -31,7 +30,9 @@ void SimulationWorld::addPlaneBoundaries(FloatingPoint x_min,
       new PlaneObject(Point(0.0, y_max, 0.0), Point(0.0, -1.0, 0.0)));
 }
 
-void SimulationWorld::clear() { objects_.clear(); }
+void SimulationWorld::clear() {
+  objects_.clear();
+}
 
 FloatingPoint SimulationWorld::getDistanceToPoint(
     const Point& coords, FloatingPoint max_dist) const {
@@ -54,8 +55,9 @@ void SimulationWorld::getPointcloudFromTransform(
   Point view_direction = pose.getRotation().rotate(nominal_view_direction);
   Point view_origin = pose.getPosition();
 
-  getPointcloudFromViewpoint(view_origin, view_direction, camera_res, fov_h_rad,
-                             max_dist, ptcloud, colors);
+  getPointcloudFromViewpoint(
+      view_origin, view_direction, camera_res, fov_h_rad, max_dist, ptcloud,
+      colors);
 }
 
 void SimulationWorld::getPointcloudFromViewpoint(
@@ -70,8 +72,8 @@ void SimulationWorld::getPointcloudFromViewpoint(
   // view direction. Nominal view is positive x direction.
   const Point nominal_view_direction(1.0, 0.0, 0.0);
   Eigen::Quaternion<FloatingPoint> rotation_quaternion =
-      Eigen::Quaternion<FloatingPoint>::FromTwoVectors(nominal_view_direction,
-                                                       view_direction);
+      Eigen::Quaternion<FloatingPoint>::FromTwoVectors(
+          nominal_view_direction, view_direction);
   rotation_quaternion.normalize();
   const Rotation ray_rotation(rotation_quaternion);
 
@@ -91,9 +93,9 @@ void SimulationWorld::getPointcloudFromViewpoint(
       for (const std::unique_ptr<Object>& object : objects_) {
         Point object_intersect;
         FloatingPoint object_dist;
-        bool intersects =
-            object->getRayIntersection(view_origin, ray_direction, max_dist,
-                                       &object_intersect, &object_dist);
+        bool intersects = object->getRayIntersection(
+            view_origin, ray_direction, max_dist, &object_intersect,
+            &object_dist);
         if (intersects) {
           if (!ray_valid || object_dist < ray_dist) {
             ray_valid = true;
@@ -124,9 +126,9 @@ void SimulationWorld::getNoisyPointcloudFromTransform(
   Point view_direction = pose.getRotation().rotate(nominal_view_direction);
   Point view_origin = pose.getPosition();
 
-  getNoisyPointcloudFromViewpoint(view_origin, view_direction, camera_res,
-                                  fov_h_rad, max_dist, noise_sigma, ptcloud,
-                                  colors);
+  getNoisyPointcloudFromViewpoint(
+      view_origin, view_direction, camera_res, fov_h_rad, max_dist, noise_sigma,
+      ptcloud, colors);
 }
 
 void SimulationWorld::getNoisyPointcloudFromViewpoint(
@@ -160,9 +162,9 @@ void SimulationWorld::getNoisyPointcloudFromViewpoint(
       for (const std::unique_ptr<Object>& object : objects_) {
         Point object_intersect;
         FloatingPoint object_dist;
-        bool intersects =
-            object->getRayIntersection(view_origin, ray_direction, max_dist,
-                                       &object_intersect, &object_dist);
+        bool intersects = object->getRayIntersection(
+            view_origin, ray_direction, max_dist, &object_intersect,
+            &object_dist);
         if (intersects) {
           if (!ray_valid || object_dist < ray_dist) {
             ray_valid = true;

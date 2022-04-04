@@ -159,23 +159,47 @@ class Block {
   }
 
   // Basic function accessors.
-  size_t voxels_per_side() const { return voxels_per_side_; }
-  FloatingPoint voxel_size() const { return voxel_size_; }
-  FloatingPoint voxel_size_inv() const { return voxel_size_inv_; }
-  size_t num_voxels() const { return num_voxels_; }
-  Point origin() const { return origin_; }
-  void setOrigin(const Point& new_origin) { origin_ = new_origin; }
-  FloatingPoint block_size() const { return block_size_; }
+  size_t voxels_per_side() const {
+    return voxels_per_side_;
+  }
+  FloatingPoint voxel_size() const {
+    return voxel_size_;
+  }
+  FloatingPoint voxel_size_inv() const {
+    return voxel_size_inv_;
+  }
+  size_t num_voxels() const {
+    return num_voxels_;
+  }
+  Point origin() const {
+    return origin_;
+  }
+  void setOrigin(const Point& new_origin) {
+    origin_ = new_origin;
+  }
+  FloatingPoint block_size() const {
+    return block_size_;
+  }
 
-  bool updated(Update::Status status) const { return updated_[status]; }
-  bool has_data() const { return has_data_; }
-  bool& has_data() { return has_data_; }
+  bool updated(Update::Status status) const {
+    return updated_[status];
+  }
+  bool has_data() const {
+    return has_data_;
+  }
+  bool& has_data() {
+    return has_data_;
+  }
 
   void setUpdated(Update::Status status, bool value) {
     updated_[status] = value;
   }
-  void setUpdatedAll() { updated_.set(); }
-  void set_has_data(bool has_data) { has_data_ = has_data; }
+  void setUpdatedAll() {
+    updated_.set();
+  }
+  void set_has_data(bool has_data) {
+    has_data_ = has_data;
+  }
 
   // Serialization.
   void getProto(BlockProto* proto) const;

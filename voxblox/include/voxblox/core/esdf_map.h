@@ -32,8 +32,8 @@ class EsdfMap {
   };
 
   explicit EsdfMap(const Config& config)
-      : esdf_layer_(new Layer<EsdfVoxel>(config.esdf_voxel_size,
-                                         config.esdf_voxels_per_side)),
+      : esdf_layer_(new Layer<EsdfVoxel>(
+            config.esdf_voxel_size, config.esdf_voxels_per_side)),
         interpolator_(esdf_layer_.get()) {
     block_size_ = config.esdf_voxel_size * config.esdf_voxels_per_side;
   }
@@ -50,15 +50,23 @@ class EsdfMap {
 
   virtual ~EsdfMap() {}
 
-  Layer<EsdfVoxel>* getEsdfLayerPtr() { return esdf_layer_.get(); }
+  Layer<EsdfVoxel>* getEsdfLayerPtr() {
+    return esdf_layer_.get();
+  }
   const Layer<EsdfVoxel>* getEsdfLayerConstPtr() const {
     return esdf_layer_.get();
   }
 
-  const Layer<EsdfVoxel>& getEsdfLayer() const { return *esdf_layer_; }
+  const Layer<EsdfVoxel>& getEsdfLayer() const {
+    return *esdf_layer_;
+  }
 
-  FloatingPoint block_size() const { return block_size_; }
-  FloatingPoint voxel_size() const { return esdf_layer_->voxel_size(); }
+  FloatingPoint block_size() const {
+    return block_size_;
+  }
+  FloatingPoint voxel_size() const {
+    return esdf_layer_->voxel_size();
+  }
 
   /**
    * Specific accessor functions for esdf maps.
@@ -67,17 +75,18 @@ class EsdfMap {
    * FloatingPoint to have a standard, cast-free interface to planning
    * functions.
    */
-  bool getDistanceAtPosition(const Eigen::Vector3d& position,
-                             double* distance) const;
-  bool getDistanceAtPosition(const Eigen::Vector3d& position, bool interpolate,
-                             double* distance) const;
+  bool getDistanceAtPosition(
+      const Eigen::Vector3d& position, double* distance) const;
+  bool getDistanceAtPosition(
+      const Eigen::Vector3d& position, bool interpolate,
+      double* distance) const;
 
-  bool getDistanceAndGradientAtPosition(const Eigen::Vector3d& position,
-                                        double* distance,
-                                        Eigen::Vector3d* gradient) const;
-  bool getDistanceAndGradientAtPosition(const Eigen::Vector3d& position,
-                                        bool interpolate, double* distance,
-                                        Eigen::Vector3d* gradient) const;
+  bool getDistanceAndGradientAtPosition(
+      const Eigen::Vector3d& position, double* distance,
+      Eigen::Vector3d* gradient) const;
+  bool getDistanceAndGradientAtPosition(
+      const Eigen::Vector3d& position, bool interpolate, double* distance,
+      Eigen::Vector3d* gradient) const;
 
   bool isObserved(const Eigen::Vector3d& position) const;
 
@@ -91,22 +100,25 @@ class EsdfMap {
 
   // Convenience functions for querying many points at once from Python
   void batchGetDistanceAtPosition(
-      EigenDRef<const Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,
+      EigenDRef<const Eigen::Matrix<double, 3, Eigen::Dynamic>>&
+          positions,  // NOLINT
       Eigen::Ref<Eigen::VectorXd> distances,
       Eigen::Ref<Eigen::VectorXi> observed) const;
 
   void batchGetDistanceAndGradientAtPosition(
-      EigenDRef<const Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,
+      EigenDRef<const Eigen::Matrix<double, 3, Eigen::Dynamic>>&
+          positions,  // NOLINT
       Eigen::Ref<Eigen::VectorXd> distances,
-      EigenDRef<Eigen::Matrix<double, 3, Eigen::Dynamic>>& gradients,
+      EigenDRef<Eigen::Matrix<double, 3, Eigen::Dynamic>>& gradients,  // NOLINT
       Eigen::Ref<Eigen::VectorXi> observed) const;
 
   void batchIsObserved(
-      EigenDRef<const Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,
+      EigenDRef<const Eigen::Matrix<double, 3, Eigen::Dynamic>>&
+          positions,  // NOLINT
       Eigen::Ref<Eigen::VectorXi> observed) const;
 
-  unsigned int coordPlaneSliceGetCount(unsigned int free_plane_index,
-                                       double free_plane_val) const;
+  unsigned int coordPlaneSliceGetCount(
+      unsigned int free_plane_index, double free_plane_val) const;
 
   /**
    * Extract all voxels on a slice plane that is parallel to one of the
@@ -116,7 +128,7 @@ class EsdfMap {
    */
   unsigned int coordPlaneSliceGetDistance(
       unsigned int free_plane_index, double free_plane_val,
-      EigenDRef<Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,
+      EigenDRef<Eigen::Matrix<double, 3, Eigen::Dynamic>>& positions,  // NOLINT
       Eigen::Ref<Eigen::VectorXd> distances, unsigned int max_points) const;
 
  protected:

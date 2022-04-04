@@ -1,9 +1,9 @@
 #ifndef VOXBLOX_CORE_VOXEL_H_
 #define VOXBLOX_CORE_VOXEL_H_
 
-#include <float.h>
 #include <climits>
 #include <cstdint>
+#include <float.h>
 #include <string>
 
 #include "voxblox/core/color.h"
@@ -15,18 +15,21 @@ namespace voxblox {
 #define UNDEF INT_MAX  // Undefined voxel index
 
 struct TsdfVoxel {
-  float distance = 0.0f; // +: in front, -: behind the surface
+  // signed distance, +: in front, -: behind the surface
+  float distance = 0.0f;
   float weight = 0.0f;
   Color color;
-  Ray gradient = Ray::Zero(); // ADD(py): for the implementation of Gradient TSDF, its direction is from the surface toward the sensor
+  // ADD(py): for the implementation of signed distance gradient, its direction
+  // is from the surface toward the sensor // NOLINT
+  Ray gradient = Ray::Zero();
   bool occupied = false;
 };
 
 struct EsdfVoxel {
-  float distance = 0.0f; // when finer esdf is on, this distance also includes the inner-voxel part
-
-  float raw_distance = 0.0f; // without the inner-voxel part
-
+  // when finer esdf is on, this distance also includes the inner-voxel part
+  float distance = 0.0f;
+  // without the inner-voxel part (between voxel centers)
+  float raw_distance = 0.0f;
   bool observed = false;
   /**
    * Whether the voxel was copied from the TSDF (false) or created from a pose
@@ -38,33 +41,29 @@ struct EsdfVoxel {
 
   /**
    * Relative direction toward parent. If itself, then either uninitialized
-   * or in the fixed frontier.
+   * or in the fixed frontier. (used only by Voxblox)
    */
   Eigen::Vector3i parent = Eigen::Vector3i::Zero();
 
-  /** Used for fast incremental ESDF mapping from occupied grids.
-   * Reference: FIESTA (https://github.com/HKUST-Aerial-Robotics/FIESTA)
-   * It's a bit wasteful on map memory. Fix it later.
-   */
-
   // Fix FIESTA's problem of unsigned distance, use signed distance instead
   bool behind = false;
-  
   // The newly observed voxel
-  bool newly = false; 
-
+  bool newly = false;
   // only for evlauation visualization
   float error = 0.0f;
 
   // distance square with the unit of the voxel size (deprecated)
   // int dist_square = 0;
 
-  float raise = -1.0f; //not raised
+  // used only for voxedt esdf integrator
+  float raise = -1.0f;
 
   // Index of this voxel's closest occupied voxel
+  // Used by FIESTA and Voxfield
   GlobalIndex coc_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
 
-  // Simple version of a doubly linked list (prev, next, head)
+  // Simplified version of a doubly linked list (prev, next, head)
+  // Used by FIESTA and Voxfield
   GlobalIndex prev_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
   GlobalIndex next_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
   GlobalIndex head_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);

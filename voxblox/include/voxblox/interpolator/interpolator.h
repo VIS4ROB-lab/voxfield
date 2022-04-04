@@ -21,17 +21,18 @@ class Interpolator {
 
   explicit Interpolator(const Layer<VoxelType>* layer);
 
-  bool getGradient(const Point& pos, Point* grad,
-                   const bool interpolate = false) const;
+  bool getGradient(
+      const Point& pos, Point* grad, const bool interpolate = false) const;
 
-  bool getDistance(const Point& pos, FloatingPoint* distance,
-                   bool interpolate = false) const;
+  bool getDistance(
+      const Point& pos, FloatingPoint* distance,
+      bool interpolate = false) const;
 
-  bool getWeight(const Point& pos, FloatingPoint* weight,
-                 bool interpolate = false) const;
+  bool getWeight(
+      const Point& pos, FloatingPoint* weight, bool interpolate = false) const;
 
-  bool getVoxel(const Point& pos, VoxelType* voxel,
-                bool interpolate = false) const;
+  bool getVoxel(
+      const Point& pos, VoxelType* voxel, bool interpolate = false) const;
 
   /**
    * This tries to use whatever information is available to interpolate the
@@ -39,18 +40,19 @@ class Interpolator {
    * this will still estimate a 1-sided gradient. Should give the same results
    * as getGradient() and getDistance() if all neighbors are filled.
    */
-  bool getAdaptiveDistanceAndGradient(const Point& pos, FloatingPoint* distance,
-                                      Point* grad) const;
+  bool getAdaptiveDistanceAndGradient(
+      const Point& pos, FloatingPoint* distance, Point* grad) const;
 
   /// Without interpolation.
-  bool getNearestDistanceAndWeight(const Point& pos, FloatingPoint* distance,
-                                   float* weight) const;
+  bool getNearestDistanceAndWeight(
+      const Point& pos, FloatingPoint* distance, float* weight) const;
 
-  bool setIndexes(const Point& pos, BlockIndex* block_index,
-                  InterpIndexes* voxel_indexes) const;
+  bool setIndexes(
+      const Point& pos, BlockIndex* block_index,
+      InterpIndexes* voxel_indexes) const;
 
-  bool getVoxelsAndQVector(const Point& pos, const VoxelType** voxels,
-                           InterpVector* q_vector) const;
+  bool getVoxelsAndQVector(
+      const Point& pos, const VoxelType** voxels, InterpVector* q_vector) const;
 
  private:
   /**
@@ -58,14 +60,13 @@ class Interpolator {
    * Relates the interpolation distance of any arbitrary point inside a voxel
    * to the values of the voxel corners.
    */
-  void getQVector(const Point& voxel_pos, const Point& pos,
-                  const FloatingPoint voxel_size_inv,
-                  InterpVector* q_vector) const;
+  void getQVector(
+      const Point& voxel_pos, const Point& pos,
+      const FloatingPoint voxel_size_inv, InterpVector* q_vector) const;
 
-  bool getVoxelsAndQVector(const BlockIndex& block_index,
-                           const InterpIndexes& voxel_indexes, const Point& pos,
-                           const VoxelType** voxels,
-                           InterpVector* q_vector) const;
+  bool getVoxelsAndQVector(
+      const BlockIndex& block_index, const InterpIndexes& voxel_indexes,
+      const Point& pos, const VoxelType** voxels, InterpVector* q_vector) const;
 
   bool getInterpDistance(const Point& pos, FloatingPoint* distance) const;
 
@@ -88,12 +89,12 @@ class Interpolator {
   static uint8_t getAlpha(const VoxelType& voxel);
 
   template <typename TGetter>
-  static FloatingPoint interpMember(const InterpVector& q_vector,
-                                    const VoxelType** voxels,
-                                    TGetter (*getter)(const VoxelType&));
+  static FloatingPoint interpMember(
+      const InterpVector& q_vector, const VoxelType** voxels,
+      TGetter (*getter)(const VoxelType&));
 
-  static VoxelType interpVoxel(const InterpVector& q_vector,
-                               const VoxelType** voxels);
+  static VoxelType interpVoxel(
+      const InterpVector& q_vector, const VoxelType** voxels);
 
   const Layer<VoxelType>* layer_;
 };

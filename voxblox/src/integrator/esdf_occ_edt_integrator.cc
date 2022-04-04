@@ -80,11 +80,11 @@ void EsdfOccEdtIntegrator::updateFromOccBlocks(
           esdf_voxel.distance = esdf_voxel.behind
                                     ? -config_.max_behind_surface_m
                                     : config_.default_distance_m;
-          esdf_voxel.in_queue = false;    
-          esdf_voxel.raise = -1.0;             
-        }
-        else
+          esdf_voxel.in_queue = false;
+          esdf_voxel.raise = -1.0;
+        } else {
           esdf_voxel.newly = false;
+        }
       }
     }
   }
@@ -150,51 +150,51 @@ void EsdfOccEdtIntegrator::setLocalRange() {
   }
 }
 
+// Implementation of VDB-EDT under Voxblox's data structure
 // Main processing function of EDT
-// Reference: Zhu. D, et al., VDB-EDT: An Efficient Euclidean Distance Transform 
-// Algorithm Based on VDB Data Structure
+// Reference: Zhu. D, et al., VDB-EDT: An Efficient Euclidean
+// Distance Transform Algorithm Based on VDB Data Structure
 // Code: https://github.com/zhudelong/VDB-EDT
 // VDB's processing speed is about 3 times faster than our voxel hashings
 // Try to invlove VDB's data structure in our own work
-// py: it's better to base your work on voxblox, mainly due to the mesh 
+// py: it's better to base your work on voxblox, mainly due to the mesh
 // reconstruction part
-
 // Similar to FIESTA, but without the dll (so it's kind of slow)
-// So that we do not know which voxels would be affected after some deleting (which is always recorded by the dll)
+// So that we do not know which voxels would be affected after some deleting
+// (which is always recorded by the dll)
 // From occ to ESDF
 // need the insert_list and the delete_list
 void EsdfOccEdtIntegrator::updateESDF() {
   timing::Timer init_timer("upate_esdf/edt/update_init");
-  
-  //update_queue_ is a priority queue, voxels with the smaller absolute distance
-  //would be updated first 
+  // update_queue_ is a priority queue, voxels with the
+  // smaller absolute distance would be updated first
 
-  // Set Obstacle 
+  // Set Obstacle
   while (!insert_list_.empty()) {
     GlobalIndex cur_vox_idx = *insert_list_.begin();
     insert_list_.erase(insert_list_.begin());
-
     EsdfVoxel* cur_vox = esdf_layer_->getVoxelPtrByGlobalIndex(cur_vox_idx);
     CHECK_NOTNULL(cur_vox);
     cur_vox->coc_idx = cur_vox_idx;
     cur_vox->distance = 0.0f;
-    cur_vox->raise = -1.0f; //not raised
+    // not raised
+    cur_vox->raise = -1.0f;
     cur_vox->in_queue = true;
     update_queue_.push(cur_vox_idx, 0.0f);
   }
-  
+
   // Remove Obstacle
   while (!delete_list_.empty()) {
     GlobalIndex cur_vox_idx = *delete_list_.begin();
     delete_list_.erase(delete_list_.begin());
-
     EsdfVoxel* cur_vox = esdf_layer_->getVoxelPtrByGlobalIndex(cur_vox_idx);
     CHECK_NOTNULL(cur_vox);
     cur_vox->coc_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
     cur_vox->distance = config_.default_distance_m;
-    cur_vox->raise = 0.0f; //waiting for raise
+    // waiting for raise
+    cur_vox->raise = 0.0f;
     cur_vox->in_queue = true;
-    update_queue_.push(cur_vox_idx, 0.0f); //also 0 priority?
+    update_queue_.push(cur_vox_idx, 0.0f);
   }
   init_timer.Stop();
 
@@ -208,19 +208,18 @@ void EsdfOccEdtIntegrator::updateESDF() {
     EsdfVoxel* cur_vox = esdf_layer_->getVoxelPtrByGlobalIndex(cur_vox_idx);
     CHECK_NOTNULL(cur_vox);
 
-    if(!cur_vox->in_queue)
-        continue;
-    if (cur_vox->raise >=0) {
-        // timing::Timer raise_timer("upate_esdf/edt/raise");
-        processRaise(cur_vox);
-        // raise_timer.Stop();
-        sum_raise_ ++;
-    }
-    else {
-        // timing::Timer lower_timer("upate_esdf/edt/lower");
-        processLower(cur_vox);
-        // lower_timer.Stop();
-        sum_lower_ ++;
+    if (!cur_vox->in_queue)
+      continue;
+    if (cur_vox->raise >= 0) {
+      // timing::Timer raise_timer("upate_esdf/edt/raise");
+      processRaise(cur_vox);
+      // raise_timer.Stop();
+      sum_raise_++;
+    } else {
+      // timing::Timer lower_timer("upate_esdf/edt/lower");
+      processLower(cur_vox);
+      // lower_timer.Stop();
+      sum_lower_++;
     }
   }
   update_timer.Stop();
@@ -231,8 +230,7 @@ void EsdfOccEdtIntegrator::updateESDF() {
   }
 }
 
-void EsdfOccEdtIntegrator::processRaise(EsdfVoxel* cur_vox)
-{
+void EsdfOccEdtIntegrator::processRaise(EsdfVoxel* cur_vox) {
   // Get the global indices of neighbors.
   Neighborhood<>::IndexMatrix nbr_voxs_idx;
   Neighborhood<>::getFromGlobalIndex(cur_vox->self_idx, &nbr_voxs_idx);
@@ -240,146 +238,126 @@ void EsdfOccEdtIntegrator::processRaise(EsdfVoxel* cur_vox)
   // Go through the neighbors and see if we can update any of them.
   for (unsigned int idx = 0u; idx < nbr_voxs_idx.cols(); ++idx) {
     GlobalIndex nbr_vox_idx = nbr_voxs_idx.col(idx);
-    if (!voxInRange(nbr_vox_idx)) continue;
-    EsdfVoxel* nbr_vox =
-        esdf_layer_->getVoxelPtrByGlobalIndex(nbr_vox_idx);
+    if (!voxInRange(nbr_vox_idx))
+      continue;
+    EsdfVoxel* nbr_vox = esdf_layer_->getVoxelPtrByGlobalIndex(nbr_vox_idx);
     CHECK_NOTNULL(nbr_vox);
     GlobalIndex nbr_coc_vox_idx = nbr_vox->coc_idx;
     if (!nbr_vox->observed || nbr_coc_vox_idx(0) == UNDEF)
       continue;
     OccupancyVoxel* nbr_coc_occ_vox =
-      occ_layer_->getVoxelPtrByGlobalIndex(nbr_coc_vox_idx);
-    CHECK_NOTNULL(nbr_coc_occ_vox);             
+        occ_layer_->getVoxelPtrByGlobalIndex(nbr_coc_vox_idx);
+    CHECK_NOTNULL(nbr_coc_occ_vox);
     // check if the closest occupied voxel is still occupied
-    if (!nbr_coc_occ_vox->occupied) { //unoccupied, need to raise
+    if (!nbr_coc_occ_vox->occupied) {
+      // unoccupied, need to raise
       update_queue_.push(nbr_vox_idx, std::abs(nbr_vox->distance));
-      nbr_vox->raise=std::abs(nbr_vox->distance);
+      nbr_vox->raise = std::abs(nbr_vox->distance);
       nbr_vox->in_queue = true;
       nbr_vox->coc_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
       nbr_vox->distance = config_.default_distance_m;
-    }
-    else if (!nbr_vox->in_queue) {
+    } else if (!nbr_vox->in_queue) {
       nbr_vox->in_queue = true;
       update_queue_.push(nbr_vox_idx, nbr_vox->distance);
     }
   }
-  cur_vox->raise = -1.0f; //not Raise
+  // not Raise
+  cur_vox->raise = -1.0f;
   cur_vox->in_queue = false;
 }
 
-// VDB-EDT is fast mainly because of the VDB data structure
-// so in my mind the fastest solution is to combine VDB with
-// FIESTA
-// getVoxelPtrByGlobalIndex is a very slow function
-
-void EsdfOccEdtIntegrator::processLower(EsdfVoxel* cur_vox)
-{
+void EsdfOccEdtIntegrator::processLower(EsdfVoxel* cur_vox) {
   // Get the global indices of neighbors.
-
   Neighborhood<>::IndexMatrix nbr_voxs_idx;
   Neighborhood<>::getFromGlobalIndex(cur_vox->self_idx, &nbr_voxs_idx);
 #ifdef DIRECTION_GUIDE
   std::vector<int> used_nbr_idx;
-  Neighborhood<>::getFromGlobalIndexAndObstacle(cur_vox->self_idx, cur_vox->coc_idx,
-                                                used_nbr_idx);
+  Neighborhood<>::getFromGlobalIndexAndObstacle(
+      cur_vox->self_idx,
+      cur_vox->coc_idx,  // NOLINT
+      used_nbr_idx);
 // #else
 //   Neighborhood<>::IndexMatrix nbr_voxs_idx;
 //   Neighborhood<>::getFromGlobalIndex(cur_vox->self_idx, &nbr_voxs_idx);
 #endif
-  
 #ifdef DIRECTION_GUIDE
-  //better to have another shorter vector according to cur_coc
+  // better to have another shorter vector according to cur_coc
   for (unsigned int idx = 0u; idx < used_nbr_idx.size(); ++idx) {
-      GlobalIndex nbr_vox_idx = nbr_voxs_idx.col(used_nbr_idx[idx]);
+    GlobalIndex nbr_vox_idx = nbr_voxs_idx.col(used_nbr_idx[idx]);
 #else
   // Go through the neighbors and see if we can update any of them.
   for (unsigned int idx = 0u; idx < nbr_voxs_idx.cols(); ++idx) {
-      GlobalIndex nbr_vox_idx = nbr_voxs_idx.col(idx);
+    GlobalIndex nbr_vox_idx = nbr_voxs_idx.col(idx);
 #endif
-      if (!voxInRange(nbr_vox_idx)) continue;
-      EsdfVoxel* nbr_vox =
-                esdf_layer_->getVoxelPtrByGlobalIndex(nbr_vox_idx);
-      CHECK_NOTNULL(nbr_vox);
-      if (!nbr_vox->observed) continue;
-      float temp_dist = dist(cur_vox->coc_idx, nbr_vox_idx);
-      temp_dist = std::min(temp_dist, config_.default_distance_m);
-          
-      if (nbr_vox->raise >= temp_dist)
-      {
+    if (!voxInRange(nbr_vox_idx))
+      continue;
+    EsdfVoxel* nbr_vox = esdf_layer_->getVoxelPtrByGlobalIndex(nbr_vox_idx);
+    CHECK_NOTNULL(nbr_vox);
+    if (!nbr_vox->observed)
+      continue;
+    float temp_dist = dist(cur_vox->coc_idx, nbr_vox_idx);
+    temp_dist = std::min(temp_dist, config_.default_distance_m);
+
+    if (nbr_vox->raise >= temp_dist) {
+      nbr_vox->coc_idx = cur_vox->coc_idx;
+      nbr_vox->distance =
+          nbr_vox->behind ? -std::min(temp_dist, config_.max_behind_surface_m)
+                          : temp_dist;
+      // not raise
+      nbr_vox->raise = -1.0f;
+      nbr_vox->in_queue = true;
+      update_queue_.push(nbr_vox_idx, temp_dist);
+    } else if (nbr_vox->raise < 0.0f) {
+      if (temp_dist < std::abs(nbr_vox->distance)) {
         nbr_vox->coc_idx = cur_vox->coc_idx;
-        nbr_vox->distance = nbr_vox->behind ? 
-          -std::min(temp_dist, config_.max_behind_surface_m) : temp_dist;
-        nbr_vox->raise = -1.0f; //not raise
-        nbr_vox->in_queue = true;
-        update_queue_.push(nbr_vox_idx, temp_dist);
+        nbr_vox->distance =
+            nbr_vox->behind ? -std::min(temp_dist, config_.max_behind_surface_m)
+                            : temp_dist;
+        // not raise
+        nbr_vox->raise = -1.0f;
+        if (temp_dist < config_.default_distance_m) {
+          nbr_vox->in_queue = true;
+          update_queue_.push(nbr_vox_idx, temp_dist);
+        }
       }
-      else if (nbr_vox->raise < 0.0f)
-      {
-              // if (nbr_vox->coc_idx(0) != UNDEF) {
-              //   OccupancyVoxel* nbr_coc_occ_vox =
-              //       occ_layer_->getVoxelPtrByGlobalIndex(nbr_vox->coc_idx);
-              //   CHECK_NOTNULL(nbr_coc_occ_vox);
-              //   if((temp_dist < std::abs(nbr_vox->distance))||
-              //     (nbr_coc_occ_vox->occupied &&
-              //     (temp_dist == std::abs(nbr_vox->distance)))){ 
-        if (temp_dist < std::abs(nbr_vox->distance)) {
-            nbr_vox->coc_idx = cur_vox->coc_idx;
-            nbr_vox->distance = nbr_vox->behind ? 
-              -std::min(temp_dist, config_.max_behind_surface_m) : temp_dist;
-            nbr_vox->raise = -1.0f; //not raise
-            if(temp_dist < config_.default_distance_m)
-            {
-              nbr_vox->in_queue = true;
-              update_queue_.push(nbr_vox_idx, temp_dist);
-            }
-        }  
-      }     
+    }
   }
-  //cur_vox->raise = -1.0f;
+  // cur_vox->raise = -1.0f;
   cur_vox->in_queue = false;
 }
 
-void EsdfOccEdtIntegrator::loadInsertList(
-    const GlobalIndexList& insert_list) {
+void EsdfOccEdtIntegrator::loadInsertList(const GlobalIndexList& insert_list) {
   insert_list_ = insert_list;
 }
 
-void EsdfOccEdtIntegrator::loadDeleteList(
-    const GlobalIndexList& delete_list) {
+void EsdfOccEdtIntegrator::loadDeleteList(const GlobalIndexList& delete_list) {
   delete_list_ = delete_list;
 }
 
-//consider the boundary, better to not use the range, instead, use 
-//the radius to determine the update boundary
-//think about the way to speed up (like the direction of update),
-//according to the code of edt
-//check the paper of fiesta (esdf-tool)
-
-inline int EsdfOccEdtIntegrator::distSquare(GlobalIndex vox_idx_a,
-                                            GlobalIndex vox_idx_b) {
+inline int EsdfOccEdtIntegrator::distSquare(
+    GlobalIndex vox_idx_a, GlobalIndex vox_idx_b) {
   int dx = vox_idx_a(0) - vox_idx_b(0);
   int dy = vox_idx_a(1) - vox_idx_b(1);
   int dz = vox_idx_a(2) - vox_idx_b(2);
-  
   return (dx * dx + dy * dy + dz * dz);
 }
 
-inline float EsdfOccEdtIntegrator::dist(GlobalIndex vox_idx_a,
-                                        GlobalIndex vox_idx_b) {
+inline float EsdfOccEdtIntegrator::dist(
+    GlobalIndex vox_idx_a, GlobalIndex vox_idx_b) {
   return (vox_idx_b - vox_idx_a).cast<float>().norm() * esdf_voxel_size_;
-  // TODO(yuepan): may use square root & * resolution_ at last
+  // TODO(py): may use square root & * resolution_ at last
   // together to speed up
 }
 
 inline bool EsdfOccEdtIntegrator::voxInRange(GlobalIndex vox_idx) {
-  return (vox_idx(0) >= range_min_(0) && vox_idx(0) <= range_max_(0) &&
-          vox_idx(1) >= range_min_(1) && vox_idx(1) <= range_max_(1) &&
-          vox_idx(2) >= range_min_(2) && vox_idx(2) <= range_max_(2));
+  return (
+      vox_idx(0) >= range_min_(0) && vox_idx(0) <= range_max_(0) &&
+      vox_idx(1) >= range_min_(1) && vox_idx(1) <= range_max_(1) &&
+      vox_idx(2) >= range_min_(2) && vox_idx(2) <= range_max_(2));
 }
 
 // only for the visualization of Esdf error
-void EsdfOccEdtIntegrator::assignError(GlobalIndex vox_idx,
-                                          float esdf_error) {
+void EsdfOccEdtIntegrator::assignError(GlobalIndex vox_idx, float esdf_error) {
   EsdfVoxel* vox = esdf_layer_->getVoxelPtrByGlobalIndex(vox_idx);
   vox->error = esdf_error;
 }

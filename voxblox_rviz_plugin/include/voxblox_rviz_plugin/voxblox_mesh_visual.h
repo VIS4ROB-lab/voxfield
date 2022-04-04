@@ -16,22 +16,28 @@ namespace voxblox_rviz_plugin {
 /// Visualizes a single voxblox_msgs::Mesh message.
 class VoxbloxMeshVisual {
  public:
-  VoxbloxMeshVisual(Ogre::SceneManager* scene_manager,
-                    Ogre::SceneNode* parent_node, std::string name_space = "");
+  VoxbloxMeshVisual(
+      Ogre::SceneManager* scene_manager, Ogre::SceneNode* parent_node,
+      std::string name_space = "");
   virtual ~VoxbloxMeshVisual();
 
-  void setMessage(const voxblox_msgs::Mesh::ConstPtr& msg,
-                  uint8_t alpha = std::numeric_limits<uint8_t>::max());
+  void setMessage(
+      const voxblox_msgs::Mesh::ConstPtr& msg,
+      uint8_t alpha = std::numeric_limits<uint8_t>::max());
 
   // enable / disable visibility
   void setEnabled(bool enabled);
 
   /// Set the coordinate frame pose.
-  void setPose(const Ogre::Vector3& position,
-               const Ogre::Quaternion& orientation);
+  void setPose(
+      const Ogre::Vector3& position, const Ogre::Quaternion& orientation);
 
-  void setFrameId(const std::string& frame_id) { frame_id_ = frame_id; }
-  const std::string& getFrameId() { return frame_id_; }
+  void setFrameId(const std::string& frame_id) {
+    frame_id_ = frame_id;
+  }
+  const std::string& getFrameId() {
+    return frame_id_;
+  }
 
  private:
   Ogre::SceneNode* frame_node_;

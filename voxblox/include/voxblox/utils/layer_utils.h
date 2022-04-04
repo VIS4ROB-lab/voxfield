@@ -14,15 +14,15 @@ namespace voxblox {
 namespace utils {
 
 template <typename VoxelType>
-bool isSameVoxel(const VoxelType& /* voxel_A */,
-                 const VoxelType& /* voxel_B */) {
+bool isSameVoxel(
+    const VoxelType& /* voxel_A */, const VoxelType& /* voxel_B */) {
   LOG(FATAL) << "Not implemented for this voxel type!";
   return false;
 }
 
 template <typename VoxelType>
-bool isSameBlock(const Block<VoxelType>& block_A,
-                 const Block<VoxelType>& block_B) {
+bool isSameBlock(
+    const Block<VoxelType>& block_A, const Block<VoxelType>& block_B) {
   bool is_the_same = true;
 
   constexpr double kTolerance = 1e-10;
@@ -43,15 +43,16 @@ bool isSameBlock(const Block<VoxelType>& block_A,
   is_the_same &= block_A.num_voxels() == block_B.num_voxels();
 
   for (size_t voxel_idx = 0u; voxel_idx < block_A.num_voxels(); ++voxel_idx) {
-    is_the_same &= isSameVoxel(block_A.getVoxelByLinearIndex(voxel_idx),
-                               block_B.getVoxelByLinearIndex(voxel_idx));
+    is_the_same &= isSameVoxel(
+        block_A.getVoxelByLinearIndex(voxel_idx),
+        block_B.getVoxelByLinearIndex(voxel_idx));
   }
   return is_the_same;
 }
 
 template <typename VoxelType>
-bool isSameLayer(const Layer<VoxelType>& layer_A,
-                 const Layer<VoxelType>& layer_B) {
+bool isSameLayer(
+    const Layer<VoxelType>& layer_A, const Layer<VoxelType>& layer_B) {
   constexpr double kTolerance = 1e-10;
 
   bool is_the_same = true;

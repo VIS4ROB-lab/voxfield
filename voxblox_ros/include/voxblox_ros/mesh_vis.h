@@ -71,14 +71,13 @@ inline ColorMode getColorModeFromString(const std::string& color_mode_string) {
   }
 }
 
-inline Point lambertShading(const Point& normal, const Point& light,
-                            const Point& color) {
+inline Point lambertShading(
+    const Point& normal, const Point& light, const Point& color) {
   return std::max<FloatingPoint>(normal.dot(light), 0.0f) * color;
 }
 
-inline void lambertColorFromColorAndNormal(const Color& color,
-                                           const Point& normal,
-                                           std_msgs::ColorRGBA* color_msg) {
+inline void lambertColorFromColorAndNormal(
+    const Color& color, const Point& normal, std_msgs::ColorRGBA* color_msg) {
   // These are just some arbitrary light directions, I believe taken from
   // OpenChisel.
   const Point light_dir = Point(0.8f, -0.2f, 0.7f).normalized();
@@ -95,13 +94,13 @@ inline void lambertColorFromColorAndNormal(const Color& color,
   color_msg->a = 1.0;
 }
 
-inline void lambertColorFromNormal(const Point& normal,
-                                   std_msgs::ColorRGBA* color_msg) {
+inline void lambertColorFromNormal(
+    const Point& normal, std_msgs::ColorRGBA* color_msg) {
   lambertColorFromColorAndNormal(Color(127, 127, 127), normal, color_msg);
 }
 
-inline void normalColorFromNormal(const Point& normal,
-                                  std_msgs::ColorRGBA* color_msg) {
+inline void normalColorFromNormal(
+    const Point& normal, std_msgs::ColorRGBA* color_msg) {
   // Normals should be in the scale -1 to 1, so we need to shift them to
   // 0 -> 1 range.
   color_msg->r = normal.x() * 0.5 + 0.5;
@@ -110,8 +109,8 @@ inline void normalColorFromNormal(const Point& normal,
   color_msg->a = 1.0;
 }
 
-inline void heightColorFromVertex(const Point& vertex,
-                                  std_msgs::ColorRGBA* color_msg) {
+inline void heightColorFromVertex(
+    const Point& vertex, std_msgs::ColorRGBA* color_msg) {
   // TODO(helenol): figure out a nicer way to do this without hard-coded
   // constants.
   const double min_z = -1;
@@ -122,9 +121,9 @@ inline void heightColorFromVertex(const Point& vertex,
   colorVoxbloxToMsg(rainbowColorMap(mapped_height), color_msg);
 }
 
-inline std_msgs::ColorRGBA getVertexColor(const Mesh::ConstPtr& mesh,
-                                          const ColorMode& color_mode,
-                                          const size_t index) {
+inline std_msgs::ColorRGBA getVertexColor(
+    const Mesh::ConstPtr& mesh, const ColorMode& color_mode,
+    const size_t index) {
   std_msgs::ColorRGBA color_msg;
   switch (color_mode) {
     case kColor:
@@ -140,8 +139,8 @@ inline std_msgs::ColorRGBA getVertexColor(const Mesh::ConstPtr& mesh,
       lambertColorFromNormal(mesh->normals[index], &color_msg);
       break;
     case kLambertColor:
-      lambertColorFromColorAndNormal(mesh->colors[index], mesh->normals[index],
-                                     &color_msg);
+      lambertColorFromColorAndNormal(
+          mesh->colors[index], mesh->normals[index], &color_msg);
       break;
     case kGray:
       color_msg.r = color_msg.g = color_msg.b = 0.5;
@@ -151,8 +150,8 @@ inline std_msgs::ColorRGBA getVertexColor(const Mesh::ConstPtr& mesh,
   return color_msg;
 }
 
-inline void generateVoxbloxMeshMsg(MeshLayer* mesh_layer, ColorMode color_mode,
-                                   voxblox_msgs::Mesh* mesh_msg) {
+inline void generateVoxbloxMeshMsg(
+    MeshLayer* mesh_layer, ColorMode color_mode, voxblox_msgs::Mesh* mesh_msg) {
   CHECK_NOTNULL(mesh_msg);
   CHECK_NOTNULL(mesh_layer);
 
@@ -204,22 +203,22 @@ inline void generateVoxbloxMeshMsg(MeshLayer* mesh_layer, ColorMode color_mode,
       CHECK((normalized_verticies.array() >= 0.0).all());
 
       // convert to uint16_t fixed point representation
-      mesh_block.x.push_back(std::numeric_limits<uint16_t>::max() *
-                             normalized_verticies.x());
-      mesh_block.y.push_back(std::numeric_limits<uint16_t>::max() *
-                             normalized_verticies.y());
-      mesh_block.z.push_back(std::numeric_limits<uint16_t>::max() *
-                             normalized_verticies.z());
+      mesh_block.x.push_back(
+          std::numeric_limits<uint16_t>::max() * normalized_verticies.x());
+      mesh_block.y.push_back(
+          std::numeric_limits<uint16_t>::max() * normalized_verticies.y());
+      mesh_block.z.push_back(
+          std::numeric_limits<uint16_t>::max() * normalized_verticies.z());
 
       if (color_mode != kNormals) {
         const std_msgs::ColorRGBA color_msg =
             getVertexColor(mesh, color_mode, i);
-        mesh_block.r.push_back(std::numeric_limits<uint8_t>::max() *
-                               color_msg.r);
-        mesh_block.g.push_back(std::numeric_limits<uint8_t>::max() *
-                               color_msg.g);
-        mesh_block.b.push_back(std::numeric_limits<uint8_t>::max() *
-                               color_msg.b);
+        mesh_block.r.push_back(
+            std::numeric_limits<uint8_t>::max() * color_msg.r);
+        mesh_block.g.push_back(
+            std::numeric_limits<uint8_t>::max() * color_msg.g);
+        mesh_block.b.push_back(
+            std::numeric_limits<uint8_t>::max() * color_msg.b);
       }
     }
 
@@ -234,17 +233,17 @@ inline void generateVoxbloxMeshMsg(MeshLayer* mesh_layer, ColorMode color_mode,
   }
 }
 
-inline void generateVoxbloxMeshMsg(const MeshLayer::Ptr& mesh_layer,
-                                   ColorMode color_mode,
-                                   voxblox_msgs::Mesh* mesh_msg) {
+inline void generateVoxbloxMeshMsg(
+    const MeshLayer::Ptr& mesh_layer, ColorMode color_mode,
+    voxblox_msgs::Mesh* mesh_msg) {
   CHECK_NOTNULL(mesh_msg);
   CHECK(mesh_layer);
   generateVoxbloxMeshMsg(mesh_layer.get(), color_mode, mesh_msg);
 }
 
-inline void fillMarkerWithMesh(const MeshLayer::ConstPtr& mesh_layer,
-                               ColorMode color_mode,
-                               visualization_msgs::Marker* marker) {
+inline void fillMarkerWithMesh(
+    const MeshLayer::ConstPtr& mesh_layer, ColorMode color_mode,
+    visualization_msgs::Marker* marker) {
   CHECK_NOTNULL(marker);
   marker->header.stamp = ros::Time::now();
   marker->ns = "mesh";

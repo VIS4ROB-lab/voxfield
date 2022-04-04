@@ -4,9 +4,9 @@
 
 namespace voxblox {
 
-EsdfIntegrator::EsdfIntegrator(const Config& config,
-                               Layer<TsdfVoxel>* tsdf_layer,
-                               Layer<EsdfVoxel>* esdf_layer)
+EsdfIntegrator::EsdfIntegrator(
+    const Config& config, Layer<TsdfVoxel>* tsdf_layer,
+    Layer<EsdfVoxel>* esdf_layer)
     : config_(config), tsdf_layer_(tsdf_layer), esdf_layer_(esdf_layer) {
   CHECK(tsdf_layer_);
   CHECK(esdf_layer_);
@@ -28,8 +28,8 @@ void EsdfIntegrator::addNewRobotPosition(const Point& position) {
   // First set all in inner sphere to free.
   HierarchicalIndexMap block_voxel_list;
   timing::Timer sphere_timer("upate_esdf/voxblox/clear_radius/get_sphere");
-  utils::getAndAllocateSphereAroundPoint(position, config_.clear_sphere_radius,
-                                         esdf_layer_, &block_voxel_list);
+  utils::getAndAllocateSphereAroundPoint(
+      position, config_.clear_sphere_radius, esdf_layer_, &block_voxel_list);
   sphere_timer.Stop();
   for (const std::pair<BlockIndex, VoxelIndexList>& kv : block_voxel_list) {
     // Get block.
@@ -58,10 +58,11 @@ void EsdfIntegrator::addNewRobotPosition(const Point& position) {
 
   // Second set all remaining unknown to occupied.
   HierarchicalIndexMap block_voxel_list_occ;
-  timing::Timer outer_sphere_timer("upate_esdf/voxblox/clear_radius/get_outer_sphere");
-  utils::getAndAllocateSphereAroundPoint(position,
-                                         config_.occupied_sphere_radius,
-                                         esdf_layer_, &block_voxel_list_occ);
+  timing::Timer outer_sphere_timer(
+      "upate_esdf/voxblox/clear_radius/get_outer_sphere");  // NOLINT
+  utils::getAndAllocateSphereAroundPoint(
+      position, config_.occupied_sphere_radius, esdf_layer_,
+      &block_voxel_list_occ);
   outer_sphere_timer.Stop();
   for (const std::pair<BlockIndex, VoxelIndexList>& kv : block_voxel_list_occ) {
     // Get block.
@@ -95,8 +96,8 @@ void EsdfIntegrator::updateFromTsdfLayerBatch() {
   esdf_layer_->removeAllBlocks();
   BlockIndexList tsdf_blocks;
   tsdf_layer_->getAllAllocatedBlocks(&tsdf_blocks);
-  tsdf_blocks.insert(tsdf_blocks.end(), updated_blocks_.begin(),
-                     updated_blocks_.end());
+  tsdf_blocks.insert(
+      tsdf_blocks.end(), updated_blocks_.begin(), updated_blocks_.end());
   updated_blocks_.clear();
   updateFromTsdfBlocks(tsdf_blocks);
 }
@@ -104,10 +105,10 @@ void EsdfIntegrator::updateFromTsdfLayerBatch() {
 void EsdfIntegrator::updateFromTsdfLayer(bool clear_updated_flag) {
   BlockIndexList tsdf_blocks;
   tsdf_layer_->getAllUpdatedBlocks(Update::kEsdf, &tsdf_blocks);
-
-  if (tsdf_blocks.size() > 0) { // NOTE(py): added
-    tsdf_blocks.insert(tsdf_blocks.end(), updated_blocks_.begin(),
-                      updated_blocks_.end());
+  // ADD(py):
+  if (tsdf_blocks.size() > 0) {
+    tsdf_blocks.insert(
+        tsdf_blocks.end(), updated_blocks_.begin(), updated_blocks_.end());
     updated_blocks_.clear();
     const bool kIncremental = true;
     updateFromTsdfBlocks(tsdf_blocks, kIncremental);
@@ -123,8 +124,8 @@ void EsdfIntegrator::updateFromTsdfLayer(bool clear_updated_flag) {
   }
 }
 
-void EsdfIntegrator::updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
-                                          bool incremental) {
+void EsdfIntegrator::updateFromTsdfBlocks(
+    const BlockIndexList& tsdf_blocks, bool incremental) {
   CHECK_EQ(tsdf_layer_->voxels_per_side(), esdf_layer_->voxels_per_side());
   timing::Timer esdf_timer("upate_esdf/voxblox");
 
@@ -155,7 +156,7 @@ void EsdfIntegrator::updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
           tsdf_block->getVoxelByLinearIndex(lin_index);
       // If this voxel is unobserved in the original map, skip it.
       if (tsdf_voxel.weight < config_.min_weight) {
-        if (!incremental && config_.add_occupied_crust) { // batch
+        if (!incremental && config_.add_occupied_crust) {
           // Create a little crust of occupied voxels around.
           EsdfVoxel& esdf_voxel = esdf_block->getVoxelByLinearIndex(lin_index);
           esdf_voxel.distance = -config_.default_distance_m;
@@ -182,7 +183,8 @@ void EsdfIntegrator::updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
           // In fixed band, just add and lock it.
           esdf_voxel.distance = tsdf_voxel.distance;
           esdf_voxel.fixed = true;
-          // Also add it to open (update_priority_queue) so it can update the neighbors.
+          // Also add it to open (update_priority_queue)
+          // so it can update the neighbors.
           esdf_voxel.in_queue = true;
           open_.push(global_index, esdf_voxel.distance);
         } else {
@@ -222,12 +224,13 @@ void EsdfIntegrator::updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
             esdf_voxel.in_queue = true;
             open_.push(global_index, esdf_voxel.distance);
             num_raise++;
-          } else if ((esdf_voxel.distance > 0.0f &&
-                      tsdf_voxel.distance + config_.min_diff_m <
-                          esdf_voxel.distance) ||
-                     (esdf_voxel.distance <= 0.0f &&
-                      tsdf_voxel.distance - config_.min_diff_m >
-                          esdf_voxel.distance)) {
+          } else if (
+              (esdf_voxel.distance > 0.0f &&
+               tsdf_voxel.distance + config_.min_diff_m <
+                   esdf_voxel.distance) ||
+              (esdf_voxel.distance <= 0.0f &&
+               tsdf_voxel.distance - config_.min_diff_m >
+                   esdf_voxel.distance)) {
             // Lower.
             esdf_voxel.fixed = tsdf_fixed;
             if (esdf_voxel.fixed) {
@@ -240,12 +243,13 @@ void EsdfIntegrator::updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks,
             esdf_voxel.in_queue = true;
             open_.push(global_index, esdf_voxel.distance);
             num_lower++;
-          } else if ((esdf_voxel.distance > 0.0f &&
-                      tsdf_voxel.distance - config_.min_diff_m >
-                          esdf_voxel.distance) ||
-                     (esdf_voxel.distance <= 0.0f &&
-                      tsdf_voxel.distance + config_.min_diff_m <
-                          esdf_voxel.distance)) {
+          } else if (
+              (esdf_voxel.distance > 0.0f &&
+               tsdf_voxel.distance - config_.min_diff_m >
+                   esdf_voxel.distance) ||
+              (esdf_voxel.distance <= 0.0f &&
+               tsdf_voxel.distance + config_.min_diff_m <
+                   esdf_voxel.distance)) {
             // Raise.
             esdf_voxel.fixed = tsdf_fixed;
             if (esdf_voxel.fixed) {
@@ -344,9 +348,10 @@ void EsdfIntegrator::processRaiseSet() {
       if (config_.full_euclidean_distance) {
         Point voxel_parent_direction =
             neighbor_voxel->parent.cast<FloatingPoint>().normalized();
-        voxel_parent_direction = Point(std::round(voxel_parent_direction.x()),
-                                       std::round(voxel_parent_direction.y()),
-                                       std::round(voxel_parent_direction.z()));
+        voxel_parent_direction = Point(
+            std::round(voxel_parent_direction.x()),
+            std::round(voxel_parent_direction.y()),
+            std::round(voxel_parent_direction.z()));
         is_neighbors_parent =
             (voxel_parent_direction.cast<int>() == -direction);
       }
@@ -525,7 +530,8 @@ bool EsdfIntegrator::updateVoxelFromNeighbors(const GlobalIndex& global_index) {
       if (std::abs(neighbor_voxel->distance) < std::abs(voxel->distance)) {
         voxel->distance =
             neighbor_voxel->distance + signum(voxel->distance) * distance;
-        voxel->parent = -(neighbor_index - global_index).cast<int>(); // expansion direction
+        // expansion direction
+        voxel->parent = -(neighbor_index - global_index).cast<int>();
         return true;
       }
     }
@@ -533,10 +539,9 @@ bool EsdfIntegrator::updateVoxelFromNeighbors(const GlobalIndex& global_index) {
   return false;
 }
 
-// py: added
+// ADD(py)
 // only for the visualization of Esdf error
-void EsdfIntegrator::assignError(GlobalIndex vox_idx,
-                                 float esdf_error) {
+void EsdfIntegrator::assignError(GlobalIndex vox_idx, float esdf_error) {
   EsdfVoxel* vox = esdf_layer_->getVoxelPtrByGlobalIndex(vox_idx);
   vox->error = esdf_error;
 }

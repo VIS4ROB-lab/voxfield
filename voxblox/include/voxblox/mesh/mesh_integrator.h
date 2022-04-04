@@ -30,8 +30,8 @@
 #include <thread>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"
@@ -88,8 +88,9 @@ class MeshIntegrator {
    * Use this constructor in case you would like to modify the layer during mesh
    * extraction, i.e. modify the updated flag.
    */
-  MeshIntegrator(const MeshIntegratorConfig& config,
-                 Layer<VoxelType>* sdf_layer, MeshLayer* mesh_layer)
+  MeshIntegrator(
+      const MeshIntegratorConfig& config, Layer<VoxelType>* sdf_layer,
+      MeshLayer* mesh_layer)
       : config_(config),
         sdf_layer_mutable_(CHECK_NOTNULL(sdf_layer)),
         sdf_layer_const_(CHECK_NOTNULL(sdf_layer)),
@@ -109,8 +110,9 @@ class MeshIntegrator {
    * This constructor will not allow you to modify the layer, i.e. clear the
    * updated flag.
    */
-  MeshIntegrator(const MeshIntegratorConfig& config,
-                 const Layer<VoxelType>& sdf_layer, MeshLayer* mesh_layer)
+  MeshIntegrator(
+      const MeshIntegratorConfig& config, const Layer<VoxelType>& sdf_layer,
+      MeshLayer* mesh_layer)
       : config_(config),
         sdf_layer_mutable_(nullptr),
         sdf_layer_const_(&sdf_layer),
@@ -162,9 +164,9 @@ class MeshIntegrator {
     }
   }
 
-  void generateMeshBlocksFunction(const BlockIndexList& all_tsdf_blocks,
-                                  bool clear_updated_flag,
-                                  ThreadSafeIndex* index_getter) {
+  void generateMeshBlocksFunction(
+      const BlockIndexList& all_tsdf_blocks, bool clear_updated_flag,
+      ThreadSafeIndex* index_getter) {
     DCHECK(index_getter != nullptr);
     CHECK(!clear_updated_flag || (sdf_layer_mutable_ != nullptr))
         << "If you would like to modify the updated flag in the blocks, please "
@@ -183,8 +185,8 @@ class MeshIntegrator {
     }
   }
 
-  void extractBlockMesh(typename Block<VoxelType>::ConstPtr block,
-                        Mesh::Ptr mesh) {
+  void extractBlockMesh(
+      typename Block<VoxelType>::ConstPtr block, Mesh::Ptr mesh) {
     DCHECK(block != nullptr);
     DCHECK(mesh != nullptr);
 
@@ -197,8 +199,8 @@ class MeshIntegrator {
         for (voxel_index.z() = 0; voxel_index.z() < vps - 1;
              ++voxel_index.z()) {
           Point coords = block->computeCoordinatesFromVoxelIndex(voxel_index);
-          extractMeshInsideBlock(*block, voxel_index, coords, &next_mesh_index,
-                                 mesh.get());
+          extractMeshInsideBlock(
+              *block, voxel_index, coords, &next_mesh_index, mesh.get());
         }
       }
     }
@@ -210,8 +212,8 @@ class MeshIntegrator {
     for (voxel_index.z() = 0; voxel_index.z() < vps; voxel_index.z()++) {
       for (voxel_index.y() = 0; voxel_index.y() < vps; voxel_index.y()++) {
         Point coords = block->computeCoordinatesFromVoxelIndex(voxel_index);
-        extractMeshOnBorder(*block, voxel_index, coords, &next_mesh_index,
-                            mesh.get());
+        extractMeshOnBorder(
+            *block, voxel_index, coords, &next_mesh_index, mesh.get());
       }
     }
 
@@ -222,8 +224,8 @@ class MeshIntegrator {
     for (voxel_index.z() = 0; voxel_index.z() < vps; voxel_index.z()++) {
       for (voxel_index.x() = 0; voxel_index.x() < vps - 1; voxel_index.x()++) {
         Point coords = block->computeCoordinatesFromVoxelIndex(voxel_index);
-        extractMeshOnBorder(*block, voxel_index, coords, &next_mesh_index,
-                            mesh.get());
+        extractMeshOnBorder(
+            *block, voxel_index, coords, &next_mesh_index, mesh.get());
       }
     }
 
@@ -232,8 +234,8 @@ class MeshIntegrator {
     for (voxel_index.y() = 0; voxel_index.y() < vps - 1; voxel_index.y()++) {
       for (voxel_index.x() = 0; voxel_index.x() < vps - 1; voxel_index.x()++) {
         Point coords = block->computeCoordinatesFromVoxelIndex(voxel_index);
-        extractMeshOnBorder(*block, voxel_index, coords, &next_mesh_index,
-                            mesh.get());
+        extractMeshOnBorder(
+            *block, voxel_index, coords, &next_mesh_index, mesh.get());
       }
     }
   }
@@ -260,9 +262,9 @@ class MeshIntegrator {
     mesh->updated = true;
   }
 
-  void extractMeshInsideBlock(const Block<VoxelType>& block,
-                              const VoxelIndex& index, const Point& coords,
-                              VertexIndex* next_mesh_index, Mesh* mesh) {
+  void extractMeshInsideBlock(
+      const Block<VoxelType>& block, const VoxelIndex& index,
+      const Point& coords, VertexIndex* next_mesh_index, Mesh* mesh) {
     DCHECK(next_mesh_index != nullptr);
     DCHECK(mesh != nullptr);
 
@@ -289,9 +291,9 @@ class MeshIntegrator {
     }
   }
 
-  void extractMeshOnBorder(const Block<VoxelType>& block,
-                           const VoxelIndex& index, const Point& coords,
-                           VertexIndex* next_mesh_index, Mesh* mesh) {
+  void extractMeshOnBorder(
+      const Block<VoxelType>& block, const VoxelIndex& index,
+      const Point& coords, VertexIndex* next_mesh_index, Mesh* mesh) {
     DCHECK(mesh != nullptr);
 
     Eigen::Matrix<FloatingPoint, 3, 8> cube_coord_offsets =
@@ -308,8 +310,8 @@ class MeshIntegrator {
       if (block.isValidVoxelIndex(corner_index)) {
         const VoxelType& voxel = block.getVoxelByVoxelIndex(corner_index);
 
-        if (!utils::getSdfIfValid(voxel, config_.min_weight,
-                                  &(corner_sdf(i)))) {
+        if (!utils::getSdfIfValid(
+                voxel, config_.min_weight, &(corner_sdf(i)))) {
           all_neighbors_observed = false;
           break;
         }
@@ -323,8 +325,8 @@ class MeshIntegrator {
           if (corner_index(j) < 0) {
             block_offset(j) = -1;
             corner_index(j) = corner_index(j) + voxels_per_side_;
-          } else if (corner_index(j) >=
-                     static_cast<IndexElement>(voxels_per_side_)) {
+          } else if (
+              corner_index(j) >= static_cast<IndexElement>(voxels_per_side_)) {
             block_offset(j) = 1;
             corner_index(j) = corner_index(j) - voxels_per_side_;
           }
@@ -340,8 +342,8 @@ class MeshIntegrator {
           const VoxelType& voxel =
               neighbor_block.getVoxelByVoxelIndex(corner_index);
 
-          if (!utils::getSdfIfValid(voxel, config_.min_weight,
-                                    &(corner_sdf(i)))) {
+          if (!utils::getSdfIfValid(
+                  voxel, config_.min_weight, &(corner_sdf(i)))) {
             all_neighbors_observed = false;
             break;
           }

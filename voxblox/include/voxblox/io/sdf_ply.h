@@ -32,8 +32,9 @@ enum PlyOutputTypes {
  * SDF values within this max value result in a colored point.
  */
 template <typename VoxelType>
-bool getColorFromVoxel(const VoxelType& voxel, const float sdf_color_range,
-                       const float sdf_max_value, Color* color);
+bool getColorFromVoxel(
+    const VoxelType& voxel, const float sdf_color_range,
+    const float sdf_max_value, Color* color);
 
 /**
  * Convert a voxel to a colored point. The sdf_color_range determines the range
@@ -43,8 +44,9 @@ bool getColorFromVoxel(const VoxelType& voxel, const float sdf_color_range,
  * SDF values within this max value result in a colored point.
  */
 template <>
-bool getColorFromVoxel(const TsdfVoxel& voxel, const float sdf_color_range,
-                       const float sdf_max_value, Color* color);
+bool getColorFromVoxel(
+    const TsdfVoxel& voxel, const float sdf_color_range,
+    const float sdf_max_value, Color* color);
 
 /**
  * Convert a voxel to a colored point. The sdf_color_range determines the range
@@ -54,8 +56,9 @@ bool getColorFromVoxel(const TsdfVoxel& voxel, const float sdf_color_range,
  * SDF values within this max value result in a colored point.
  */
 template <>
-bool getColorFromVoxel(const EsdfVoxel& voxel, const float sdf_color_range,
-                       const float sdf_max_value, Color* color);
+bool getColorFromVoxel(
+    const EsdfVoxel& voxel, const float sdf_color_range,
+    const float sdf_max_value, Color* color);
 
 /**
  * This function converts all voxels with positive weight/observed into points
@@ -68,10 +71,9 @@ bool getColorFromVoxel(const EsdfVoxel& voxel, const float sdf_color_range,
  * will be generated independent of the SDF value.
  */
 template <typename VoxelType>
-bool convertVoxelGridToPointCloud(const Layer<VoxelType>& layer,
-                                  const float sdf_color_range,
-                                  const float sdf_max_value,
-                                  voxblox::Mesh* point_cloud) {
+bool convertVoxelGridToPointCloud(
+    const Layer<VoxelType>& layer, const float sdf_color_range,
+    const float sdf_max_value, voxblox::Mesh* point_cloud) {
   CHECK_NOTNULL(point_cloud);
   CHECK_GT(sdf_color_range, 0.0f);
 
@@ -96,8 +98,8 @@ bool convertVoxelGridToPointCloud(const Layer<VoxelType>& layer,
               block.computeCoordinatesFromVoxelIndex(voxel_index);
 
           Color color;
-          if (getColorFromVoxel(voxel, sdf_color_range, sdf_max_value,
-                                &color)) {
+          if (getColorFromVoxel(
+                  voxel, sdf_color_range, sdf_max_value, &color)) {
             point_cloud->vertices.push_back(coord);
             point_cloud->colors.push_back(color);
           }
@@ -109,9 +111,9 @@ bool convertVoxelGridToPointCloud(const Layer<VoxelType>& layer,
 }
 
 template <typename VoxelType>
-bool convertVoxelGridToPointCloud(const Layer<VoxelType>& layer,
-                                  const float sdf_color_range,
-                                  voxblox::Mesh* point_cloud) {
+bool convertVoxelGridToPointCloud(
+    const Layer<VoxelType>& layer, const float sdf_color_range,
+    voxblox::Mesh* point_cloud) {
   constexpr float kInvalidSdfMaxValue = -1.0f;
   return convertVoxelGridToPointCloud<VoxelType>(
       layer, sdf_color_range, kInvalidSdfMaxValue, point_cloud);
@@ -153,8 +155,8 @@ bool convertLayerToMesh(
     const bool connected_mesh = true,
     const FloatingPoint vertex_proximity_threshold = 1e-10) {
   MeshIntegratorConfig mesh_config;
-  return convertLayerToMesh(layer, mesh_config, mesh, connected_mesh,
-                            vertex_proximity_threshold);
+  return convertLayerToMesh(
+      layer, mesh_config, mesh, connected_mesh, vertex_proximity_threshold);
 }
 
 /**
@@ -164,10 +166,10 @@ bool convertLayerToMesh(
  * for modes that use an SDF-based point cloud coloring function.
  */
 template <typename VoxelType>
-bool outputLayerAsPly(const Layer<VoxelType>& layer,
-                      const std::string& filename, PlyOutputTypes type,
-                      const float sdf_color_range = 0.3f,
-                      const float max_sdf_value_to_output = 0.3f) {
+bool outputLayerAsPly(
+    const Layer<VoxelType>& layer, const std::string& filename,
+    PlyOutputTypes type, const float sdf_color_range = 0.3f,
+    const float max_sdf_value_to_output = 0.3f) {
   CHECK(!filename.empty());
   switch (type) {
     case PlyOutputTypes::kSdfColoredDistanceField: {

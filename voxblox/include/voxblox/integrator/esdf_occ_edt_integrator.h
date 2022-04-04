@@ -6,8 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include <glog/logging.h>
 #include <Eigen/Core>
+#include <glog/logging.h>
 
 #include "voxblox/core/layer.h"
 #include "voxblox/core/voxel.h"
@@ -21,7 +21,7 @@ namespace voxblox {
 /**
  * Builds an ESDF layer out of a given occupancy layer.
  */
-class EsdfOccEdtIntegrator {  
+class EsdfOccEdtIntegrator {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -46,7 +46,6 @@ class EsdfOccEdtIntegrator {
     int num_buckets = 20;
 
     // Number of the neighbor voxels (select from 6, 18, 24 and 26)
-    // TODO: double-check if 24 is the best choice
     int num_neighbor = 24;
 
     // Turn on the patch code (Algorithm 3 in FIESTA) or not
@@ -57,9 +56,9 @@ class EsdfOccEdtIntegrator {
     GlobalIndex range_boundary_offset = GlobalIndex(100, 100, 50);
   };
 
-  EsdfOccEdtIntegrator(const Config& config,
-                          Layer<OccupancyVoxel>* occ_layer,
-                          Layer<EsdfVoxel>* esdf_layer);
+  EsdfOccEdtIntegrator(
+      const Config& config, Layer<OccupancyVoxel>* occ_layer,
+      Layer<EsdfVoxel>* esdf_layer);
 
   void updateFromOccLayer(bool clear_updated_flag);
 
@@ -84,7 +83,7 @@ class EsdfOccEdtIntegrator {
   inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
 
   inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-                                            
+
   inline bool voxInRange(GlobalIndex vox_idx);
 
   void loadInsertList(const GlobalIndexList& insert_list);
@@ -101,7 +100,9 @@ class EsdfOccEdtIntegrator {
   }
 
   /// Update some specific settings.
-  float getEsdfMaxDistance() const { return config_.max_distance_m; }
+  float getEsdfMaxDistance() const {
+    return config_.max_distance_m;
+  }
   void setEsdfMaxDistance(float max_distance) {
     config_.max_distance_m = max_distance;
     if (config_.default_distance_m < max_distance) {
@@ -119,7 +120,7 @@ class EsdfOccEdtIntegrator {
   GlobalIndexList insert_list_;
   GlobalIndexList delete_list_;
   BucketQueue<GlobalIndex> update_queue_;
-  LongIndexSet updated_voxel_;  // TODO
+  LongIndexSet updated_voxel_;
 
   size_t esdf_voxels_per_side_;
   FloatingPoint esdf_voxel_size_;

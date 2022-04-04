@@ -1,6 +1,8 @@
 #ifndef VOXBLOX_UTILS_NEIGHBOR_TOOLS_EX_H_
 #define VOXBLOX_UTILS_NEIGHBOR_TOOLS_EX_H_
 
+#include <vector>
+
 #include "voxblox/core/common.h"
 #include "voxblox/core/layer.h"
 
@@ -35,36 +37,37 @@ class Neighborhood24 : public Neighborhood24LookupTables {
   typedef Eigen::Matrix<LongIndexElement, 3, 24> IndexMatrix;
 
   /// Get the global index of all 24 neighbors of the input index.
-  static void getFromGlobalIndex(const GlobalIndex& global_index,
-                                 IndexMatrix* neighbors) {
+  static void getFromGlobalIndex(
+      const GlobalIndex& global_index, IndexMatrix* neighbors) {
     CHECK_NOTNULL(neighbors);
     for (unsigned int i = 0u; i < 24; ++i) {
       neighbors->col(i) = global_index + kLongOffsets.col(i);
     }
   }
 
-  
-  static void getFromGlobalIndexAndObstacle(const GlobalIndex& global_index, 
-                                            const GlobalIndex& coc_index,
-                                            std::vector<int> &neighbors_idx) {
-    
-    // -1,  1,  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -2,  2,  0,  0,  0,  0, // dx
-    //  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2,  0,  0, // dy
-    //  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2; // dz
-    //  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23; // index
+  static void getFromGlobalIndexAndObstacle(
+      const GlobalIndex& global_index, const GlobalIndex& coc_index,
+      std::vector<int>& neighbors_idx) {  // NOLINT
+    // -1,  1,  0,  0,  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1,
+    // -2,  2,  0,  0,  0,  0, // dx     // NOLINT
+    //  0,  0, -1,  1,  0,  0, -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,
+    //  0,  0, -2,  2,  0,  0, // dy     // NOLINT 0,  0,  0,  0, -1,  1,  0, 0,
+    //  -1,  1, -1,  1,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0, -2,  2; // dz //
+    //  NOLINT 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    //  16, 17, 18, 19, 20, 21, 22, 23; // index  // NOLINT
 
-    // z >= obstz 
+    // z >= obstz
     if (coc_index(2) <= global_index(2)) {
       neighbors_idx.push_back(5);
       neighbors_idx.push_back(23);
     }
-    // z <= obstz 
-    if (coc_index(2) >= global_index(2)) { 
+    // z <= obstz
+    if (coc_index(2) >= global_index(2)) {
       neighbors_idx.push_back(4);
       neighbors_idx.push_back(22);
     }
     // y >= obsty
-    if (coc_index(1) <= global_index(1)) { 
+    if (coc_index(1) <= global_index(1)) {
       neighbors_idx.push_back(3);
       neighbors_idx.push_back(21);
       if (coc_index(2) <= global_index(2))
@@ -108,7 +111,6 @@ class Neighborhood24 : public Neighborhood24LookupTables {
         neighbors_idx.push_back(6);
     }
   }
-
 
   /**
    * Get the block idx and local voxel index of a neighbor voxel. The neighbor
@@ -154,25 +156,24 @@ class Neighborhood24 : public Neighborhood24LookupTables {
     AlignedVector<VoxelKey>& neighbors = *neighbors_ptr;
     for (unsigned int i = 0u; i < 24; ++i) {
       VoxelKey& neighbor = neighbors[i];
-      getFromBlockAndVoxelIndexAndDirection(block_index, voxel_index,
-                                            kOffsets.col(i), voxels_per_side,
-                                            &neighbor.first, &neighbor.second);
+      getFromBlockAndVoxelIndexAndDirection(
+          block_index, voxel_index, kOffsets.col(i), voxels_per_side,
+          &neighbor.first, &neighbor.second);
     }
   }
 
   /// Get the signed offset between the global indices of two voxels.
-  static SignedIndex getOffsetBetweenVoxels(const BlockIndex& start_block_index,
-                                            const VoxelIndex& start_voxel_index,
-                                            const BlockIndex& end_block_index,
-                                            const VoxelIndex& end_voxel_index,
-                                            const size_t voxels_per_side) {
+  static SignedIndex getOffsetBetweenVoxels(
+      const BlockIndex& start_block_index, const VoxelIndex& start_voxel_index,
+      const BlockIndex& end_block_index, const VoxelIndex& end_voxel_index,
+      const size_t voxels_per_side) {
     CHECK_NE(voxels_per_side, 0u);
     return (end_voxel_index - start_voxel_index) +
            (end_block_index - start_block_index) * voxels_per_side;
   }
 };
 
-// TODO: find the way to extend it to something simialr to 6, 18, 26-nei
+// TODO(py): find the way to extend it to something simialr to 6, 18, 26-nei
 }  // namespace voxblox
 
 #endif  // VOXBLOX_UTILS_NEIGHBOR_TOOLS_EX_H_

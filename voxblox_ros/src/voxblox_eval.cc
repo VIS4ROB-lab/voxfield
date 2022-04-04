@@ -38,14 +38,16 @@ namespace voxblox {
 
 class VoxbloxEvaluator {
  public:
-  VoxbloxEvaluator(const ros::NodeHandle& nh,
-                   const ros::NodeHandle& nh_private);
+  VoxbloxEvaluator(
+      const ros::NodeHandle& nh, const ros::NodeHandle& nh_private);
   void evaluate();
   void visualize();
   void evaluateEsdf();
   void visualizeEsdf();
   void generatePointCloudFromOcc();
-  bool shouldExit() const { return !visualize_; }
+  bool shouldExit() const {
+    return !visualize_;
+  }
 
  private:
   ros::NodeHandle nh_;
@@ -57,15 +59,15 @@ class VoxbloxEvaluator {
   bool visualize_;
   // Whether to recolor the voxels by error to the GT before generating a mesh.
   bool recolor_by_error_;
+  // If visualizing, what TF frame to visualize in.
+  std::string frame_id_;
   // Whether to also evaluate the Esdf mapping accuracy
-  bool eval_esdf_ = false;
+  bool eval_esdf_;
   // Whether to use the occupied grid centers as the reference for evaluating
   // esdf.
   bool use_occ_ref_esdf_;
   // How to color the mesh.
   ColorMode color_mode_;
-  // If visualizing, what TF frame to visualize in.
-  std::string frame_id_ = "world";
   // esdf & tsdf slice level (unit: m)
   float slice_level_;
   // error limit for visualization (unit: m)
@@ -102,8 +104,8 @@ class VoxbloxEvaluator {
   std::shared_ptr<MeshIntegrator<TsdfVoxel>> mesh_integrator_;
 };
 
-VoxbloxEvaluator::VoxbloxEvaluator(const ros::NodeHandle& nh,
-                                   const ros::NodeHandle& nh_private)
+VoxbloxEvaluator::VoxbloxEvaluator(
+    const ros::NodeHandle& nh, const ros::NodeHandle& nh_private)
     : nh_(nh),
       nh_private_(nh_private),
       visualize_(true),
@@ -122,16 +124,16 @@ VoxbloxEvaluator::VoxbloxEvaluator(const ros::NodeHandle& nh,
   nh_private_.param("use_occ_ref", use_occ_ref_esdf_, use_occ_ref_esdf_);
   nh_private_.param("slice_level", slice_level_, slice_level_);
   nh_private_.param("error_limit_m", error_limit_m_, error_limit_m_);
-  nh_private_.param("eval_only_positive", eval_only_positive_,
-                                          eval_only_positive_);
+  nh_private_.param(
+      "eval_only_positive", eval_only_positive_, eval_only_positive_);
 
   // Load transformations.
   XmlRpc::XmlRpcValue T_V_G_xml;
   if (nh_private_.getParam("T_V_G", T_V_G_xml)) {
     kindr::minimal::xmlRpcToKindr(T_V_G_xml, &T_V_G_);
     bool invert_static_tranform = false;
-    nh_private_.param("invert_T_V_G", invert_static_tranform,
-                      invert_static_tranform);
+    nh_private_.param(
+        "invert_T_V_G", invert_static_tranform, invert_static_tranform);
     if (invert_static_tranform) {
       T_V_G_ = T_V_G_.inverse();
     }
@@ -217,8 +219,8 @@ VoxbloxEvaluator::VoxbloxEvaluator(const ros::NodeHandle& nh,
 void VoxbloxEvaluator::evaluate() {
   // First, transform the pointcloud into the correct coordinate frame.
   // First, rotate the pointcloud into the world frame.
-  pcl::transformPointCloud(gt_ptcloud_, gt_ptcloud_,
-                           T_V_G_.getTransformationMatrix());
+  pcl::transformPointCloud(
+      gt_ptcloud_, gt_ptcloud_, T_V_G_.getTransformationMatrix());
 
   // Go through each point, use trilateral interpolation to figure out the
   // distance at that point.
@@ -246,8 +248,8 @@ void VoxbloxEvaluator::evaluate() {
     const bool interpolate = true;
     // We will do multiple lookups -- the first is to determine whether the
     // voxel exists.
-    if (!interpolator_->getNearestDistanceAndWeight(point, &distance,
-                                                    &weight)) {
+    if (!interpolator_->getNearestDistanceAndWeight(
+            point, &distance, &weight)) {
       unknown_voxels++;
     } else if (weight <= min_weight) {
       unknown_voxels++;
@@ -338,8 +340,10 @@ void VoxbloxEvaluator::evaluateEsdf() {
     for (size_t lin_index = 0u; lin_index < num_voxels_per_block; ++lin_index) {
       const EsdfVoxel& esdf_voxel =
           esdf_block->getVoxelByLinearIndex(lin_index);
-      if (!esdf_voxel.observed) continue;
-      if (eval_only_positive_ && esdf_voxel.distance < 0) continue;
+      if (!esdf_voxel.observed)
+        continue;
+      if (eval_only_positive_ && esdf_voxel.distance < 0)
+        continue;
 
       VoxelIndex voxel_index =
           esdf_block->computeVoxelIndexFromLinearIndex(lin_index);
@@ -349,8 +353,9 @@ void VoxbloxEvaluator::evaluateEsdf() {
       Point point =
           getCenterPointFromGridIndex(global_index, esdf_layer_->voxel_size());
 
-      kdtree.nearestKSearch(pcl::PointXYZRGB(point(0), point(1), point(2)), 1,
-                            pointIdxNKNSearch, pointNKNSquaredDistance);
+      kdtree.nearestKSearch(
+          pcl::PointXYZRGB(point(0), point(1), point(2)), 1, pointIdxNKNSearch,
+          pointNKNSquaredDistance);
       float cur_gt_dist = std::sqrt(pointNKNSquaredDistance[0]);
       float cur_est_dist = std::abs(esdf_voxel.distance);
       float cur_error_dist = cur_est_dist - cur_gt_dist;
@@ -397,7 +402,8 @@ void VoxbloxEvaluator::generatePointCloudFromOcc() {
     for (size_t lin_index = 0u; lin_index < num_voxels_per_block; ++lin_index) {
       const OccupancyVoxel& occ_voxel =
           occ_block->getVoxelByLinearIndex(lin_index);
-      if (!occ_voxel.observed || occ_voxel.probability_log < 0.7) continue;
+      if (!occ_voxel.observed || occ_voxel.probability_log < 0.7)
+        continue;
 
       VoxelIndex voxel_index =
           occ_block->computeVoxelIndexFromLinearIndex(lin_index);
@@ -443,8 +449,8 @@ void VoxbloxEvaluator::visualizeEsdf() {
   // TODO(yuepan): for visualization colormap, the value (here the error)
   // should evenly lay around 0.0, make sure to set the range of the
   // value for expected visualization
-  createDistancePointcloudFromEsdfLayerSlice(*esdf_layer_, kZAxisIndex,
-                                             slice_level_, &pointcloud);
+  createDistancePointcloudFromEsdfLayerSlice(
+      *esdf_layer_, kZAxisIndex, slice_level_, &pointcloud);
 
   pointcloud.header.frame_id = frame_id_;
   esdf_error_slice_pub_.publish(pointcloud);

@@ -50,8 +50,9 @@ int main(int argc, char** argv) {
   esdf_integrator_config.default_distance_m = default_distance_m;
 
   EsdfMap esdf_map(esdf_config);
-  EsdfIntegrator esdf_integrator(esdf_integrator_config, layer_from_file.get(),
-                                 esdf_map.getEsdfLayerPtr());
+  EsdfIntegrator esdf_integrator(
+      esdf_integrator_config, layer_from_file.get(),
+      esdf_map.getEsdfLayerPtr());
 
   esdf_integrator.updateFromTsdfLayerBatch();
 

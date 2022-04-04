@@ -66,19 +66,29 @@ class Accumulator {
     }
   }
 
-  int TotalSamples() const { return totalsamples_; }
+  int TotalSamples() const {
+    return totalsamples_;
+  }
 
-  double Sum() const { return sum_; }
+  double Sum() const {
+    return sum_;
+  }
 
-  double Mean() const { return sum_ / totalsamples_; }
+  double Mean() const {
+    return sum_ / totalsamples_;
+  }
 
   double RollingMean() const {
     return window_sum_ / std::min(window_samples_, N);
   }
 
-  double Max() const { return max_; }
+  double Max() const {
+    return max_;
+  }
 
-  double Min() const { return min_; }
+  double Min() const {
+    return min_;
+  }
 
   double LazyVariance() const {
     if (window_samples_ == 0) {
@@ -120,13 +130,15 @@ class DummyTimer {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   explicit DummyTimer(size_t /*handle*/, bool /*constructStopped*/ = false) {}
-  explicit DummyTimer(std::string const& /*tag*/,
-                      bool /*constructStopped*/ = false) {}
+  explicit DummyTimer(
+      std::string const& /*tag*/, bool /*constructStopped*/ = false) {}
   ~DummyTimer() {}
 
   void Start() {}
   void Stop() {}
-  bool IsTiming() { return false; }
+  bool IsTiming() {
+    return false;
+  }
 };
 
 class Timer {
@@ -179,7 +191,9 @@ class Timing {
   static std::string Print();
   static std::string SecondsToTimeString(double seconds);
   static void Reset();
-  static const map_t& GetTimers() { return Instance().tagMap_; }
+  static const map_t& GetTimers() {
+    return Instance().tagMap_;
+  }
 
  private:
   void AddTime(size_t handle, double seconds);

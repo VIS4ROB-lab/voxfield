@@ -260,12 +260,12 @@ TEST_F(ProtobufTsdfTest, MultipleLayerSerialization) {
 
   constexpr bool multiple_layer_support = true;
   Layer<TsdfVoxel>::Ptr tsdf_layer_from_file;
-  ASSERT_TRUE(io::LoadLayer<TsdfVoxel>(file, multiple_layer_support,
-                                       &tsdf_layer_from_file));
+  ASSERT_TRUE(io::LoadLayer<TsdfVoxel>(
+      file, multiple_layer_support, &tsdf_layer_from_file));
 
   Layer<EsdfVoxel>::Ptr esdf_layer_from_file;
-  ASSERT_TRUE(io::LoadLayer<EsdfVoxel>(file, multiple_layer_support,
-                                       &esdf_layer_from_file));
+  ASSERT_TRUE(io::LoadLayer<EsdfVoxel>(
+      file, multiple_layer_support, &esdf_layer_from_file));
 
   CompareLayers(*layer_, *tsdf_layer_from_file);
   esdf_test.CompareLayers(*esdf_layer, *esdf_layer_from_file);

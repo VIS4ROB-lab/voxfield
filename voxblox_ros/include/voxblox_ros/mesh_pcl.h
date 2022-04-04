@@ -49,15 +49,15 @@ inline void toPCLPolygonMesh(
   std::vector<pcl::Vertices> polygons;
 
   Mesh mesh;
-  convertMeshLayerToMesh(mesh_layer, &mesh, simplify_and_connect_mesh,
-                         vertex_proximity_threshold);
+  convertMeshLayerToMesh(
+      mesh_layer, &mesh, simplify_and_connect_mesh, vertex_proximity_threshold);
 
   // add points
   pointcloud.reserve(mesh.vertices.size());
   for (const Point& point : mesh.vertices) {
-    pointcloud.push_back(pcl::PointXYZ(static_cast<float>(point[0]),
-                                       static_cast<float>(point[1]),
-                                       static_cast<float>(point[2])));
+    pointcloud.push_back(pcl::PointXYZ(
+        static_cast<float>(point[0]), static_cast<float>(point[1]),
+        static_cast<float>(point[2])));
   }
   // add triangles
   pcl::Vertices vertices_idx;
@@ -85,17 +85,19 @@ inline void toSimplifiedPCLPolygonMesh(
     const FloatingPoint vertex_proximity_threshold,
     pcl::PolygonMesh* polygon_mesh_ptr) {
   constexpr bool kSimplifiedAndConnectedMesh = true;
-  toPCLPolygonMesh(mesh_layer, frame_id, polygon_mesh_ptr,
-                   kSimplifiedAndConnectedMesh, vertex_proximity_threshold);
+  toPCLPolygonMesh(
+      mesh_layer, frame_id, polygon_mesh_ptr, kSimplifiedAndConnectedMesh,
+      vertex_proximity_threshold);
 }
 
-inline void toConnectedPCLPolygonMesh(const MeshLayer& mesh_layer,
-                                      const std::string frame_id,
-                                      pcl::PolygonMesh* polygon_mesh_ptr) {
+inline void toConnectedPCLPolygonMesh(
+    const MeshLayer& mesh_layer, const std::string frame_id,
+    pcl::PolygonMesh* polygon_mesh_ptr) {
   constexpr bool kSimplifiedAndConnectedMesh = true;
   constexpr FloatingPoint kVertexThreshold = 1e-10;
-  toPCLPolygonMesh(mesh_layer, frame_id, polygon_mesh_ptr,
-                   kSimplifiedAndConnectedMesh, kVertexThreshold);
+  toPCLPolygonMesh(
+      mesh_layer, frame_id, polygon_mesh_ptr, kSimplifiedAndConnectedMesh,
+      kVertexThreshold);
 }
 
 }  // namespace voxblox
