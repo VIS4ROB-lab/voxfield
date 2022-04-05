@@ -145,7 +145,7 @@ void EsdfVoxfieldIntegrator::updateFromTsdfBlocks(
   esdf_timer.Stop();
 }
 
-// Get the range of the changed tsdf grid (inserted or deleted)
+// Get the range of the updated tsdf grid (inserted or deleted)
 void EsdfVoxfieldIntegrator::getUpdateRange() {
   // initialization
   update_range_min_ << UNDEF, UNDEF, UNDEF;

@@ -129,6 +129,8 @@ class VoxbloxServer : public TsdfServer {
 
   bool esdf_ready_;
 
+  int update_esdf_every_n_ = 0;
+
   // ESDF maps.
   std::shared_ptr<EsdfMap> esdf_map_;
   std::unique_ptr<EsdfIntegrator> esdf_integrator_;

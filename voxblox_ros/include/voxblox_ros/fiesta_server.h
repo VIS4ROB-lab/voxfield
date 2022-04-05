@@ -38,6 +38,7 @@ class FiestaServer : public TsdfServer {
   void publishOccupancyOccupiedNodes();
 
   virtual void publishPointclouds();
+  virtual void newPoseCallback(const Transformation& T_G_C);
   virtual void publishMap(bool reset_remote_map = false);
   virtual bool saveTsdfMap(const std::string& file_path);
   virtual bool saveEsdfMap(const std::string& file_path);
@@ -146,6 +147,8 @@ class FiestaServer : public TsdfServer {
   bool incremental_update_;
   int num_subscribers_esdf_map_;
   bool esdf_ready_;
+
+  int update_esdf_every_n_ = 0;
 
   // ESDF maps.
   std::shared_ptr<EsdfMap> esdf_map_;

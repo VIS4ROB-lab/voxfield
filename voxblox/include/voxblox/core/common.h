@@ -62,7 +62,7 @@ typedef IndexVector VoxelIndexList;
 typedef AlignedVector<LongIndex> LongIndexVector;
 typedef LongIndexVector GlobalIndexVector;
 
-// Common containers for indices (used in FIESTA)
+// Common containers for indices (used in FIESTA and Voxfield)
 typedef AlignedQueue<GlobalIndex> GlobalIndexQueue;
 typedef AlignedList<GlobalIndex> GlobalIndexList;
 typedef std::unordered_set<GlobalIndex> GlobalIndexSet;

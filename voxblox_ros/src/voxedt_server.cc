@@ -117,6 +117,8 @@ void VoxedtServer::setupRos() {
     update_esdf_timer_ = nh_private_.createTimer(
         ros::Duration(update_esdf_every_n_sec), &VoxedtServer::updateEsdfEvent,
         this);
+  } else {
+    update_esdf_every_n_ = static_cast<int>(-1.0 * update_esdf_every_n_sec);
   }
 
   esdf_ready_ = false;
@@ -481,10 +483,25 @@ void VoxedtServer::setTraversabilityRadius(float traversability_radius) {
   traversability_radius_ = traversability_radius;
 }
 
-// void VoxedtServer::newPoseCallback(const Transformation& T_G_C) {
-//   if (clear_sphere_for_planning_) {
-//     esdf_integrator_->addNewRobotPosition(T_G_C.getPosition());
-//   }
+void VoxedtServer::newPoseCallback(const Transformation& T_G_C) {
+  // if update_esdf_every_n_sec_ is negative
+  // we regard it as the update interval
+  if (update_esdf_every_n_ > 0 && frame_count_ != 0 &&
+      frame_count_ % update_esdf_every_n_ == 0) {
+    updateEsdf();
+    if (publish_slices_)
+      publishSlices();
+  }
+
+  // if (clear_sphere_for_planning_) {
+  //   esdf_integrator_->addNewRobotPosition(T_G_C.getPosition());
+  // }
+
+  // timing::Timer block_remove_timer("remove_distant_blocks");
+  esdf_map_->getEsdfLayerPtr()->removeDistantBlocks(
+      T_G_C.getPosition(), max_block_distance_from_body_);
+  // block_remove_timer.Stop();
+}
 
 //   timing::Timer block_remove_timer("remove_distant_blocks");
 //   esdf_map_->getEsdfLayerPtr()->removeDistantBlocks(

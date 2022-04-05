@@ -96,6 +96,8 @@ void VoxbloxServer::setupRos() {
     update_esdf_timer_ = nh_private_.createTimer(
         ros::Duration(update_esdf_every_n_sec), &VoxbloxServer::updateEsdfEvent,
         this);
+  } else {
+    update_esdf_every_n_ = static_cast<int>(-1.0 * update_esdf_every_n_sec);
   }
   // ADD(py):
   bool eval_esdf_on = false;
@@ -265,6 +267,15 @@ void VoxbloxServer::setTraversabilityRadius(float traversability_radius) {
 }
 
 void VoxbloxServer::newPoseCallback(const Transformation& T_G_C) {
+  // if update_esdf_every_n_sec_ is negative
+  // we regard it as the update interval
+  if (update_esdf_every_n_ > 0 && frame_count_ != 0 &&
+      frame_count_ % update_esdf_every_n_ == 0) {
+    updateEsdf();
+    if (publish_slices_)
+      publishSlices();
+  }
+
   if (clear_sphere_for_planning_) {
     esdf_integrator_->addNewRobotPosition(T_G_C.getPosition());
   }
