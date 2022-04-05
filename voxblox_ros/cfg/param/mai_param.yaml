@@ -1,0 +1,78 @@
+# Map 
+voxel_size: &voxel_size 0.25
+voxels_per_side_in_block: &voxels_per_side_in_block 8
+
+occ_voxel_size: *voxel_size
+occ_voxels_per_side: *voxels_per_side_in_block
+
+tsdf_voxel_size: *voxel_size
+tsdf_voxels_per_side: *voxels_per_side_in_block
+
+esdf_voxel_size: *voxel_size
+esdf_voxels_per_side: *voxels_per_side_in_block
+
+truncation_distance: -3.0
+
+# TSDF integration
+method: merged # select from simple, fast and merged
+merge_with_clear: false
+max_ray_length_m: 50.0
+min_ray_length_m: 1.5
+integration_threads: 6
+normal_available: true
+use_const_weight: false
+use_weight_dropoff: true
+weight_reduction_exp: 1.0
+curve_assumption: true
+reliable_band_ratio: 2.0
+reliable_normal_ratio_thre: 0.05
+
+# ESDF integration
+local_range_offset_x: 20
+local_range_offset_y: 20
+local_range_offset_z: 5
+esdf_default_distance_m: 4.0
+max_behind_surface_m: 1.0 # should be larger than truncation_distance
+num_buckets: 50
+patch_on: true
+early_break: true
+finer_esdf_on: true
+eval_esdf_on: false
+
+# Occupancy grid integration
+occ_voxel_size_ratio: 0.865
+occ_min_weight: 0.0001
+probability_hit: 0.7
+probability_miss: 0.4
+threshold_min: 0.12
+threshold_max: 0.97
+threshold_occupancy: 0.7
+
+# State estimation 
+enable_icp: false
+icp_iterations: 10
+use_tf_transforms: true
+world_frame: world
+sensor_frame: velodyne
+
+# Timer
+update_mesh_every_n_sec: 0.5
+update_esdf_every_n_sec: 0.5
+publish_map_every_n_sec: 0.5
+eval_esdf_every_n_sec: 0.0
+min_time_between_msgs_sec: 0.1
+
+# Visualization
+color_mode: normals # select from color, normals, height, lambert, lambert_color
+intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, inverse_grayscale, ironbow
+# publishing settings
+publish_traversable: false
+publish_pointclouds: false
+publish_slices: true
+publish_robot_model: true
+slice_level: 0.0
+robot_model_scale: 1.0
+
+# Logging
+verbose: false
+timing: true

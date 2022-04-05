@@ -29,7 +29,6 @@
     <!-- <remap from="pointcloud" to="/velodyne_points" if="$(arg use_laser)" /> -->
     <remap from="pointcloud" to="/velodyne_points_filtered" if="$(arg use_laser)" />
     <remap from="pointcloud" to="/stereo_gray/points2" unless="$(arg use_laser)" />
-    <remap from="transform" to="/vehicle"/>
     <rosparam file="$(find voxblox_ros)/cfg/param/kitti_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/kitti_calib.yaml"/>
   </node>
