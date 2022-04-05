@@ -9,6 +9,8 @@
   <arg name="bag_file" default="/media/yuepan/SeagateNew/1_data/kitti/semantickitti_sequence07_gt.bag"/>
   <!-- These datasets can be created with the KITTI raw datasets: http://www.cvlibs.net/datasets/kitti/raw_data.php and kitti_to_rosbag: https://github.com/ethz-asl/kitti_to_rosbag -->
   
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/car.dae"/> 
+
   <!-- whether to use laser (true) or stereo (false) for the map. -->
   <arg name="use_laser" default="true" />
   
@@ -32,6 +34,7 @@
     <remap from="transform" to="/vehicle"/>
     <rosparam file="$(find voxblox_ros)/cfg/param/kitti_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/kitti_calib.yaml"/>
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
   </node>
 
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/kitti_25cm.rviz" />

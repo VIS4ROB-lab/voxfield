@@ -69,6 +69,8 @@ TsdfServer::TsdfServer(
       nh_private_.advertise<voxblox_msgs::Layer>("tsdf_map_out", 1, false);
   tsdf_map_sub_ = nh_private_.subscribe(
       "tsdf_map_in", 1, &TsdfServer::tsdfMapCallback, this);
+  robot_model_pub_ =
+      nh_private_.advertise<visualization_msgs::Marker>("Robot_model", 100);
   nh_private_.param("publish_tsdf_map", publish_tsdf_map_, publish_tsdf_map_);
 
   if (use_freespace_pointcloud_) {
@@ -138,6 +140,8 @@ TsdfServer::TsdfServer(
     update_mesh_timer_ = nh_private_.createTimer(
         ros::Duration(update_mesh_every_n_sec), &TsdfServer::updateMeshEvent,
         this);
+  } else {
+    update_mesh_every_n_ = static_cast<int>(-1.0 * update_mesh_every_n_sec);
   }
 
   double publish_map_every_n_sec = 1.0;
@@ -187,6 +191,13 @@ void TsdfServer::getServerConfigFromRosParam(
 
   nh_private.param("verbose", verbose_, verbose_);
   nh_private.param("timing", timing_, timing_);
+
+  // Robot model related
+  nh_private_.param(
+      "publish_robot_model", publish_robot_model_, publish_robot_model_);
+  nh_private_.param("robot_model_file", robot_model_file_, robot_model_file_);
+  nh_private_.param(
+      "robot_model_scale", robot_model_scale_, robot_model_scale_);
 
   // Mesh settings.
   nh_private.param("mesh_filename", mesh_filename_, mesh_filename_);
@@ -334,6 +345,11 @@ void TsdfServer::processPointCloudMessageAndInsert(
         (end - start).toSec(),
         tsdf_map_->getTsdfLayer().getNumberOfAllocatedBlocks());
   }
+  // mesh reconstruction with the counter interval
+  if (update_mesh_every_n_ > 0 && frame_count_ != 0 &&
+      frame_count_ % update_mesh_every_n_ == 0) {
+    updateMesh();
+  }
 
   // timing::Timer block_remove_timer("remove_distant_blocks");
   tsdf_map_->getTsdfLayerPtr()->removeDistantBlocks(
@@ -342,8 +358,40 @@ void TsdfServer::processPointCloudMessageAndInsert(
       T_G_C.getPosition(), max_block_distance_from_body_);
   // block_remove_timer.Stop();
 
+  publishRobotMesh(T_G_C_refined);
+
   // Callback for inheriting classes.
   newPoseCallback(T_G_C);
+}
+
+void TsdfServer::publishRobotMesh(const Transformation& T_G_C) {
+  // publish the robot model with the pose
+  visualization_msgs::Marker robot_model;
+  robot_model.header.frame_id = world_frame_;
+  robot_model.header.stamp = ros::Time();
+  robot_model.mesh_resource = "file://" + robot_model_file_;
+  robot_model.mesh_use_embedded_materials = true;
+  robot_model.scale.x = robot_model.scale.y = robot_model.scale.z =
+      robot_model_scale_;
+  robot_model.lifetime = ros::Duration();
+  robot_model.action = visualization_msgs::Marker::MODIFY;
+  robot_model.color.a = robot_model.color.r = robot_model.color.g =
+      robot_model.color.b = 1.;
+  robot_model.type = visualization_msgs::Marker::MESH_RESOURCE;
+
+  // Change to horizontal camera frame
+  Transformation T_G_CH = T_G_C * transformer_.getModelTransform();
+  Eigen::Quaternionf quatrot = T_G_CH.getEigenQuaternion();
+  Point quat_vec = quatrot.vec();
+  robot_model.pose.orientation.x = quat_vec(0);
+  robot_model.pose.orientation.y = quat_vec(1);
+  robot_model.pose.orientation.z = quat_vec(2);
+  robot_model.pose.orientation.w = quatrot.w();
+  Point translation = T_G_CH.getPosition();
+  robot_model.pose.position.x = translation(0);
+  robot_model.pose.position.y = translation(1);
+  robot_model.pose.position.z = translation(2);
+  robot_model_pub_.publish(robot_model);
 }
 
 // Checks if we can get the next message from queue.

@@ -69,6 +69,8 @@ NpTsdfServer::NpTsdfServer(
       nh_private_.advertise<voxblox_msgs::Layer>("tsdf_map_out", 1, false);
   tsdf_map_sub_ = nh_private_.subscribe(
       "tsdf_map_in", 1, &NpTsdfServer::tsdfMapCallback, this);
+  robot_model_pub_ =
+      nh_private_.advertise<visualization_msgs::Marker>("Robot_model", 100);
   nh_private_.param("publish_tsdf_map", publish_tsdf_map_, publish_tsdf_map_);
 
   if (use_freespace_pointcloud_) {
@@ -106,26 +108,6 @@ NpTsdfServer::NpTsdfServer(
     tsdf_integrator_.reset(new SimpleNpTsdfIntegrator(
         integrator_config, tsdf_map_->getTsdfLayerPtr()));
   }
-  // Sensor specific
-  nh_private_.param("sensor_is_lidar", sensor_is_lidar_, sensor_is_lidar_);
-
-  nh_private_.param("width", width_, width_);
-  nh_private_.param("height", height_, height_);
-  nh_private_.param(
-      "smooth_thre_ratio", smooth_thre_ratio_, smooth_thre_ratio_);
-
-  if (sensor_is_lidar_) {
-    nh_private_.param("fov_up", fov_up_, fov_up_);
-    nh_private_.param("fov_down", fov_down_, fov_down_);
-    float fov = std::abs(fov_down_) + std::abs(fov_up_);
-    fov_down_rad_ = fov_down_ / 180.0f * M_PI;
-    fov_rad_ = fov / 180.0f * M_PI;
-  } else {
-    nh_private_.param("vx", vx_, vx_);
-    nh_private_.param("vy", vy_, vy_);
-    nh_private_.param("fx", fx_, fx_);
-    nh_private_.param("fy", fy_, fy_);
-  }
 
   mesh_layer_.reset(new MeshLayer(tsdf_map_->block_size()));
   mesh_integrator_.reset(new MeshIntegrator<TsdfVoxel>(
@@ -147,7 +129,7 @@ NpTsdfServer::NpTsdfServer(
       "publish_map", &NpTsdfServer::publishTsdfMapCallback, this);
 
   // If set, use a timer to progressively integrate the mesh.
-  double update_mesh_every_n_sec = 1.0;
+  double update_mesh_every_n_sec = 1.0f;
   nh_private_.param(
       "update_mesh_every_n_sec", update_mesh_every_n_sec,
       update_mesh_every_n_sec);
@@ -156,6 +138,8 @@ NpTsdfServer::NpTsdfServer(
     update_mesh_timer_ = nh_private_.createTimer(
         ros::Duration(update_mesh_every_n_sec), &NpTsdfServer::updateMeshEvent,
         this);
+  } else {
+    update_mesh_every_n_ = static_cast<int>(-1.0 * update_mesh_every_n_sec);
   }
 
   double publish_map_every_n_sec = 1.0;
@@ -192,7 +176,6 @@ void NpTsdfServer::getServerConfigFromRosParam(
   nh_private.param("publish_slices", publish_slices_, publish_slices_);
   nh_private.param(
       "publish_pointclouds", publish_pointclouds_, publish_pointclouds_);
-
   nh_private.param(
       "use_freespace_pointcloud", use_freespace_pointcloud_,
       use_freespace_pointcloud_);
@@ -203,8 +186,36 @@ void NpTsdfServer::getServerConfigFromRosParam(
       "accumulate_icp_corrections", accumulate_icp_corrections_,
       accumulate_icp_corrections_);
 
+  // Logging
   nh_private.param("verbose", verbose_, verbose_);
   nh_private.param("timing", timing_, timing_);
+
+  // Sensor specific
+  nh_private_.param("sensor_is_lidar", sensor_is_lidar_, sensor_is_lidar_);
+  nh_private_.param("width", width_, width_);
+  nh_private_.param("height", height_, height_);
+  nh_private_.param(
+      "smooth_thre_ratio", smooth_thre_ratio_, smooth_thre_ratio_);
+
+  if (sensor_is_lidar_) {
+    nh_private_.param("fov_up", fov_up_, fov_up_);
+    nh_private_.param("fov_down", fov_down_, fov_down_);
+    float fov = std::abs(fov_down_) + std::abs(fov_up_);
+    fov_down_rad_ = fov_down_ / 180.0f * M_PI;
+    fov_rad_ = fov / 180.0f * M_PI;
+  } else {
+    nh_private_.param("vx", vx_, vx_);
+    nh_private_.param("vy", vy_, vy_);
+    nh_private_.param("fx", fx_, fx_);
+    nh_private_.param("fy", fy_, fy_);
+  }
+
+  // Robot model related
+  nh_private_.param(
+      "publish_robot_model", publish_robot_model_, publish_robot_model_);
+  nh_private_.param("robot_model_file", robot_model_file_, robot_model_file_);
+  nh_private_.param(
+      "robot_model_scale", robot_model_scale_, robot_model_scale_);
 
   // Mesh settings.
   nh_private.param("mesh_filename", mesh_filename_, mesh_filename_);
@@ -370,6 +381,12 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
         (end - start).toSec(),
         tsdf_map_->getTsdfLayer().getNumberOfAllocatedBlocks());
   }
+  // mesh reconstruction with the counter interval
+  if (update_mesh_every_n_ > 0 && frame_count_ != 0 &&
+      frame_count_ % update_mesh_every_n_ == 0) {
+    updateMesh();
+  }
+
   // timing::Timer block_remove_timer("remove_distant_blocks");
   tsdf_map_->getTsdfLayerPtr()->removeDistantBlocks(
       T_G_C.getPosition(), max_block_distance_from_body_);
@@ -377,8 +394,40 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
       T_G_C.getPosition(), max_block_distance_from_body_);
   // block_remove_timer.Stop();
 
+  publishRobotMesh(T_G_C_refined);
+
   // Callback for inheriting classes.
   newPoseCallback(T_G_C);
+}
+
+void NpTsdfServer::publishRobotMesh(const Transformation& T_G_C) {
+  // publish the robot model with the pose
+  visualization_msgs::Marker robot_model;
+  robot_model.header.frame_id = world_frame_;
+  robot_model.header.stamp = ros::Time();
+  robot_model.mesh_resource = "file://" + robot_model_file_;
+  robot_model.mesh_use_embedded_materials = true;
+  robot_model.scale.x = robot_model.scale.y = robot_model.scale.z =
+      robot_model_scale_;
+  robot_model.lifetime = ros::Duration();
+  robot_model.action = visualization_msgs::Marker::MODIFY;
+  robot_model.color.a = robot_model.color.r = robot_model.color.g =
+      robot_model.color.b = 1.;
+  robot_model.type = visualization_msgs::Marker::MESH_RESOURCE;
+
+  // Change to horizontal camera frame
+  Transformation T_G_CH = T_G_C * transformer_.getModelTransform();
+  Eigen::Quaternionf quatrot = T_G_CH.getEigenQuaternion();
+  Point quat_vec = quatrot.vec();
+  robot_model.pose.orientation.x = quat_vec(0);
+  robot_model.pose.orientation.y = quat_vec(1);
+  robot_model.pose.orientation.z = quat_vec(2);
+  robot_model.pose.orientation.w = quatrot.w();
+  Point translation = T_G_CH.getPosition();
+  robot_model.pose.position.x = translation(0);
+  robot_model.pose.position.y = translation(1);
+  robot_model.pose.position.z = translation(2);
+  robot_model_pub_.publish(robot_model);
 }
 
 // Checks if we can get the next message from queue.
@@ -426,6 +475,7 @@ void NpTsdfServer::insertPointcloud(
   while (
       getNextPointcloudFromQueue(&pointcloud_queue_, &pointcloud_msg, &T_G_C)) {
     constexpr bool is_freespace_pointcloud = false;
+    // main processing entrance
     processPointCloudMessageAndInsert(
         pointcloud_msg, T_G_C, is_freespace_pointcloud);
     processed_any = true;

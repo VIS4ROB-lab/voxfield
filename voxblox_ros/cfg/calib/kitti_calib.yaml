@@ -1,3 +1,11 @@
+# model transformation (switch axis)
+T_C_CH:
+- [-1.0, 0.0, 0.0, 0.0]
+- [ 0.0, 0.0, 1.0, 1.8]
+- [ 0.0, 1.0, 0.0, 0.0]
+- [ 0.0, 0.0, 0.0, 1.0]
+invert_T_C_CH: true
+
 # lidar intrinsics
 sensor_is_lidar: true
 width: 1024  # Px

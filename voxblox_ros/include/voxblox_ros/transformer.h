@@ -26,6 +26,10 @@ class Transformer {
 
   void transformCallback(const geometry_msgs::TransformStamped& transform_msg);
 
+  Transformation getStaticTransform();
+
+  Transformation getModelTransform();
+
  private:
   bool lookupTransformTf(
       const std::string& from_frame, const std::string& to_frame,
@@ -57,10 +61,12 @@ class Transformer {
    */
   Transformation T_B_C_;
   Transformation T_B_D_;
+  Transformation T_D_C_;
+  Transformation T_C_CH_;
   /**
    * If we use topic transforms, we have 2 parts: a dynamic transform from a
    * topic and a static transform from parameters.
-   * Static transform should be T_G_D (where D is whatever sensor the
+   * Dynamic transform should be T_G_D (where D is whatever sensor the
    * dynamic coordinate frame is in) and the static should be T_D_C (where
    * C is the sensor frame that produces the depth data). It is possible to
    * specify T_C_D and set invert_static_transform to true.

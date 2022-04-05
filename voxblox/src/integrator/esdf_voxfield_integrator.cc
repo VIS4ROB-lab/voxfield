@@ -573,4 +573,80 @@ void EsdfVoxfieldIntegrator::assignError(
   vox->error = esdf_error;
 }
 
+// // Used for planning - allocates sphere around as observed but occupied,
+// // and clears space in a sphere around current position.
+// void EsdfVoxfieldIntegrator::addNewRobotPosition(const Point& position) {
+//   timing::Timer clear_timer("upate_esdf/voxfield/clear_radius");
+
+//   // First set all in inner sphere to free.
+//   HierarchicalIndexMap block_voxel_list;
+//   timing::Timer sphere_timer("upate_esdf/voxfield/clear_radius/get_sphere");
+//   utils::getAndAllocateSphereAroundPoint(
+//       position, config_.clear_sphere_radius, esdf_layer_, &block_voxel_list);
+//   sphere_timer.Stop();
+//   for (const std::pair<BlockIndex, VoxelIndexList>& kv : block_voxel_list) {
+//     // Get block.
+//     Block<EsdfVoxel>::Ptr block_ptr =
+//     esdf_layer_->getBlockPtrByIndex(kv.first);
+
+//     for (const VoxelIndex& voxel_index : kv.second) {
+//       if (!block_ptr->isValidVoxelIndex(voxel_index)) {
+//         continue;
+//       }
+//       EsdfVoxel& esdf_voxel = block_ptr->getVoxelByVoxelIndex(voxel_index);
+//       // We can clear unobserved or hallucinated voxels.
+//       if (!esdf_voxel.observed || esdf_voxel.hallucinated) {
+//         if (esdf_voxel.hallucinated) {
+//           GlobalIndex global_index =
+//           getGlobalVoxelIndexFromBlockAndVoxelIndex(
+//               kv.first, voxel_index, voxels_per_side_);
+//           raise_.push(global_index);
+//         }
+//         esdf_voxel.distance = config_.default_distance_m;
+//         esdf_voxel.observed = true;
+//         esdf_voxel.hallucinated = true;
+//         esdf_voxel.parent.setZero();
+//         updated_blocks_.insert(kv.first);
+//       }
+//     }
+//   }
+
+//   // Second set all remaining unknown to occupied.
+//   HierarchicalIndexMap block_voxel_list_occ;
+//   timing::Timer outer_sphere_timer(
+//       "upate_esdf/voxfield/clear_radius/get_outer_sphere");  // NOLINT
+//   utils::getAndAllocateSphereAroundPoint(
+//       position, config_.occupied_sphere_radius, esdf_layer_,
+//       &block_voxel_list_occ);
+//   outer_sphere_timer.Stop();
+//   for (const std::pair<BlockIndex, VoxelIndexList>& kv :
+//   block_voxel_list_occ) {
+//     // Get block.
+//     Block<EsdfVoxel>::Ptr block_ptr =
+//     esdf_layer_->getBlockPtrByIndex(kv.first);
+
+//     for (const VoxelIndex& voxel_index : kv.second) {
+//       if (!block_ptr->isValidVoxelIndex(voxel_index)) {
+//         continue;
+//       }
+//       EsdfVoxel& esdf_voxel = block_ptr->getVoxelByVoxelIndex(voxel_index);
+//       if (!esdf_voxel.observed) {
+//         esdf_voxel.distance = -config_.default_distance_m;
+//         esdf_voxel.observed = true;
+//         esdf_voxel.hallucinated = true;
+//         esdf_voxel.parent.setZero();
+//         updated_blocks_.insert(kv.first);
+//       } else if (!esdf_voxel.in_queue) {
+//         GlobalIndex global_index = getGlobalVoxelIndexFromBlockAndVoxelIndex(
+//             kv.first, voxel_index, voxels_per_side_);
+//         open_.push(global_index, esdf_voxel.distance);
+//       }
+//     }
+//   }
+
+//   VLOG(3) << "Changed " << updated_blocks_.size()
+//           << " blocks from unknown to free or occupied near the robot.";
+//   clear_timer.Stop();
+// }
+
 }  // namespace voxblox

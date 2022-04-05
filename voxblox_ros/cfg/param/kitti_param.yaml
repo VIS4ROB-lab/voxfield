@@ -69,7 +69,10 @@ intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, i
 publish_traversable: false
 publish_pointclouds: false
 publish_slices: true
+publish_robot_model: true
 slice_level: 0.0
+robot_model_scale: 1.0
 
 # Logging
-verbose: true
+verbose: false
+timing: true

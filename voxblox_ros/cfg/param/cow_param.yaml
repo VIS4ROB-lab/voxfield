@@ -55,7 +55,7 @@ use_tf_transforms: false
 world_frame: world
 
 # Timer
-update_mesh_every_n_sec: 1.0
+update_mesh_every_n_sec: 0.5
 update_esdf_every_n_sec: 0.2
 publish_map_every_n_sec: 1.0
 eval_esdf_every_n_sec: 0.0
@@ -68,7 +68,9 @@ intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, i
 publish_traversable: false
 publish_pointclouds: false
 publish_slices: true
+publish_robot_model: true
 slice_level: 1.0
+robot_model_scale: 3.0
 
 # Logging
 verbose: false

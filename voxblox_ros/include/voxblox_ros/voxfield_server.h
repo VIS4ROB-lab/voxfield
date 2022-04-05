@@ -38,7 +38,7 @@ class VoxfieldServer : public NpTsdfServer {
   void publishOccupancyOccupiedNodes();
 
   virtual void publishPointclouds();
-  // virtual void newPoseCallback(const Transformation& T_G_C);
+  virtual void newPoseCallback(const Transformation& T_G_C);
   virtual void publishMap(bool reset_remote_map = false);
   virtual bool saveMap(const std::string& file_path);
   virtual bool loadMap(const std::string& file_path);
@@ -119,7 +119,7 @@ class VoxfieldServer : public NpTsdfServer {
 
   /// Timers.
   ros::Timer update_esdf_timer_;
-  ros::Timer eval_esdf_timer_;  // py: added
+  ros::Timer eval_esdf_timer_;
 
   bool clear_sphere_for_planning_;
   bool publish_esdf_map_;
@@ -128,13 +128,15 @@ class VoxfieldServer : public NpTsdfServer {
   bool incremental_update_;
   int num_subscribers_esdf_map_;
 
-  bool esdf_ready_;  // py: added
+  bool esdf_ready_;
+
+  // default: not update according to the counter
+  int update_esdf_every_n_ = 0;
 
   // ESDF maps.
   std::shared_ptr<EsdfMap> esdf_map_;
   std::unique_ptr<EsdfVoxfieldIntegrator> esdf_integrator_;
 
-  // py: added
   // Occupancy maps.
   std::shared_ptr<OccupancyMap> occupancy_map_;
   std::unique_ptr<OccTsdfIntegrator> occupancy_integrator_;

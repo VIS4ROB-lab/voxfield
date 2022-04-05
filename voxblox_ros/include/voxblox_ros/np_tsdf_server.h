@@ -139,6 +139,9 @@ class NpTsdfServer {
   /// Overwrites the layer with what's coming from the topic!
   void tsdfMapCallback(const voxblox_msgs::Layer& layer_msg);
 
+  // Visualize the robot model in the map
+  void publishRobotMesh(const Transformation& T_G_C);
+
   /// Preprocessing
   // from point cloud to range image
   bool projectPointCloudToImage(
@@ -184,6 +187,7 @@ class NpTsdfServer {
   ros::Publisher tsdf_slice_pub_;
   ros::Publisher occupancy_marker_pub_;
   ros::Publisher icp_transform_pub_;
+  ros::Publisher robot_model_pub_;
 
   /// Publish the complete map for other nodes to consume.
   ros::Publisher tsdf_map_pub_;
@@ -217,6 +221,13 @@ class NpTsdfServer {
    */
   std::string world_frame_;
   std::string sensor_frame_;
+
+  // Robot model related
+  std::string robot_model_file_;
+  float robot_model_scale_ = 1.0;
+
+  // Mesh reconstruction interval counter
+  int update_mesh_every_n_ = 0;
 
   /**
    * Name of the ICP corrected frame. Publishes TF and transform topic to this
@@ -254,6 +265,7 @@ class NpTsdfServer {
   bool publish_slices_;
   bool publish_pointclouds_;
   bool publish_tsdf_map_;
+  bool publish_robot_model_;
 
   /// Whether to save the latest mesh message sent (for inheriting classes).
   bool cache_mesh_;

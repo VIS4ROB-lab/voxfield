@@ -24,7 +24,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: Raw point cloud
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -145,6 +145,14 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /voxblox_node/Robot_model
+      Name: Robot Car
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
@@ -173,7 +181,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 64.93885803222656
+      Distance: 91.23442077636719
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

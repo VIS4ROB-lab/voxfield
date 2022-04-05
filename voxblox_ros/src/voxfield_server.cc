@@ -64,10 +64,8 @@ void VoxfieldServer::setupRos() {
   esdf_error_slice_pub_ =
       nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "esdf_error_slice", 1, true);
-
   esdf_map_pub_ =
       nh_private_.advertise<voxblox_msgs::Layer>("esdf_map_out", 1, false);
-
   // Set up subscriber.
   esdf_map_sub_ = nh_private_.subscribe(
       "esdf_map_in", 1, &VoxfieldServer::esdfMapCallback, this);
@@ -85,11 +83,10 @@ void VoxfieldServer::setupRos() {
       "publish_traversable", publish_traversable_, publish_traversable_);
   nh_private_.param(
       "traversability_radius", traversability_radius_, traversability_radius_);
-
-  double update_esdf_every_n_sec = 1.0;
+  double update_esdf_every_n_sec = 1.0f;
   nh_private_.param(
       "update_esdf_every_n_sec", update_esdf_every_n_sec,
-      update_esdf_every_n_sec);
+      update_esdf_every_n_sec);  // NOLINT
 
   save_esdf_map_srv_ = nh_private_.advertiseService(
       "save_esdf_map", &VoxfieldServer::saveEsdfMapCallback, this);
@@ -98,6 +95,8 @@ void VoxfieldServer::setupRos() {
     update_esdf_timer_ = nh_private_.createTimer(
         ros::Duration(update_esdf_every_n_sec),
         &VoxfieldServer::updateEsdfEvent, this);
+  } else {
+    update_esdf_every_n_ = static_cast<int>(-1.0 * update_esdf_every_n_sec);
   }
 
   // ADD(py):
@@ -268,16 +267,25 @@ void VoxfieldServer::setTraversabilityRadius(float traversability_radius) {
   traversability_radius_ = traversability_radius;
 }
 
-// void VoxfieldServer::newPoseCallback(const Transformation& T_G_C) {
-//   if (clear_sphere_for_planning_) {
-//     esdf_integrator_->addNewRobotPosition(T_G_C.getPosition());
-//   }
+void VoxfieldServer::newPoseCallback(const Transformation& T_G_C) {
+  // if update_esdf_every_n_sec_ is negative
+  // we regard it as the update interval
+  if (update_esdf_every_n_ > 0 && frame_count_ != 0 &&
+      frame_count_ % update_esdf_every_n_ == 0) {
+    updateEsdf();
+    if (publish_slices_)
+      publishSlices();
+  }
 
-//   timing::Timer block_remove_timer("remove_distant_blocks");
-//   esdf_map_->getEsdfLayerPtr()->removeDistantBlocks(
-//       T_G_C.getPosition(), max_block_distance_from_body_);
-//   block_remove_timer.Stop();
-// }
+  // if (clear_sphere_for_planning_) {
+  //   esdf_integrator_->addNewRobotPosition(T_G_C.getPosition());
+  // }
+
+  // timing::Timer block_remove_timer("remove_distant_blocks");
+  esdf_map_->getEsdfLayerPtr()->removeDistantBlocks(
+      T_G_C.getPosition(), max_block_distance_from_body_);
+  // block_remove_timer.Stop();
+}
 
 void VoxfieldServer::esdfMapCallback(const voxblox_msgs::Layer& layer_msg) {
   timing::Timer receive_map_timer("map/receive_esdf");

@@ -5,7 +5,8 @@
 #include <minkindr_conversions/kindr_xml.h>
 
 namespace voxblox {
-
+// TODO(py): change the name of these transformation, current name
+// is hard to understand
 Transformer::Transformer(
     const ros::NodeHandle& nh, const ros::NodeHandle& nh_private)
     : nh_(nh),
@@ -65,13 +66,35 @@ Transformer::Transformer(
       }
     }
   }
+  T_D_C_ = T_B_D_.inverse() * T_B_C_;
   // Or we will use tf_transform, we do not need the calibration parameters
   // lookupTransformTf
+  // Model transformation
+  XmlRpc::XmlRpcValue T_C_CH_xml;
+  if (nh_private_.getParam("T_C_CH", T_C_CH_xml)) {
+    kindr::minimal::xmlRpcToKindr(T_C_CH_xml, &T_C_CH_);
+
+    // See if we need to invert it.
+    bool invert_static_tranform = false;
+    nh_private_.param(
+        "invert_T_C_CH", invert_static_tranform, invert_static_tranform);
+    if (invert_static_tranform) {
+      T_C_CH_ = T_C_CH_.inverse();
+    }
+  }
 }
 
 void Transformer::transformCallback(
     const geometry_msgs::TransformStamped& transform_msg) {
   transform_queue_.push_back(transform_msg);
+}
+
+Transformation Transformer::getStaticTransform() {
+  return T_B_C_;
+}
+
+Transformation Transformer::getModelTransform() {
+  return T_C_CH_;
 }
 
 bool Transformer::lookupTransform(
@@ -186,8 +209,8 @@ bool Transformer::lookupTransformQueue(
 
   // If we have a static transform, apply it too.
   // Transform should actually be T_G_C. So need to take it through the full
-  // chain.
-  *transform = T_G_D * T_B_D_.inverse() * T_B_C_;
+  // chain. transform is T_G_C
+  *transform = T_G_D * T_D_C_;
 
   // And also clear the queue up to this point. This leaves the current
   // message in place.

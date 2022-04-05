@@ -153,6 +153,14 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /voxblox_node/Robot_model
+      Name: RGB-D Camera
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 255; 255; 255
@@ -181,16 +189,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 13.103899002075195
+      Distance: 10.001533508300781
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.051585420966148376
-        Y: 1.1459256410598755
-        Z: 1.401793122291565
+        X: -0.6356792449951172
+        Y: 0.746555745601654
+        Z: 1.4022098779678345
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -217,5 +225,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1853
-  X: 361
-  Y: 191
+  X: 265
+  Y: 242

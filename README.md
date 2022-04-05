@@ -18,10 +18,13 @@ To install Voxfield, follow these [instructions]().
 ## Example Usage
 ### Run on the Cow & Lady dataset
 
-
 ### Run on the KITTI dataset
 
-## TODO
+### Run on the MaiCity dataset
+
+### Run on your own dataset
+
+### Used for path planning
 
 ## Acknowledgments
 We thanks greatly for the authors of the following opensource projects: 
