@@ -21,6 +21,7 @@ namespace voxblox {
 
 /**
  * Builds an ESDF layer out of a given TSDF layer efficiently.
+ * For a description of this algorithm, please check the paper of Voxfield.
  */
 class EsdfVoxfieldIntegrator {
  public:
@@ -62,21 +63,28 @@ class EsdfVoxfieldIntegrator {
     // Number of the neighbor voxels (select from 6, 18, 24 and 26)
     int num_neighbor = 24;
 
-    // About the patch_on and early_break settings:
-    // Fastest operation can be achieved by setting patch_on=false and
-    // early_break =true. Highest accuracy can be achieved with patch_on=true
-    // and early_break= false. Please set them in the config file wisely. Turn
-    // on the patch code or not
+    /**
+     * About the patch_on and early_break settings:
+     * Fastest operation can be achieved by setting patch_on=false and
+     * early_break =true. Highest accuracy can be achieved with patch_on=true
+     * and early_break= false. Please set them in the config file wisely. Turn
+     * on the patch code or not
+     */
     bool patch_on = true;
     // Early break the increasing update or not
     bool early_break = true;
-    // Finer ESDF with the consideration of the inner voxel distance
-    // from the voxel center to the actual surface
-    // Gradient TSDF is needed for the calculation
+
+    /**
+     * Use finer ESDF with the consideration of the inner voxel distance
+     * from the voxel center to the actual surface.
+     * the non-projective TSDF and signed distance gradient are needed
+     * for the calculation.
+     */
     bool finer_esdf_on = false;
 
     // use a fixed band for esdf to directly copy the tsdf value
     bool fixed_band_esdf_on = false;
+
     // sign (direction) of the gradient, towards or opposite to the surface,
     // select from 1.0 or -1.0
     float gradient_sign = 1.0f;
@@ -130,6 +138,7 @@ class EsdfVoxfieldIntegrator {
   float getEsdfMaxDistance() const {
     return config_.max_distance_m;
   }
+
   void setEsdfMaxDistance(float max_distance) {
     config_.max_distance_m = max_distance;
     if (config_.default_distance_m < max_distance) {

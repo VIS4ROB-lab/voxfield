@@ -70,7 +70,7 @@ publish_pointclouds: false
 publish_slices: true
 publish_robot_model: true
 slice_level: 1.0
-robot_model_scale: 3.0
+robot_model_scale: 2.0
 
 # Logging
 verbose: false

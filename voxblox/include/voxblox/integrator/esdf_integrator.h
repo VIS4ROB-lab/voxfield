@@ -20,7 +20,8 @@ namespace voxblox {
 
 /**
  * Builds an ESDF layer out of a given TSDF layer. For a description of this
- * algorithm, please see: https://arxiv.org/abs/1611.03631
+ * algorithm, please check the paper of Voxblox at
+ * https://arxiv.org/abs/1611.03631
  */
 class EsdfIntegrator {
  public:
@@ -32,7 +33,7 @@ class EsdfIntegrator {
     /**
      * Whether to use full euclidean distance (true) or quasi-euclidean (false).
      * Full euclidean is slightly more accurate (up to 8% in the worst case) but
-     * slower.
+     * slower to compute.
      */
     bool full_euclidean_distance = false;
     /**

@@ -315,7 +315,6 @@ void VoxfieldServer::clear() {
   publishMap(kResetRemoteMap);
 }
 
-// py: added
 // incrementally update occupancy map from the updated TSDF map
 void VoxfieldServer::updateOccFromTsdf() {
   if (tsdf_map_->getTsdfLayer().getNumberOfAllocatedBlocks() > 0) {
@@ -328,7 +327,6 @@ void VoxfieldServer::updateOccFromTsdf() {
   }
 }
 
-// py: added
 void VoxfieldServer::evalEsdfEvent(const ros::TimerEvent& /*event*/) {
   if (esdf_ready_) {
     updateOccFromTsdf();
@@ -346,7 +344,6 @@ void VoxfieldServer::publishOccupancyOccupiedNodes() {
   occupancy_marker_pub_.publish(marker_array);
 }
 
-// py: added
 // Evaluate the accuracy of ESDF mapping, referenced to current occupancy map
 // add it later to a seperate class
 void VoxfieldServer::evalEsdfRefOcc() {
@@ -454,7 +451,6 @@ void VoxfieldServer::evalEsdfRefOcc() {
   occ_ptcloud.reset(new pcl::PointCloud<pcl::PointXYZ>());
 }
 
-// py: added
 void VoxfieldServer::visualizeEsdfError() {
   pcl::PointCloud<pcl::PointXYZRGB> pointcloud;
 
