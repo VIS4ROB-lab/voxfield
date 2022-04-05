@@ -46,9 +46,11 @@ class EsdfVoxfieldIntegrator {
 
     // Fixed band distance threshold, unit: m
     FloatingPoint band_distance_m = 1.0f;
-
-    // The threshold of TSDF distance is occ_voxel_size_ratio * voxel size
-    FloatingPoint occ_voxel_size_ratio = 0.865;  // Sqrt(3) / 2
+    /**
+     * When judge a voxel is occupied or not,
+     * the threshold of TSDF distance is occ_voxel_size_ratio * voxel size
+     */
+    FloatingPoint occ_voxel_size_ratio = 0.865;   // Sqrt(3) / 2
 
     // Minimum weight to consider a TSDF value seen at.
     float min_weight = 1e-6;
@@ -95,28 +97,39 @@ class EsdfVoxfieldIntegrator {
 
   void updateFromTsdfBlocks(const BlockIndexList& tsdf_blocks);
 
-  void setLocalRange();
-
+  /**
+   * In Voxfield we set a range for the ESDF update.
+   * This range is expanded from the bounding box of the TSDF voxels
+   * get updated during the last time interval
+   */
+  // Get the range of the updated tsdf grid (inserted or deleted)
   void getUpdateRange();
-
+  // Expand the updated range with a given margin and then allocate memory
+  void setLocalRange();
+  // Set all the voxels in the range to be unfixed
   void resetFixed();
-
-  void updateESDF();
-
-  void deleteFromList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
-
-  void insertIntoList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
-
-  inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-
-  inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-
+  // Judge if a voxel is in the update range, if not, leave it still
   inline bool voxInRange(GlobalIndex vox_idx);
 
-  void loadInsertList(const GlobalIndexList& insert_list);
+  // main ESDF updating function
+  void updateESDF();
 
+  // basic operations of a doubly linked list
+  // delete operation
+  void deleteFromList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
+  // insert operation
+  void insertIntoList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
+
+  // calculate distance between two voxel centers
+  inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
+  inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
+
+  // Insert list contains the occupied voxels that are previously free
+  void loadInsertList(const GlobalIndexList& insert_list);
+  // Delete list contains the free voxels that are previously occupied
   void loadDeleteList(const GlobalIndexList& delete_list);
 
+  // Assign the ESDF mapping error of the voxel (used for evaluation)
   void assignError(GlobalIndex vox_idx, float esdf_error);
 
   inline void clear() {
@@ -141,11 +154,11 @@ class EsdfVoxfieldIntegrator {
   inline bool isFixed(FloatingPoint dist_m) const {
     return std::abs(dist_m) < config_.band_distance_m;
   }
-
+  // Determine the occupancy state according to voxel sdf
   inline bool isOccupied(FloatingPoint dist_m) const {
     return std::abs(dist_m) <= config_.occ_voxel_size_ratio * esdf_voxel_size_;
   }
-
+  // Determine the occupancy state according to voxel sdf and gradient
   inline bool isOccupied(FloatingPoint dist_m, Ray gradient) const {
     if (gradient.norm() > kFloatEpsilon) {
       Ray dist_on_axis = dist_m * gradient;
@@ -159,7 +172,7 @@ class EsdfVoxfieldIntegrator {
       return isOccupied(dist_m);
     }
   }
-
+  // Determine the observation state according to the TSDF integration confidence
   inline bool isObserved(FloatingPoint weight) const {
     return weight >= config_.min_weight;
   }
@@ -167,6 +180,10 @@ class EsdfVoxfieldIntegrator {
  protected:
   Config config_;
 
+  size_t esdf_voxels_per_side_;
+  FloatingPoint esdf_voxel_size_;
+
+  // Involved map layers (From TSDF to ESDF)
   Layer<TsdfVoxel>* tsdf_layer_;
   Layer<EsdfVoxel>* esdf_layer_;
 
@@ -175,9 +192,6 @@ class EsdfVoxfieldIntegrator {
   GlobalIndexList delete_list_;
   BucketQueue<GlobalIndex> update_queue_;
   LongIndexSet updated_voxel_;
-
-  size_t esdf_voxels_per_side_;
-  FloatingPoint esdf_voxel_size_;
 
   // Update (inseted and deleted occupied voxels) range, unit: voxel
   GlobalIndex update_range_min_;
