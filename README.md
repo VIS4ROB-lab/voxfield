@@ -6,16 +6,17 @@ It is based on the original [**Voxblox**](https://github.com/ethz-asl/voxblox) i
 Voxfield has also been integrated into a multi-resolution panoptic mapping framework [**Panmap**](https://github.com/VIS4ROB-lab/voxfield-panmap) for high-fidelity large-scale semantic reconstruction.
 
 ## Paper and Video (TBA)
+[**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be)
 
 ## Installation
 If you have installed ROS, set up the catkin workspace and the SSH key for github, you can use the following commands to install Voxfield:
 ```
-cd ~catkin_ws
+cd ~/catkin_ws/src/
 git clone git@github.com:VIS4ROB-lab/voxfield.git
 wstool init . ./voxfield/voxfield_ssh.rosinstall
 wstool update
 ```
-And then compile voxfield with:
+And then compile Voxfield with:
 ```
 cd ~/catkin_ws/src/
 catkin build voxblox_ros
@@ -37,13 +38,13 @@ For more details, please follow these [instructions](https://voxblox.readthedocs
 wget http://robotics.ethz.ch/~asl-datasets/iros_2017_voxblox/data.bag
 wget http://robotics.ethz.ch/~asl-datasets/iros_2017_voxblox/voxblox_cow_extras.zip
 ```
-2. Set the bag file path in the launch files `./voxblox_ros/launch/voxfield_launch/cow_voxfield.launch` to the path storing the Cow & Lady bag file.
+2. Set the `bag_file` path in the launch files `./voxblox_ros/launch/voxfield_launch/cow_voxfield.launch` to the path storing the Cow & Lady bag file.
 3. Run Voxfield mapping on the Cow & Lady dataset:
 ```
 roslaunch voxblox_ros cow_voxfield.launch
 ```
-4. For the comparison with other methods (Voxblox, FIESTA, EDT), set the bag file path in the corresponding launch file and launch it. 
-To change the mapping and visualization parameters such as voxel size, configure the file `./voxblox_ros/cfg/param/cow_param.launch`.
+4. For the comparison with other methods (Voxblox, FIESTA, EDT), set the `bag_file` path in the corresponding launch file (such as `cow_voxblox.launch`) and launch it. 
+To change the mapping and visualization parameters such as voxel size and truncation distance, please configure the file `./voxblox_ros/cfg/param/cow_param.yaml`.
 
 ### Run on the KITTI dataset
 
