@@ -488,7 +488,9 @@ void FiestaServer::newPoseCallback(const Transformation& T_G_C) {
   // we regard it as the update interval
   if (update_esdf_every_n_ > 0 && frame_count_ != 0 &&
       frame_count_ % update_esdf_every_n_ == 0) {
-    updateEsdf();
+    updateOccFromTsdf();
+    updateEsdfFromOcc();
+    publishOccupancyOccupiedNodes();
     if (publish_slices_)
       publishSlices();
   }

@@ -28,10 +28,10 @@ struct TsdfVoxel {
 
 // NOTE(py): the data structure here contains all the necessary varibles and
 // intermediate data structure used for our Voxfield and also three baseline
-// methods (Voxblox, FIESTA, EDT). Therefore, the memory cost is relatively 
+// methods (Voxblox, FIESTA, EDT). Therefore, the memory cost is relatively
 // large. For practical application, one can simply select those variables used
-// specifically for Voxfield and comment the rest out to get rid of the redundant
-// memory cost
+// specifically for Voxfield and comment the rest out to get rid of the
+// redundant memory cost
 struct EsdfVoxel {
   // when finer esdf is on, this distance also includes the inner-voxel part
   float distance = 0.0f;
@@ -58,8 +58,8 @@ struct EsdfVoxel {
 
   /**
    * Whether the voxel is behind (negative value) or in front of the surface
-   * (positive value). 
-   * Use signed distance instead of unsigned distance in FIESTA 
+   * (positive value).
+   * Use signed distance instead of unsigned distance in FIESTA
    * The original opensource implementation of FIESTA is unsigned
    */
   bool behind = false;

@@ -51,7 +51,7 @@ class EsdfVoxfieldIntegrator {
      * When judge a voxel is occupied or not,
      * the threshold of TSDF distance is occ_voxel_size_ratio * voxel size
      */
-    FloatingPoint occ_voxel_size_ratio = 0.865;   // Sqrt(3) / 2
+    FloatingPoint occ_voxel_size_ratio = 0.865;  // Sqrt(3) / 2
 
     // Minimum weight to consider a TSDF value seen at.
     float min_weight = 1e-6;
@@ -132,11 +132,6 @@ class EsdfVoxfieldIntegrator {
   inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
   inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
 
-  // Insert list contains the occupied voxels that are previously free
-  void loadInsertList(const GlobalIndexList& insert_list);
-  // Delete list contains the free voxels that are previously occupied
-  void loadDeleteList(const GlobalIndexList& delete_list);
-
   // Assign the ESDF mapping error of the voxel (used for evaluation)
   void assignError(GlobalIndex vox_idx, float esdf_error);
 
@@ -181,7 +176,8 @@ class EsdfVoxfieldIntegrator {
       return isOccupied(dist_m);
     }
   }
-  // Determine the observation state according to the TSDF integration confidence
+  // Determine the observation state according to the TSDF integration
+  // confidence
   inline bool isObserved(FloatingPoint weight) const {
     return weight >= config_.min_weight;
   }

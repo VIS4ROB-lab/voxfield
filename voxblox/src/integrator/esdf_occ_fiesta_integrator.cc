@@ -1,8 +1,10 @@
 #include "voxblox/integrator/esdf_occ_fiesta_integrator.h"
 
 // marco settings, it's better to avoid them
+// Use 24 neighborhood by default (according to FIESTA's paper)
 #define USE_24_NEIGHBOR
-// #define DIRECTION_GUIDE  // No direction guide by default  // NOLINT
+// No neighborhood directional search by default
+// #define DIRECTION_GUIDE
 
 namespace voxblox {
 
@@ -39,8 +41,6 @@ void EsdfOccFiestaIntegrator::updateFromOccLayer(bool clear_updated_flag) {
   }
 }
 
-// TODO(py): add the fixed band for estimated TSDF values
-// Directly use these TSDF values as ESDF
 void EsdfOccFiestaIntegrator::updateFromOccBlocks(
     const BlockIndexList& occ_blocks) {
   CHECK_EQ(occ_layer_->voxels_per_side(), esdf_layer_->voxels_per_side());
@@ -58,7 +58,6 @@ void EsdfOccFiestaIntegrator::updateFromOccBlocks(
     if (!occ_block) {
       continue;
     }
-
     // Allocate the same block in the ESDF layer.
     // Block indices are the same across all layers.
     Block<EsdfVoxel>::Ptr esdf_block =
@@ -92,7 +91,6 @@ void EsdfOccFiestaIntegrator::updateFromOccBlocks(
       }
     }
   }
-
   getUpdateRange();
   setLocalRange();
 
@@ -154,21 +152,6 @@ void EsdfOccFiestaIntegrator::setLocalRange() {
   }
 }
 
-// Set all the voxels in the range to be unfixed
-// Deprecated
-void EsdfOccFiestaIntegrator::resetFixed() {
-  for (int x = range_min_(0); x <= range_max_(0); x++) {
-    for (int y = range_min_(1); y <= range_max_(1); y++) {
-      for (int z = range_min_(2); z <= range_max_(2); z++) {
-        GlobalIndex cur_voxel_idx = GlobalIndex(x, y, z);
-        EsdfVoxel* cur_vox =
-            esdf_layer_->getVoxelPtrByGlobalIndex(cur_voxel_idx);
-        cur_vox->fixed = false;
-      }
-    }
-  }
-}
-
 /* Delete idx from the doubly linked list
  * input:
  * occ_vox: head voxel of the list
@@ -214,29 +197,35 @@ void EsdfOccFiestaIntegrator::insertIntoList(
   }
 }
 
-// Implementation of FIESTA under voxblox's data structure
-// Main processing function of FIESTA
-// Reference: Han. L, et al., Fast Incremental Euclidean Distance Fields for
-// Online Motion Planning of Aerial Robots, IROS 2019 A mapping system called
-// Fiesta is proposed to build global ESDF map incrementally. By introducing two
-// independent updating queues for inserting and deleting obstacles separately,
-// and using Indexing Data Structures and Doubly Linked Lists for map
-// maintenance, our algorithm updates as few as possible nodes using a BFS
-// framework. The ESDF mapping has high computational performance and produces
-// near-optimal results. Code: https://github.com/HKUST-Aerial-Robotics/FIESTA
-//
-// About the patch_on and early_break settings:
-// Fastest operation can be achieved by setting patch_on=false and early_break
-// =true. Highest accuracy can be achieved with patch_on=true and early_break=
-// false. Please set them in the config file wisely.
+/**
+ * Implementation of FIESTA under voxblox's data structure
+ * Reference: Han. L, et al., Fast Incremental Euclidean Distance Fields for
+ * Online Motion Planning of Aerial Robots, IROS 2019.
+ * A mapping system called Fiesta is proposed to build global ESDF map
+ * incrementally from the occupancy grid map. By introducing two
+ * independent updating queues for inserting and deleting obstacles separately,
+ * and using Indexing Data Structures and Doubly Linked Lists for map
+ * maintenance, the algorithm updates as few as possible nodes using a BFS
+ * framework. The ESDF mapping has high computational performance and produces
+ * near-optimal results.
+ * Original Code: https://github.com/HKUST-Aerial-Robotics/FIESTA
+ * The original implementation of FIESTA is actually an unsigned distance field
+ * mapping. We re-implement FIESTA with Voxblox's data structure and enable the
+ * signed distance mapping.
+ *
+ * About the patch_on and early_break settings:
+ * Fastest operation can be achieved by setting patch_on=false and early_break
+ * =true. Highest accuracy can be achieved with patch_on=true and early_break=
+ * false. Please set them in the config file wisely.
+ */
 void EsdfOccFiestaIntegrator::updateESDF() {
   timing::Timer init_timer("update_esdf/fiesta/update_init");
-  // update_queue_ is a priority queue, voxels with the smaller
-  // absolute distance would be updated first
-  // once a voxel is added to update_queue_,
-  // its distance would be fixed and it would act as a seed
-  // for further updating
-
+  /**
+   * update_queue_ is a priority queue, voxels with the smaller
+   * absolute distance would be updated first
+   * once a voxel is added to update_queue_,
+   * its distance would be fixed and it would act as a seed for further updating
+   */
   // Algorithm 2: ESDF Updating Initialization
   while (!insert_list_.empty()) {
     // these inserted list must all in the TSDF fixed band
@@ -317,7 +306,6 @@ void EsdfOccFiestaIntegrator::updateESDF() {
           }
         }
       }
-
       next_vox_idx = temp_vox->prev_idx;
       temp_vox->next_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
       temp_vox->prev_idx = GlobalIndex(UNDEF, UNDEF, UNDEF);
@@ -353,7 +341,6 @@ void EsdfOccFiestaIntegrator::updateESDF() {
     EsdfVoxel* coc_vox =
         esdf_layer_->getVoxelPtrByGlobalIndex(cur_vox->coc_idx);
     CHECK_NOTNULL(coc_vox);
-    // also not very time-consuming
 
     updated_count++;
     total_updated_count_++;
@@ -366,7 +353,6 @@ void EsdfOccFiestaIntegrator::updateESDF() {
     Neighborhood<>::IndexMatrix nbr_voxs_idx;
     Neighborhood<>::getFromGlobalIndex(cur_vox->self_idx, &nbr_voxs_idx);
 #endif
-
     // Algorithm 3 Patch Code
     if (config_.patch_on && cur_vox->newly) {
       // only newly added voxels are required for checking
@@ -392,7 +378,6 @@ void EsdfOccFiestaIntegrator::updateESDF() {
           }
         }
       }
-
       if (change_flag) {
         cur_vox->distance =
             cur_vox->behind ? -cur_vox->distance : cur_vox->distance;
@@ -455,7 +440,6 @@ void EsdfOccFiestaIntegrator::updateESDF() {
   update_timer.Stop();
   // LOG(INFO)<<"Alg 1 done";
   // End of Algorithm 1
-
   if (config_.verbose) {
     LOG(INFO) << "FIESTA: expanding [" << updated_count << "] nodes, with ["
               << patch_count << "] changes by the patch, up-to-now ["
@@ -495,7 +479,7 @@ void EsdfOccFiestaIntegrator::loadDeleteList(
   delete_list_ = delete_list;
 }
 
-// only for the visualization of Esdf error
+// only for the visualization of ESDF error
 void EsdfOccFiestaIntegrator::assignError(
     GlobalIndex vox_idx, float esdf_error) {
   EsdfVoxel* vox = esdf_layer_->getVoxelPtrByGlobalIndex(vox_idx);

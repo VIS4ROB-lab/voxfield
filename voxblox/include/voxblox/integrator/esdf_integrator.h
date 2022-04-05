@@ -19,9 +19,9 @@
 namespace voxblox {
 
 /**
- * Builds an ESDF layer out of a given TSDF layer. For a description of this
- * algorithm, please check the paper of Voxblox at
- * https://arxiv.org/abs/1611.03631
+ * Builds an ESDF layer out of a given TSDF layer.
+ * For a description of this algorithm, please check
+ * the paper of Voxblox (https://arxiv.org/abs/1611.03631)
  */
 class EsdfIntegrator {
  public:

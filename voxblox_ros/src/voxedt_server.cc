@@ -1,5 +1,4 @@
 #include "voxblox_ros/voxedt_server.h"
-
 #include "voxblox_ros/conversions.h"
 #include "voxblox_ros/ros_params.h"
 
@@ -488,7 +487,9 @@ void VoxedtServer::newPoseCallback(const Transformation& T_G_C) {
   // we regard it as the update interval
   if (update_esdf_every_n_ > 0 && frame_count_ != 0 &&
       frame_count_ % update_esdf_every_n_ == 0) {
-    updateEsdf();
+    updateOccFromTsdf();
+    updateEsdfFromOcc();
+    publishOccupancyOccupiedNodes();
     if (publish_slices_)
       publishSlices();
   }

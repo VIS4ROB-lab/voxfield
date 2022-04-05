@@ -20,9 +20,11 @@
 namespace voxblox {
 
 /**
- * Builds an ESDF layer out of a given occupancy layer.
+ * Builds an ESDF layer out of a given occupancy layer efficiently.
+ * For a description of this algorithm, please check
+ * the paper of FIESTA (https://arxiv.org/abs/1903.02144)
  */
-class EsdfOccFiestaIntegrator {  // py: check, maybe not neccessary
+class EsdfOccFiestaIntegrator {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -54,6 +56,7 @@ class EsdfOccFiestaIntegrator {  // py: check, maybe not neccessary
 
     // Turn on the patch code (Algorithm 3 in FIESTA) or not
     bool patch_on = true;
+    // Early break the increasing update or not
     bool early_break = true;
 
     // Local map boundary size (unit: voxel)
@@ -68,26 +71,34 @@ class EsdfOccFiestaIntegrator {  // py: check, maybe not neccessary
 
   void updateFromOccBlocks(const BlockIndexList& occ_blocks);
 
-  void setLocalRange();
-
+  /**
+   * In FIESTA we set a range for the ESDF update.
+   * This range is expanded from the bounding box of the TSDF voxels
+   * get updated during the last time interval
+   */
+  // Get the range of the updated tsdf grid (inserted or deleted)
   void getUpdateRange();
-
-  void resetFixed();
-
-  void updateESDF();
-
-  void deleteFromList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
-
-  void insertIntoList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
-
-  inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-
-  inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-
+  // Expand the updated range with a given margin and then allocate memory
+  void setLocalRange();
+  // Judge if a voxel is in the update range, if not, leave it still
   inline bool voxInRange(GlobalIndex vox_idx);
 
-  void loadInsertList(const GlobalIndexList& insert_list);
+  // main ESDF updating function
+  void updateESDF();
 
+  // basic operations of a doubly linked list
+  // delete operation
+  void deleteFromList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
+  // insert operation
+  void insertIntoList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
+
+  // calculate distance between two voxel centers
+  inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
+  inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
+
+  // Insert list contains the occupied voxels that are previously free
+  void loadInsertList(const GlobalIndexList& insert_list);
+  // Delete list contains the free voxels that are previously occupied
   void loadDeleteList(const GlobalIndexList& delete_list);
 
   void assignError(GlobalIndex vox_idx, float esdf_error);
@@ -113,6 +124,7 @@ class EsdfOccFiestaIntegrator {  // py: check, maybe not neccessary
  protected:
   Config config_;
 
+  // Involved map layers (From Occupancy map to ESDF)
   Layer<OccupancyVoxel>* occ_layer_;
   Layer<EsdfVoxel>* esdf_layer_;
 

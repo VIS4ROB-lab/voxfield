@@ -29,9 +29,14 @@
 namespace voxblox {
 
 /**
- * Base class to the simple, merged and fast TSDF integrators. The integrator
- * takes in a pointcloud + pose and uses this information to update the TSDF
- * information in the given TSDF layer. Note most functions in this class state
+ * Base class to the simple, merged and fast non-projective TSDF integrators.
+ * The integrator takes in a pointcloud + pose and uses this information to
+ * update the TSDF information in the given TSDF layer. Unlike the original
+ * TSDF integrator which use the projective distance casting through the
+ * voxel as an approximation of the Euclidean distance to the surface, this
+ * non-projective TSDF integrator conduct a non-projective correction according
+ * to the signed distance gradient and surface normal vector.
+ * Note most functions in this class state
  * if they are thread safe. Unless explicitly stated otherwise, this thread
  * safety is based on the assumption that any pointers passed to the functions
  * point to objects that are guaranteed to not be accessed by other threads.

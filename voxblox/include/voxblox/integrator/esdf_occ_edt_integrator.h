@@ -19,7 +19,9 @@
 namespace voxblox {
 
 /**
- * Builds an ESDF layer out of a given occupancy layer.
+ * Builds an ESDF layer out of a given occupancy layer efficiently.
+ * For a description of this algorithm, please check
+ * the paper of VDB-EDT (https://arxiv.org/abs/2105.04419)
  */
 class EsdfOccEdtIntegrator {
  public:
@@ -46,11 +48,7 @@ class EsdfOccEdtIntegrator {
     int num_buckets = 20;
 
     // Number of the neighbor voxels (select from 6, 18, 24 and 26)
-    int num_neighbor = 24;
-
-    // Turn on the patch code (Algorithm 3 in FIESTA) or not
-    bool patch_on = true;
-    bool early_break = false;
+    int num_neighbor = 26;
 
     // Local map boundary size (unit: voxel)
     GlobalIndex range_boundary_offset = GlobalIndex(100, 100, 50);
@@ -64,30 +62,32 @@ class EsdfOccEdtIntegrator {
 
   void updateFromOccBlocks(const BlockIndexList& occ_blocks);
 
-  void setLocalRange();
-
+  /**
+   * In EDT we set a range for the ESDF update.
+   * This range is expanded from the bounding box of the TSDF voxels
+   * get updated during the last time interval
+   */
+  // Get the range of the updated tsdf grid (inserted or deleted)
   void getUpdateRange();
-
-  void resetFixed();
-
-  void updateESDF();
-
-  void processRaise(EsdfVoxel* cur_vox);
-
-  void processLower(EsdfVoxel* cur_vox);
-
-  void deleteFromList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
-
-  void insertIntoList(EsdfVoxel* occ_vox, EsdfVoxel* cur_vox);
-
-  inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-
-  inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
-
+  // Expand the updated range with a given margin and then allocate memory
+  void setLocalRange();
+  // Judge if a voxel is in the update range, if not, leave it still
   inline bool voxInRange(GlobalIndex vox_idx);
 
-  void loadInsertList(const GlobalIndexList& insert_list);
+  // main ESDF updating function
+  void updateESDF();
+  // process the raise wavefront (those voxels whose distance would increase)
+  void processRaise(EsdfVoxel* cur_vox);
+  // process the lower wavefront (those voxels whose distance would decrease)
+  void processLower(EsdfVoxel* cur_vox);
 
+  // calculate distance between two voxel centers
+  inline float dist(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
+  inline int distSquare(GlobalIndex vox_idx_a, GlobalIndex vox_idx_b);
+
+  // Insert list contains the occupied voxels that are previously free
+  void loadInsertList(const GlobalIndexList& insert_list);
+  // Delete list contains the free voxels that are previously occupied
   void loadDeleteList(const GlobalIndexList& delete_list);
 
   void assignError(GlobalIndex vox_idx, float esdf_error);
@@ -113,6 +113,7 @@ class EsdfOccEdtIntegrator {
  protected:
   Config config_;
 
+  // Involved map layers (From Occupancy map to ESDF)
   Layer<OccupancyVoxel>* occ_layer_;
   Layer<EsdfVoxel>* esdf_layer_;
 
@@ -135,7 +136,6 @@ class EsdfOccEdtIntegrator {
 
   // for recording and logging
   int total_updated_count_ = 0;
-
   int sum_occ_changed_ = 0;
   int sum_raise_ = 0;
   int sum_lower_ = 0;

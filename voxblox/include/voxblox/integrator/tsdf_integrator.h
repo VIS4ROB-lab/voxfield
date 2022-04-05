@@ -27,19 +27,6 @@
 
 namespace voxblox {
 
-// enum class TsdfIntegratorType : int {
-//   kSimple = 1,
-//   kMerged = 2,
-//   kFast = 3,
-// };
-
-// static constexpr size_t kNumTsdfIntegratorTypes = 3u;
-
-// const std::array<std::string, kNumTsdfIntegratorTypes>
-//     kTsdfIntegratorTypeNames = {{/*kSimple*/ "simple",
-//                                  /*kMerged*/ "merged",
-//                                  /*kFast*/ "fast"}};
-
 /**
  * Base class to the simple, merged and fast TSDF integrators. The integrator
  * takes in a pointcloud + pose and uses this information to update the TSDF

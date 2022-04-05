@@ -534,10 +534,6 @@ inline EsdfOccEdtIntegrator::Config getEsdfEdtIntegratorConfigFromRosParam(
   nh_private.param(
       "local_range_offset_z", range_boundary_offset_z, range_boundary_offset_z);
 
-  // nh_private.param("esdf_euclidean_distance",
-  //                  esdf_integrator_config.full_euclidean_distance,
-  //                  esdf_integrator_config.full_euclidean_distance);
-
   nh_private.param(
       "esdf_max_distance_m", esdf_integrator_config.max_distance_m,
       esdf_integrator_config.max_distance_m);
@@ -554,14 +550,6 @@ inline EsdfOccEdtIntegrator::Config getEsdfEdtIntegratorConfigFromRosParam(
   nh_private.param(
       "num_buckets", esdf_integrator_config.num_buckets,
       esdf_integrator_config.num_buckets);
-
-  nh_private.param(
-      "patch_on", esdf_integrator_config.patch_on,
-      esdf_integrator_config.patch_on);
-
-  nh_private.param(
-      "early_break", esdf_integrator_config.early_break,
-      esdf_integrator_config.early_break);
 
   if (esdf_integrator_config.default_distance_m <
       esdf_integrator_config.max_distance_m) {

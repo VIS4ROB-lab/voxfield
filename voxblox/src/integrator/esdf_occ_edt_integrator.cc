@@ -1,5 +1,6 @@
 #include "voxblox/integrator/esdf_occ_edt_integrator.h"
-// #define DIRECTION_GUIDE  // No direction guide by default
+// No neighborhood directional search by default
+// #define DIRECTION_GUIDE
 
 namespace voxblox {
 
@@ -150,20 +151,20 @@ void EsdfOccEdtIntegrator::setLocalRange() {
   }
 }
 
-// Implementation of VDB-EDT under Voxblox's data structure
-// Main processing function of EDT
-// Reference: Zhu. D, et al., VDB-EDT: An Efficient Euclidean
-// Distance Transform Algorithm Based on VDB Data Structure
-// Code: https://github.com/zhudelong/VDB-EDT
-// VDB's processing speed is about 3 times faster than our voxel hashings
-// Try to invlove VDB's data structure in our own work
-// py: it's better to base your work on voxblox, mainly due to the mesh
-// reconstruction part
-// Similar to FIESTA, but without the dll (so it's kind of slow)
-// So that we do not know which voxels would be affected after some deleting
-// (which is always recorded by the dll)
-// From occ to ESDF
-// need the insert_list and the delete_list
+/**
+ * Implementation of VDB-EDT under Voxblox's data structure
+ * Reference: Zhu. D, et al., VDB-EDT: An Efficient Euclidean
+ * Distance Transform Algorithm Based on VDB Data Structure
+ * Original Code: https://github.com/zhudelong/VDB-EDT
+ * VDB-EDT's contributions are in two folds. The first part is using
+ * the VDB-tree data structure to store the map. The second part is the
+ * efficient update scheduling strategy during ESDF mapping.
+ * To have a fair comparison on ESDF mapping performance, We implement the
+ * second part (the EDT part) with the same voxel hashing-based data
+ * structure as Voxblox.
+ * Similar to FIESTA, EDT integrate ESDF map from the occupancy map,
+ * TSDF map is not involved.
+ */
 void EsdfOccEdtIntegrator::updateESDF() {
   timing::Timer init_timer("upate_esdf/edt/update_init");
   // update_queue_ is a priority queue, voxels with the
@@ -267,7 +268,7 @@ void EsdfOccEdtIntegrator::processRaise(EsdfVoxel* cur_vox) {
 }
 
 void EsdfOccEdtIntegrator::processLower(EsdfVoxel* cur_vox) {
-  // Get the global indices of neighbors.
+  // Get the global indices of neighbors. (26 neighborhood is used)
   Neighborhood<>::IndexMatrix nbr_voxs_idx;
   Neighborhood<>::getFromGlobalIndex(cur_vox->self_idx, &nbr_voxs_idx);
 #ifdef DIRECTION_GUIDE
@@ -356,7 +357,7 @@ inline bool EsdfOccEdtIntegrator::voxInRange(GlobalIndex vox_idx) {
       vox_idx(2) >= range_min_(2) && vox_idx(2) <= range_max_(2));
 }
 
-// only for the visualization of Esdf error
+// only for the visualization of ESDF error
 void EsdfOccEdtIntegrator::assignError(GlobalIndex vox_idx, float esdf_error) {
   EsdfVoxel* vox = esdf_layer_->getVoxelPtrByGlobalIndex(vox_idx);
   vox->error = esdf_error;
