@@ -38,11 +38,4 @@
 
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/kitti_25cm.rviz" />
 
-  <!-- Use the service: rosservice call /voxblox_node/generate_mesh to save the mesh-->
-  <!-- Use the service: rosservice call /voxblox_node/save_map /media/yuepan/SeagateNew/1_data/kitti/map/xxx.vxblx to save the tsdf map-->
-  <!-- Use the service: rosservice call /voxblox_node/save_esdf_map xxx.vxblx to save the esdf map-->
-  <!-- Use the service: rosservice call /voxblox_node/save_occ_map xxx.vxblx to save the occ map-->
-  <!-- Use the service: rosservice call /voxblox_node/save_all_map xxx to save tsdf, esdf, occ maps together-->
-  <!-- Please use the full path instead of ~/xxx/xxx -->
-
 </launch>

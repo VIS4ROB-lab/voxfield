@@ -1,0 +1,17 @@
+# model transformation (switch axis)
+T_C_CH:
+- [ 0.0, 0.0, 1.0, 0.0]
+- [-1.0, 0.0, 0.0, 0.0]
+- [ 0.0,-1.0, 0.0, 0.0]
+- [ 0.0, 0.0, 0.0, 1.0]
+invert_T_C_CH: true
+
+# camera intrinsics
+sensor_is_lidar: false
+width: 640  # Px
+height: 360 # Px
+vx: 321
+vy: 179
+fx: 322
+fy: 322
+smooth_thre_ratio: 0.05

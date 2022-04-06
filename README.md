@@ -13,7 +13,8 @@ If you have installed ROS, set up the catkin workspace and the SSH key for githu
 ```
 cd ~/catkin_ws/src/
 git clone git@github.com:VIS4ROB-lab/voxfield.git
-wstool init . ./voxfield/voxfield_ssh.rosinstall
+wstool init . ./voxfield/voxfield_ssh.rosinstall     # If you created a new workspace
+wstool merge -t . ./voxfield/voxfield_ssh.rosinstall # If you use an existing workspace
 wstool update
 ```
 And then compile Voxfield with:
@@ -30,6 +31,7 @@ For more details, please follow these [instructions](https://voxblox.readthedocs
 - To run the original TSDF mapping and ESDF mapping of Voxblox, use the executables: ```tsdf_server``` and ```voxblox_server```. 
 - To run the ESDF mapping of FIESTA, use the executables: ```fiesta_server```.
 - To run the ESDF mapping of EDT, use the executables: ```voxedt_server```.
+- List of the ros services can be found [here](https://voxblox.readthedocs.io/en/latest/pages/The-Voxblox-Node.html).
 
 ## Example Usage
 ### Run on the Cow & Lady real-world RGB-D dataset
@@ -62,12 +64,14 @@ tar -xvf mai_city.tar.gz
 ```
 roslaunch voxblox_ros mai_voxfield.launch
 ```
-### Run on your own data
+### Run on your own data (TODO)
 
 ### Customizing, comparison and evaluation
 To change the mapping and visualization parameters such as voxel size and truncation distance, please configure the `.yaml` files under `./voxblox_ros/cfg/param/` folder.
 
-For the comparison with other state-of-the-art methods (Voxblox, FIESTA, EDT), set the `bag_file` path in the corresponding launch file `[dataset]_[method].launch` and launch it. 
+For the comparison with other state-of-the-art methods (Voxblox, FIESTA, EDT), set the `bag_file` path in the corresponding launch file `[dataset]_[method].launch` and launch it.
+
+To evaluate the TSDF, mesh and ESDF mapping quality, one first need to use the ros service to save the corresponding map and then use the evaluation code provided [here](https://github.com/VIS4ROB-lab/voxfield-panmap/blob/master/panoptic_mapping_utils/launch/evaluate_panmap.launch).
 
 ### Used for online path planning
 Please check these [instructions](https://voxblox.readthedocs.io/en/latest/pages/Using-Voxblox-for-Planning.html) and the repository [mav_voxblox_planning](https://github.com/ethz-asl/mav_voxblox_planning).

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="play_bag" default="true" />
+  <arg name="speed" default="0.5" />
+  <arg name="bag_file" default="/media/yuepan/SeagateNew/1_data/basement_dataset/basement_dataset.bag"/>
+
+  <!-- Download the dataset here: https://projects.asl.ethz.ch/datasets/doku.php?id=basement2018 -->
+
+  <arg name="robot_model_file" default="$(find voxblox_ros)/cfg/model/hummingbird.mesh"/> 
+
+  <node name="player" pkg="rosbag" type="play" output="screen" args="-r $(arg speed) --clock $(arg bag_file)" if="$(arg play_bag)"/>
+
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxblox_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/velodyne_points" />
+    <rosparam file="$(find voxblox_ros)/cfg/param/basement_param.yaml"/>
+    <rosparam file="$(find voxblox_ros)/cfg/calib/basement_calib.yaml"/>
+    <param name="robot_model_file" value="$(arg robot_model_file)"/>
+  </node>
+
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find voxblox_ros)/cfg/rviz/basement_10cm.rviz" />
+
+</launch>

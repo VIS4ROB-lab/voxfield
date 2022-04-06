@@ -169,7 +169,7 @@ struct Color {
 
 // Constants used across the library.
 constexpr FloatingPoint kEpsilon = 1e-6; /**< Used for coordinates. */
-constexpr float kFloatEpsilon = 1e-6;    /**< Used for weights. */
+constexpr float kFloatEpsilon = 1e-8;    /**< Used for weights. */
 constexpr int kKITTIMaxIntstance = 1000;
 /**< Used for assign an unqiue panoptic label. */  // NOLINT
 

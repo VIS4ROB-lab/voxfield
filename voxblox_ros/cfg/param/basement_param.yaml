@@ -1,5 +1,5 @@
 # Map 
-voxel_size: &voxel_size 0.05
+voxel_size: &voxel_size 0.1
 voxels_per_side_in_block: &voxels_per_side_in_block 8
 
 occ_voxel_size: *voxel_size
@@ -11,18 +11,18 @@ tsdf_voxels_per_side: *voxels_per_side_in_block
 esdf_voxel_size: *voxel_size
 esdf_voxels_per_side: *voxels_per_side_in_block
 
-truncation_distance: -2.0
+truncation_distance: -3.0
 
 # TSDF integration
 method: fast # select from simple, fast and merged
-merge_with_clear: false
-max_ray_length_m: 5.0
-min_ray_length_m: 0.1
+merge_with_clear: true
+max_ray_length_m: 10.0
+min_ray_length_m: 1.0
 integration_threads: 6
 normal_available: true
 use_const_weight: false
 use_weight_dropoff: true
-weight_reduction_exp: 2.0
+weight_reduction_exp: 1.0
 curve_assumption: true
 reliable_band_ratio: 2.0
 reliable_normal_ratio_thre: 0.05
@@ -30,9 +30,9 @@ reliable_normal_ratio_thre: 0.05
 # ESDF integration
 local_range_offset_x: 20
 local_range_offset_y: 20
-local_range_offset_z: 10
-esdf_default_distance_m: 2.0
-max_behind_surface_m: 0.2 # should be larger than truncation_distance
+local_range_offset_z: 5
+esdf_default_distance_m: 2.5
+max_behind_surface_m: 0.5 # should be larger than truncation_distance
 num_buckets: 50
 patch_on: true
 early_break: true
@@ -48,18 +48,20 @@ threshold_min: 0.12
 threshold_max: 0.97
 threshold_occupancy: 0.7
 
-# State estimation
-enable_icp: false
-icp_iterations: 10
-use_tf_transforms: false
+# State estimation 
+enable_icp: true
+icp_refine_roll_pitch: false
+icp_iterations: 15
+use_tf_transforms: true
 world_frame: world
+sensor_frame: velodyne
 
 # Timer
 # if set as a negative value, it means the frame interval for the processing
 # for example -5.0 means conduct the operation per 5 frames
 update_mesh_every_n_sec: 0.5
-update_esdf_every_n_sec: 0.2
-publish_map_every_n_sec: 1.0
+update_esdf_every_n_sec: 0.5
+publish_map_every_n_sec: 0.5
 eval_esdf_every_n_sec: 0.0
 min_time_between_msgs_sec: 0.0
 
@@ -71,8 +73,8 @@ publish_traversable: false
 publish_pointclouds: false
 publish_slices: true
 publish_robot_model: true
-slice_level: 1.0
-robot_model_scale: 2.0
+slice_level: 0.3
+robot_model_scale: 1.0
 
 # Logging
 verbose: false

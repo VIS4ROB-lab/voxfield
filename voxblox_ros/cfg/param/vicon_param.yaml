@@ -1,6 +1,6 @@
 # Map 
-voxel_size: &voxel_size 0.05
-voxels_per_side_in_block: &voxels_per_side_in_block 8
+voxel_size: &voxel_size 0.1
+voxels_per_side_in_block: &voxels_per_side_in_block 16
 
 occ_voxel_size: *voxel_size
 occ_voxels_per_side: *voxels_per_side_in_block
@@ -14,8 +14,8 @@ esdf_voxels_per_side: *voxels_per_side_in_block
 truncation_distance: -2.0
 
 # TSDF integration
-method: fast # select from simple, fast and merged
-merge_with_clear: false
+method: merged # select from simple, fast and merged
+merge_with_clear: true
 max_ray_length_m: 5.0
 min_ray_length_m: 0.1
 integration_threads: 6

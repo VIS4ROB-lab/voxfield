@@ -354,8 +354,9 @@ void NpTsdfIntegratorBase::updateTsdfVoxel(
     // close to the surface
     if (config_.normal_available) {
       // only update the gradient close to the surface
-      if (normal_G.norm() > kFloatEpsilon)
+      if (normal_G.norm() > kFloatEpsilon) {
         updateTsdfVoxelGradient(tsdf_voxel, normal_G, weight);
+      }
     }
     // blend color
     updateTsdfVoxelValue(tsdf_voxel, sdf, weight, &color);
@@ -608,7 +609,7 @@ void MergedNpTsdfIntegrator::integrateVoxel(
   }
 
   const Point merged_point_G = T_G_C * merged_point_C;
-  const Ray merged_normal_G = T_G_C * merged_normal_C;
+  const Ray merged_normal_G = T_G_C.getRotationMatrix() * merged_normal_C;
 
   RayCaster ray_caster(
       origin, merged_point_G, clearing_ray, config_.voxel_carving_enabled,

@@ -12,7 +12,7 @@
   <node name="player" pkg="rosbag" type="play" output="screen" args=" -r $(arg speed) --clock $(arg bag_file)"  if="$(arg play_bag)"/>
   
   <!-- Run voxblox_node-->
-  <node name="voxblox_node" pkg="voxblox_ros" type="voxfield_server" output="screen" args="-alsologtostderr" clear_params="true">
+  <node name="voxblox_node" pkg="voxblox_ros" type="voxedt_server" output="screen" args="-alsologtostderr" clear_params="true">
     <remap from="pointcloud" to="/velodyne_points" />
     <rosparam file="$(find voxblox_ros)/cfg/param/mai_param.yaml"/>
     <rosparam file="$(find voxblox_ros)/cfg/calib/mai_calib.yaml"/>

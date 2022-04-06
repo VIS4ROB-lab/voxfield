@@ -3,7 +3,7 @@
 #include <gflags/gflags.h>
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "voxblox");
+  ros::init(argc, argv, "voxfield");
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, false);
   google::InstallFailureSignalHandler();
