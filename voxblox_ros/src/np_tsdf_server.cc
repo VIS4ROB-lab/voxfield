@@ -543,7 +543,7 @@ void NpTsdfServer::publishAllUpdatedTsdfVoxels() {
   // Create a pointcloud with gradient direction = intensity.
   pcl::PointCloud<pcl::PointXYZI> pointcloud_g;
   createGradientPointcloudFromTsdfLayer(
-      tsdf_map_->getTsdfLayer(), 2, slice_level_, &pointcloud_g);
+      tsdf_map_->getTsdfLayer(), &pointcloud_g);
   pointcloud_g.header.frame_id = world_frame_;
   gsdf_pointcloud_pub_.publish(pointcloud_g);
 }
@@ -579,7 +579,7 @@ void NpTsdfServer::publishSlices() {
   createGradientPointcloudFromTsdfLayerSlice(
       tsdf_map_->getTsdfLayer(), 2, slice_level_, &pointcloud_g);
   pointcloud_g.header.frame_id = world_frame_;
-  tsdf_slice_pub_.publish(pointcloud_g);
+  gsdf_slice_pub_.publish(pointcloud_g);
 }
 
 void NpTsdfServer::publishMap(bool reset_remote_map) {

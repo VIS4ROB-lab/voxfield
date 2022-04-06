@@ -128,14 +128,13 @@ void VoxfieldServer::publishAllUpdatedEsdfVoxels() {
 }
 
 void VoxfieldServer::publishSlices() {
+  // publish TSDF and gradient slices
   NpTsdfServer::publishSlices();
 
+  // publish ESDF slices
   pcl::PointCloud<pcl::PointXYZI> pointcloud;
-
-  constexpr int kZAxisIndex = 2;
   createDistancePointcloudFromEsdfLayerSlice(
-      esdf_map_->getEsdfLayer(), kZAxisIndex, slice_level_, &pointcloud);
-
+      esdf_map_->getEsdfLayer(), 2, slice_level_, &pointcloud);
   pointcloud.header.frame_id = world_frame_;
   esdf_slice_pub_.publish(pointcloud);
 }

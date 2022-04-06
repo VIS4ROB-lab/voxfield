@@ -186,7 +186,7 @@ class NpTsdfServer {
   ros::Publisher gsdf_pointcloud_pub_;
   ros::Publisher surface_pointcloud_pub_;
   ros::Publisher tsdf_slice_pub_;
-  ros::Publisher psdf_slice_pub_;
+  ros::Publisher gsdf_slice_pub_;
   ros::Publisher occupancy_marker_pub_;
   ros::Publisher icp_transform_pub_;
   ros::Publisher robot_model_pub_;

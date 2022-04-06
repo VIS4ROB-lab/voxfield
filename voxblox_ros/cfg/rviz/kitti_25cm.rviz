@@ -4,7 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded: ~
-      Splitter Ratio: 0.5
+      Splitter Ratio: 0.7023121118545532
     Tree Height: 736
   - Class: rviz/Selection
     Name: Selection
@@ -110,6 +110,36 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: false
+    - Alpha: 0.5
+      Autocompute Intensity Bounds: false
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 3.1252901554107666
+      Min Color: 0; 0; 0
+      Min Intensity: -3.139755964279175
+      Name: Signed distance gradient
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.25
+      Style: Flat Squares
+      Topic: /voxblox_node/gsdf_slice
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
     - Class: voxblox_rviz_plugin/VoxbloxMesh
       Enabled: true
       Name: VoxbloxMesh
@@ -150,7 +180,7 @@ Visualization Manager:
       Marker Topic: /voxblox_node/Robot_model
       Name: Robot Car
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -181,16 +211,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 91.23442077636719
+      Distance: 84.62247467041016
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 3.430224657058716
-        Y: 6.628336429595947
-        Z: 0.0734705701470375
+        X: 6.060184955596924
+        Y: 5.618809700012207
+        Z: 0.07090748846530914
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -217,5 +247,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1853
-  X: 67
-  Y: 27
+  X: 360
+  Y: 174

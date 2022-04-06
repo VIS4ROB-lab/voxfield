@@ -15,7 +15,7 @@ truncation_distance: -3.0
 
 # TSDF integration
 method: merged # select from simple, fast and merged
-merge_with_clear: false
+merge_with_clear: true
 max_ray_length_m: 50.0
 min_ray_length_m: 1.5
 integration_threads: 6
