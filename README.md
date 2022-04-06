@@ -26,7 +26,7 @@ To avoid the potential conflict, if the original voxblox was installed, it's bet
 For more details, please follow these [instructions](https://voxblox.readthedocs.io/en/latest/pages/Installation.html).
 
 ## Instructions
-- To run the non-projective TSDF mapping and ESDF mapping of Voxfield, use the executables: ```np_tsdf_server``` and ```voxfield_server```. 
+- To run the non-projective TSDF mapping and ESDF mapping of the proposed Voxfield, use the executables: ```np_tsdf_server``` and ```voxfield_server```. 
 - To run the original TSDF mapping and ESDF mapping of Voxblox, use the executables: ```tsdf_server``` and ```voxblox_server```. 
 - To run the ESDF mapping of FIESTA, use the executables: ```fiesta_server```.
 - To run the ESDF mapping of EDT, use the executables: ```voxedt_server```.
@@ -43,16 +43,34 @@ wget http://robotics.ethz.ch/~asl-datasets/iros_2017_voxblox/voxblox_cow_extras.
 ```
 roslaunch voxblox_ros cow_voxfield.launch
 ```
-4. For the comparison with other methods (Voxblox, FIESTA, EDT), set the `bag_file` path in the corresponding launch file (such as `cow_voxblox.launch`) and launch it. 
-To change the mapping and visualization parameters such as voxel size and truncation distance, please configure the file `./voxblox_ros/cfg/param/cow_param.yaml`.
+### Run on the KITTI real-world LiDAR or stereo dataset
+1. Download the full dataset [here](http://www.cvlibs.net/datasets/kitti/eval_odometry.php) or a rosbag of sequence07 [here](https://drive.google.com/file/d/1_qUfwUw88rEKitUpt1kjswv7Cv4GPs0b/view).
+Then use the [kitti_to_rosbag](https://github.com/ethz-asl/kitti_to_rosbag) package to convert the full dataset to rosbags.
+2. Set the `bag_file` path in the launch files `./voxblox_ros/launch/voxfield_launch/kitti_voxfield.launch` to the path storing the KITTI bag file.
+3. Run Voxfield mapping on the KITTI dataset:
+```
+roslaunch voxblox_ros kitti_voxfield.launch
+```
+### Run on the MaiCity synthetic LiDAR dataset
+1. Download the dataset [here](https://www.ipb.uni-bonn.de/data/mai-city-dataset/) or use the following command in a target folder:
+```
+wget https://www.ipb.uni-bonn.de/html/projects/mai_city/mai_city.tar.gz
+tar -xvf mai_city.tar.gz
+```
+2. Set the `bag_file` path in the launch files `./voxblox_ros/launch/voxfield_launch/mai_voxfield.launch` to the path storing the MaiCity bag file.
+3. Run Voxfield mapping on the MaiCity dataset:
+```
+roslaunch voxblox_ros mai_voxfield.launch
+```
+### Run on your own data
 
-### Run on the KITTI dataset
+### Customizing, comparison and evaluation
+To change the mapping and visualization parameters such as voxel size and truncation distance, please configure the `.yaml` files under `./voxblox_ros/cfg/param/` folder.
 
-### Run on the MaiCity dataset
+For the comparison with other state-of-the-art methods (Voxblox, FIESTA, EDT), set the `bag_file` path in the corresponding launch file `[dataset]_[method].launch` and launch it. 
 
-### Run on your own dataset
-
-### Used for path planning
+### Used for online path planning
+Please check these [instructions](https://voxblox.readthedocs.io/en/latest/pages/Using-Voxblox-for-Planning.html) and the repository [mav_voxblox_planning](https://github.com/ethz-asl/mav_voxblox_planning).
 
 ## Acknowledgments
 We thanks greatly for the authors of the following opensource projects: 

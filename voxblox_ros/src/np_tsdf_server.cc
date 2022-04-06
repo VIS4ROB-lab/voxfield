@@ -49,11 +49,16 @@ NpTsdfServer::NpTsdfServer(
   tsdf_pointcloud_pub_ =
       nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
           "tsdf_pointcloud", 1, true);
+  gsdf_pointcloud_pub_ =
+      nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
+          "gsdf_pointcloud", 1, true);
   occupancy_marker_pub_ =
       nh_private_.advertise<visualization_msgs::MarkerArray>(
           "occupied_nodes", 1, true);
   tsdf_slice_pub_ = nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
       "tsdf_slice", 1, true);
+  gsdf_slice_pub_ = nh_private_.advertise<pcl::PointCloud<pcl::PointXYZI> >(
+      "gsdf_slice", 1, true);
 
   nh_private_.param(
       "pointcloud_queue_size", pointcloud_queue_size_, pointcloud_queue_size_);
@@ -530,16 +535,20 @@ void NpTsdfServer::integratePointcloud(
 
 void NpTsdfServer::publishAllUpdatedTsdfVoxels() {
   // Create a pointcloud with distance = intensity.
-  pcl::PointCloud<pcl::PointXYZI> pointcloud;
-
-  createDistancePointcloudFromTsdfLayer(tsdf_map_->getTsdfLayer(), &pointcloud);
-
-  pointcloud.header.frame_id = world_frame_;
-  tsdf_pointcloud_pub_.publish(pointcloud);
+  pcl::PointCloud<pcl::PointXYZI> pointcloud_d;
+  createDistancePointcloudFromTsdfLayer(
+      tsdf_map_->getTsdfLayer(), &pointcloud_d);
+  pointcloud_d.header.frame_id = world_frame_;
+  tsdf_pointcloud_pub_.publish(pointcloud_d);
+  // Create a pointcloud with gradient direction = intensity.
+  pcl::PointCloud<pcl::PointXYZI> pointcloud_g;
+  createGradientPointcloudFromTsdfLayer(
+      tsdf_map_->getTsdfLayer(), 2, slice_level_, &pointcloud_g);
+  pointcloud_g.header.frame_id = world_frame_;
+  gsdf_pointcloud_pub_.publish(pointcloud_g);
 }
 
 void NpTsdfServer::publishTsdfSurfacePoints() {
-  // Create a pointcloud with distance = intensity.
   pcl::PointCloud<pcl::PointXYZRGB> pointcloud;
   const float surface_distance_thresh =
       tsdf_map_->getTsdfLayer().voxel_size() * 0.75;
@@ -551,21 +560,26 @@ void NpTsdfServer::publishTsdfSurfacePoints() {
 }
 
 void NpTsdfServer::publishTsdfOccupiedNodes() {
-  // Create a pointcloud with distance = intensity.
   visualization_msgs::MarkerArray marker_array;
   createOccupancyBlocksFromTsdfLayer(
       tsdf_map_->getTsdfLayer(), world_frame_, &marker_array);
   occupancy_marker_pub_.publish(marker_array);
 }
 
+// Publish not only the tsdf value but also the signe distance
+// gradient direction
 void NpTsdfServer::publishSlices() {
-  pcl::PointCloud<pcl::PointXYZI> pointcloud;
-
+  pcl::PointCloud<pcl::PointXYZI> pointcloud_d;
   createDistancePointcloudFromTsdfLayerSlice(
-      tsdf_map_->getTsdfLayer(), 2, slice_level_, &pointcloud);
+      tsdf_map_->getTsdfLayer(), 2, slice_level_, &pointcloud_d);
+  pointcloud_d.header.frame_id = world_frame_;
+  tsdf_slice_pub_.publish(pointcloud_d);
 
-  pointcloud.header.frame_id = world_frame_;
-  tsdf_slice_pub_.publish(pointcloud);
+  pcl::PointCloud<pcl::PointXYZI> pointcloud_g;
+  createGradientPointcloudFromTsdfLayerSlice(
+      tsdf_map_->getTsdfLayer(), 2, slice_level_, &pointcloud_g);
+  pointcloud_g.header.frame_id = world_frame_;
+  tsdf_slice_pub_.publish(pointcloud_g);
 }
 
 void NpTsdfServer::publishMap(bool reset_remote_map) {
