@@ -1,12 +1,30 @@
 # Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction
 
-This repository implements Voxfield, an improved version of the volumetric mapping framework [**Voxblox**](https://github.com/ethz-asl/voxblox) on both the mapping accuracy and efficiency. 
-It is based on the original [**Voxblox**](https://github.com/ethz-asl/voxblox) implementation, with the additional capacity of a non-projective TSDF integration and an efficient ESDF integration based on TSDF map.
+![Pipeline](./docs/assets/pipeline.png)
 
-Voxfield has also been integrated into a multi-resolution panoptic mapping framework [**Panmap**](https://github.com/VIS4ROB-lab/voxfield-panmap) for high-fidelity large-scale semantic reconstruction.
+This repository implements Voxfield, an improved version of the volumetric mapping framework [**Voxblox**](https://github.com/ethz-asl/voxblox) on both the mapping accuracy and efficiency. 
+Voxfield is built based on the original [**Voxblox**](https://github.com/ethz-asl/voxblox) implementation, with the additional capacity of a non-projective TSDF integration and an efficient ESDF integration based on TSDF map. The constructed TSDF and ESDF map can be used for 3D reconstruction and robot path planning in real-time.
+
+This repository also provides the implementation of other state-of-the-art methods ([Voxblox](https://arxiv.org/abs/1611.03631), [FIESTA](https://arxiv.org/abs/1903.02144), [EDT](https://arxiv.org/abs/2105.04419)) on this task. A comparison of these methods' workflow are shown below.
+
+![Pipeline](./docs/assets/comparison.png)
+
+Voxfield can be also seamlessly integrated into those projects that originally use Voxblox as their volumetric mapping backbone. We provide an example on a multi-resolution panoptic mapping framework [**Panmap**](https://github.com/VIS4ROB-lab/voxfield-panmap) for high-fidelity large-scale semantic reconstruction.
 
 ## Paper and Video (TBA)
-[**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be)
+This repository represents the official implementation of the paper:
+
+------
+
+**Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction**
+
+*Yue Pan*, *Yves Kompis*, *Luca Bartolomei*, *Ruben Mascaro*, *Margarita Chli*
+
+[ETH Zurich](https://v4rl.ethz.ch/)
+
+------
+
+[**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be) | **paper** | **thesis report**
 
 ## Installation
 If you have installed ROS, set up the catkin workspace and the SSH key for github, you can use the following commands to install Voxfield:
@@ -75,6 +93,15 @@ To evaluate the TSDF, mesh and ESDF mapping quality, one first need to use the r
 
 ### Used for online path planning
 Please check these [instructions](https://voxblox.readthedocs.io/en/latest/pages/Using-Voxblox-for-Planning.html) and the repository [mav_voxblox_planning](https://github.com/ethz-asl/mav_voxblox_planning).
+
+### Replace Voxblox in your high-level volumetric mapping project
+
+- [Panmap](https://github.com/VIS4ROB-lab/voxfield-panmap) (Multi-resolution panoptic mapping)
+- Kimera (Semantic-metric mapping)
+- Voxgraph (Global consistent mapping)
+- ... ...
+
+## Contact (TBA)
 
 ## Acknowledgments
 We thanks greatly for the authors of the following opensource projects: 
