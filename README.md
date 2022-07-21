@@ -1,4 +1,4 @@
----
+
 This repository represents the official implementation of the paper:
 
 ## Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction
