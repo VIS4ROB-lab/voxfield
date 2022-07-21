@@ -1,6 +1,17 @@
-# Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction
+---
+This repository represents the official implementation of the paper:
+
+## Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction
+
+*Yue Pan*, *Yves Kompis*, *Luca Bartolomei*, *Ruben Mascaro*, *Cyrill Stachniss*, *Margarita Chli*
+
+[ETH Zurich](https://v4rl.ethz.ch/) | [University of Bonn](https://www.ipb.uni-bonn.de/)
+
+[**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be) | **paper** | **thesis report**
 
 ![Pipeline](./docs/assets/pipeline.png)
+
+---
 
 This repository implements Voxfield, an improved version of the volumetric mapping framework [**Voxblox**](https://github.com/ethz-asl/voxblox) on both the mapping accuracy and efficiency. 
 Voxfield is built based on the original [**Voxblox**](https://github.com/ethz-asl/voxblox) implementation, with the additional capacity of a non-projective TSDF integration and an efficient ESDF integration based on TSDF map. The constructed TSDF and ESDF map can be used for 3D reconstruction and robot path planning in real-time.
@@ -11,20 +22,6 @@ This repository also provides the implementation of other state-of-the-art metho
 
 Voxfield can be also seamlessly integrated into those projects that originally use Voxblox as their volumetric mapping backbone. We provide an example on a multi-resolution panoptic mapping framework [**Panmap**](https://github.com/VIS4ROB-lab/voxfield-panmap) for high-fidelity large-scale semantic reconstruction.
 
-## Paper and Video (TBA)
-This repository represents the official implementation of the paper:
-
-------
-
-**Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction**
-
-*Yue Pan*, *Yves Kompis*, *Luca Bartolomei*, *Ruben Mascaro*, *Margarita Chli*
-
-[ETH Zurich](https://v4rl.ethz.ch/)
-
-------
-
-[**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be) | **paper** | **thesis report**
 
 ## Installation
 If you have installed ROS, set up the catkin workspace and the SSH key for github, you can use the following commands to install Voxfield:
@@ -101,7 +98,16 @@ Please check these [instructions](https://voxblox.readthedocs.io/en/latest/pages
 - Voxgraph (Global consistent mapping)
 - ... ...
 
-## Contact (TBA)
+## Citation
+If you find this code useful for your work or use it in your project, please consider citing the paper:
+```
+@inproceedings{pan2022iros,
+  title={Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction},
+  author={Yue Pan, Yves Kompis, Luca Bartolomei, Ruben Mascaro, Cyrill Stachniss, Margarita Chli},
+  booktitle={Proceedings of the IEEE/RSJ Int. Conf. on Intelligent Robots and Systems (IROS)},
+  year={2022}
+}
+```
 
 ## Acknowledgments
 We thanks greatly for the authors of the following opensource projects: 
