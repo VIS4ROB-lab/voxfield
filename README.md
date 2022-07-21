@@ -9,7 +9,7 @@ This repository represents the official implementation of the paper:
 
 [**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be) | **paper** | **thesis report**
 
-![Pipeline](./docs/assets/pipeline.png)
+![Pipeline](./docs/assets/pipeline-voxfield.png)
 
 ---
 
