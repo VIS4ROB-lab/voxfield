@@ -20,7 +20,7 @@ Voxfield is built based on the original [**Voxblox**](https://github.com/ethz-as
 
 This repository also provides the implementation of other state-of-the-art methods ([Voxblox](https://arxiv.org/abs/1611.03631), [FIESTA](https://arxiv.org/abs/1903.02144), [EDT](https://arxiv.org/abs/2105.04419)) on this task. A comparison of these methods' workflow are shown below.
 
-![Pipeline](./docs/assets/comparison.png){:height="80%" width="80%"}
+![Pipeline](./docs/assets/comparison.png)
 
 Voxfield can be also seamlessly integrated into those projects that originally use Voxblox as their volumetric mapping backbone. We provide an example on a multi-resolution panoptic mapping framework [**Panmap**](https://github.com/VIS4ROB-lab/voxfield-panmap) for high-fidelity large-scale semantic reconstruction.
 
