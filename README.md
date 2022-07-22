@@ -39,7 +39,7 @@ And then compile Voxfield with:
 
 ```
 cd ~/catkin_ws/src/
-catkin build voxfield_ros
+catkin build voxblox_ros
 ```
 
 To avoid the potential conflict, if the original voxblox was installed, it's better to remove voxblox from `catkin_ws/src`.
@@ -69,7 +69,7 @@ wget http://robotics.ethz.ch/~asl-datasets/iros_2017_voxblox/voxblox_cow_extras.
 3. Run Voxfield mapping on the Cow & Lady dataset:
 
 ```
-roslaunch voxfield_ros cow_voxfield.launch
+roslaunch voxblox_ros cow_voxfield.launch
 ```
 
 ### Run on the KITTI real-world LiDAR or stereo dataset
@@ -80,7 +80,7 @@ roslaunch voxfield_ros cow_voxfield.launch
 3. Run Voxfield mapping on the KITTI dataset:
 
 ```
-roslaunch voxfield_ros kitti_voxfield.launch
+roslaunch voxblox_ros kitti_voxfield.launch
 ```
 
 ### Run on the MaiCity synthetic LiDAR dataset
@@ -96,7 +96,7 @@ tar -xvf mai_city.tar.gz
 3. Run Voxfield mapping on the MaiCity dataset:
 
 ```
-roslaunch voxfield_ros mai_voxfield.launch
+roslaunch voxblox_ros mai_voxfield.launch
 ```
 
 ### Run on your own data (TBA)
