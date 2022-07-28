@@ -6,7 +6,7 @@ This repository represents the official implementation of the paper:
 
 [ETH Zurich](https://v4rl.ethz.ch/) | [University of Bonn](https://www.ipb.uni-bonn.de/)
 
-[**1-min demo video**](https://www.youtube.com/watch?v=QbH1aT3zAvs&feature=youtu.be) | **paper** | **thesis report**
+[**1-min demo video**](https://youtu.be/sPNzTOLqb2I) | [**paper**](https://www.research-collection.ethz.ch/handle/20.500.11850/560719) | **report**
 
 
 ![Pipeline](./docs/assets/pipeline-voxfield.png)
