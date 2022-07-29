@@ -1,6 +1,6 @@
 This repository represents the official implementation of the paper:
 
-## Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction
+## Voxfield: Non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction
 
 *Yue Pan*, *Yves Kompis*, *Luca Bartolomei*, *Ruben Mascaro*, *Cyrill Stachniss*, *Margarita Chli*
 
@@ -126,7 +126,7 @@ If you find this code useful for your work or use it in your project, please con
 
 ```
 @inproceedings{pan2022iros,
-  title={Voxfield: non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction},
+  title={Voxfield: Non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction},
   author={Yue Pan, Yves Kompis, Luca Bartolomei, Ruben Mascaro, Cyrill Stachniss, Margarita Chli},
   booktitle={Proceedings of the IEEE/RSJ Int. Conf. on Intelligent Robots and Systems (IROS)},
   year={2022}
