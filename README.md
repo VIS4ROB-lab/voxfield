@@ -4,7 +4,7 @@ This repository represents the official implementation of the paper:
 
 *Yue Pan*, *Yves Kompis*, *Luca Bartolomei*, *Ruben Mascaro*, *Cyrill Stachniss*, *Margarita Chli*
 
-[ETH Zurich](https://v4rl.ethz.ch/) | [University of Bonn](https://www.ipb.uni-bonn.de/)
+[ETH Zurich](https://asl.ethz.ch/v4rl.html) | [University of Bonn](https://www.ipb.uni-bonn.de/)
 
 [**1-min demo video**](https://youtu.be/sPNzTOLqb2I) | [**paper**](https://www.research-collection.ethz.ch/handle/20.500.11850/560719) | **report**
 
@@ -127,7 +127,7 @@ If you find this code useful for your work or use it in your project, please con
 ```
 @inproceedings{pan2022iros,
   title={Voxfield: Non-Projective Signed Distance Fields for Online Planning and 3D Reconstruction},
-  author={Yue Pan, Yves Kompis, Luca Bartolomei, Ruben Mascaro, Cyrill Stachniss, Margarita Chli},
+  author={Yue Pan and Yves Kompis and Luca Bartolomei and Ruben Mascaro and Cyrill Stachniss and Margarita Chli},
   booktitle={Proceedings of the IEEE/RSJ Int. Conf. on Intelligent Robots and Systems (IROS)},
   year={2022}
 }
