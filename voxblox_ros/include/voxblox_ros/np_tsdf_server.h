@@ -148,7 +148,9 @@ class NpTsdfServer {
       const Pointcloud& points_C, const Colors& colors,
       cv::Mat& vertex_map,          // NOLINT
       cv::Mat& depth_image,         // NOLINT
-      cv::Mat& color_image) const;  // NOLINT
+      cv::Mat& color_image,         // NOLINT
+      float min_z,            // NOLINT
+      float min_d) const;         // NOLINT
   float projectPointToImageLiDAR(const Point& p_C, int* u, int* v) const;
   bool projectPointToImageCamera(const Point& p_C, int* u, int* v) const;
   cv::Mat computeNormalImage(
@@ -340,6 +342,10 @@ class NpTsdfServer {
   float fov_down_;
   float fov_down_rad_;
   float fov_rad_;
+
+  // For preprocessing noise filter (mianly for KITTI)
+  float min_dist_ = 0.1f; // 2.75 for KITTI
+  float min_z_ = -1000.0f;// -3.0 for KITTI
 
   size_t frame_count_ = 0;
 };

@@ -201,6 +201,10 @@ void NpTsdfServer::getServerConfigFromRosParam(
   nh_private_.param("height", height_, height_);
   nh_private_.param(
       "smooth_thre_ratio", smooth_thre_ratio_, smooth_thre_ratio_);
+  nh_private_.param(
+      "min_z", min_z_, min_z_);
+  nh_private_.param(
+      "min_dist", min_dist_, min_dist_);
 
   if (sensor_is_lidar_) {
     nh_private_.param("fov_up", fov_up_, fov_up_);
@@ -313,12 +317,13 @@ void NpTsdfServer::processPointCloudMessageAndInsert(
   cv::Mat depth_image(vertex_map.size(), CV_32FC1, -1.0);
   cv::Mat color_image = cv::Mat::zeros(vertex_map.size(), CV_8UC3);
   projectPointCloudToImage(
-      points_C, colors, vertex_map, depth_image, color_image);
+      points_C, colors, vertex_map, depth_image, color_image, min_z_, min_dist_);
   cv::Mat normal_image = computeNormalImage(vertex_map, depth_image);
   // Back project to point cloud from range images
   points_C = extractPointCloud(vertex_map, depth_image);
   normals_C = extractNormals(normal_image, depth_image);
   colors = extractColors(color_image, depth_image);
+  
   range_pre_timer.Stop();
 
   // ICP based pose refinement
@@ -786,7 +791,9 @@ bool NpTsdfServer::projectPointCloudToImage(
     const Pointcloud& points_C, const Colors& colors,
     cv::Mat& vertex_map,   // corresponding point // NOLINT
     cv::Mat& depth_image,  // Float depth image (CV_32FC1). // NOLINT
-    cv::Mat& color_image) const {
+    cv::Mat& color_image,
+    float min_z, 
+    float min_d) const {
   // TODO(py): consider to calculate in parallel to speed up
   for (size_t i = 0; i < points_C.size(); i++) {
     int u, v;
@@ -795,7 +802,7 @@ bool NpTsdfServer::projectPointCloudToImage(
       depth = projectPointToImageLiDAR(points_C[i], &u, &v);
     else
       depth = projectPointToImageCamera(points_C[i], &u, &v);
-    if (depth > 0.0) {
+    if (depth > min_d && points_C[i].z() > min_z) {
       float old_depth = depth_image.at<float>(v, u);
       // save only nearest point for each pixel
       if (old_depth <= 0.0 || old_depth > depth) {
@@ -822,7 +829,7 @@ float NpTsdfServer::projectPointToImageLiDAR(
       std::sqrt(p_C.x() * p_C.x() + p_C.y() * p_C.y() + p_C.z() * p_C.z());
   float yaw = std::atan2(p_C.y(), p_C.x());
   float pitch = std::asin(p_C.z() / depth);
-  // projections in im coor (percentage)
+  // projections in image coordinates (percentage)
   float proj_x = 0.5 * (yaw / M_PI + 1.0);
   float proj_y = 1.0 - (pitch - fov_down_rad_) / fov_rad_;
   // scale to image size

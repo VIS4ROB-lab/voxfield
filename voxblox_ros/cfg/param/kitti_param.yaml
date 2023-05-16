@@ -11,21 +11,24 @@ tsdf_voxels_per_side: *voxels_per_side_in_block
 esdf_voxel_size: *voxel_size
 esdf_voxels_per_side: *voxels_per_side_in_block
 
-truncation_distance: -3.0
+truncation_distance: -4.0
 
 # TSDF integration
 method: merged # select from simple, fast and merged
 merge_with_clear: true
-max_ray_length_m: 50.0
-min_ray_length_m: 1.5
+max_ray_length_m: 45.0
+min_ray_length_m: 2.75
 integration_threads: 6
 normal_available: true
 use_const_weight: false
 use_weight_dropoff: true
 weight_reduction_exp: 1.0
 curve_assumption: true
-reliable_band_ratio: 2.0
+reliable_band_ratio: 3.0
 reliable_normal_ratio_thre: 0.05
+min_z: -2.5
+min_dist: 2.75
+
 
 # ESDF integration
 local_range_offset_x: 20
@@ -59,13 +62,13 @@ sensor_frame: velodyne
 # if set as a negative value, it means the frame interval for the processing
 # for example -5.0 means conduct the operation per 5 frames
 update_mesh_every_n_sec: 0.5
-update_esdf_every_n_sec: 0.5
+update_esdf_every_n_sec: 0 # turn on/off the esdf mapping module here (turn off by setting this value to 0)
 publish_map_every_n_sec: 0.5
 eval_esdf_every_n_sec: 0.0
 min_time_between_msgs_sec: 0.0
 
 # Visualization
-color_mode: lambert_color # select from color, normals, height, lambert, lambert_color
+color_mode: normals # select from color, normals, height, lambert, lambert_color
 intensity_colormap: rainbow # select from rainbow, inverse_rainbow, grayscale, inverse_grayscale, ironbow
 # publishing settings
 publish_traversable: false
